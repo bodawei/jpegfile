@@ -5,12 +5,19 @@
 
 package com.jpegfile;
 
+import com.jpegfile.segment.EoiSegment;
 import com.jpegfile.segment.JpegSegment;
+import com.jpegfile.segment.SoiSegment;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,19 +25,29 @@ import java.util.List;
  */
 public class JpegFile implements Iterable<JpegSegment> {
 
-    protected static List SEGMENT_MANAGERS = new ArrayList();
+    protected Map<Integer,Class<JpegSegment>> segmentManagers = new HashMap();
     protected List<JpegSegment> segments;
 
-    public JpegFile(File jpegFile) {
-
+    public JpegFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
+        RandomAccessFile file = new RandomAccessFile(jpegFile, "r");
+        int aByte;
+        while (file.getFilePointer() < file.length()) {
+            aByte = file.readUnsignedByte();
+            if (aByte != 0xFF) {
+                // we have a problem
+            } else {
+                int markerByte = file.readUnsignedByte();
+                Class<JpegSegment> managerClass = this.segmentManagers.get(markerByte);
+                JpegSegment manager = managerClass.newInstance();
+                this.segments.add(manager);
+            }
+        }
     }
 
     public JpegFile() {
         segments = new ArrayList<JpegSegment>();
-    }
-
-    public static void addSegmentManager(Class segmentManager) {
-
+        this.segmentManagers.put(SoiSegment.MARKER, SoiSegment.class);
+        this.segmentManagers.put(EoiSegment.MARKER, EoiSegment.class);
     }
     
     public void writeCopyToFile(File file) {
