@@ -17,7 +17,7 @@
 /**
  *
  * @author Young Lee
- */s
+ */
 public class main {
 
 }

@@ -6,17 +6,18 @@
 package com.jpegfile.segment;
 
 /**
- *
- * @author dburrowes
+ * Start of Frame: Extended Sequential
+ * @author bodawei
  */
-public class EoiSegment extends JpegSegment {
-    // use static initializer to let jpegfile know about this?
-    private static final int MARKER = 0xD9;
+public class Sof1Segment extends SofSegment {
+    private static final int MARKER = 0xC1;
 
     public static int getMarkerCode() {
         return MARKER;
     }
-	
-    public EoiSegment() {
-    }
+
+
+	public Sof1Segment() {
+		
+	}
 }

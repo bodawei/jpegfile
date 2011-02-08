@@ -9,11 +9,10 @@ import java.io.OutputStream;
 
 /**
  *
- * @author Young Lee
  */
 public class JpegSegment {
     // use static initializer to let jpegfile know about this?
-    public static final int MARKER = 0xFF;
+    private static final int MARKER = 0xFF;
 
     public static int getMarkerCode() {
         return MARKER;

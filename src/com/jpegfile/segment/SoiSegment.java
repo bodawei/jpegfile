@@ -10,7 +10,7 @@ package com.jpegfile.segment;
  * @author dburrowes
  */
 public class SoiSegment extends JpegSegment {
-    public static final int MARKER = 0xD8;
+    private static final int MARKER = 0xD8;
 
     public static int getMarkerCode() {
         return MARKER;
