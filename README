@@ -1,0 +1,15 @@
+JPEGFile : The README
+
+PURPOSE
+=======
+This project provides classes to manipulate the data structures that make up a "JPEG" file.  It does not provide any kind of JPEG encoder or decoder.
+
+The original motivation for the project was my desire to be able to programmatically make changes to the "EXIF" information in a JPEG file.  Since I could find no tools already existing to do this in Java, I set out to write my own, and the project broadened a little bit beyond just doing EXIF.
+
+
+CREDITS
+=======
+Without access to the official JPEG specs (they seem a little expensive for my hobbyist needs), and only fragmentary information in other sources, I was overjoyed to find Alex Katovsky's project to do this:
+
+http://www.a-kat.com/programming/cpp/jpeg/JPEGDump.html
+http://www.facebook.com/alexander.katovsky

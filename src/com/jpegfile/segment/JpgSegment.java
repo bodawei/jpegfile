@@ -13,29 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.jpegfile.segment;
 
 /**
- * The End Of Image segment
+ * Base class for all segments
  */
-public class EoiSegment extends SegmentBase {
-	/**
-	 * The marker code corresponding to this type of segment
-	 */
-	public static final int MARKER = 0xD9;
+public class JpgSegment extends SegmentBase {
+    // use static initializer to let jpegfile know about this?
+    private static final int MARKER = 0xC8;
 
-	/**
-	 * Construct
-	 */
-    public EoiSegment() {
+    public static int getMarkerCode() {
+        return MARKER;
     }
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
-	public int getMarker() {
-		return EoiSegment.MARKER;
-	}
+	
+    public JpgSegment() {
+    }
 }

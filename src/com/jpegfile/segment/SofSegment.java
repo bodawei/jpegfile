@@ -9,7 +9,7 @@ package com.jpegfile.segment;
  * Start Of Frame
  * @author dburrowes
  */
-public class SofSegment extends JpegSegment {
+public class SofSegment extends SegmentBase {
     // use static initializer to let jpegfile know about this?
     private static final int MARKER = 0xD9;
 
