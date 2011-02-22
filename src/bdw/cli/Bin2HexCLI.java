@@ -27,12 +27,17 @@ public class Bin2HexCLI {
     /**
 	 * Right now this is a lame thing. It ignores its inputs and just reads from
 	 * standard in and writes to standard out.
-	 * 
+	 *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         Bin2Hex encoder = new Bin2Hex();
-		
+
+		if (args[0].toLowerCase().equals("--bytesperline")) {
+			int limit = Integer.valueOf(args[1]);
+			encoder.setBytesPerLine(limit);
+		}
+
 		try {
 			encoder.convert(System.in, System.out);
 			System.exit(0);

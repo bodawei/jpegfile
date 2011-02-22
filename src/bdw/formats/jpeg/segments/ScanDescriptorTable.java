@@ -16,18 +16,21 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Start of Frame: Extended Sequential
+ *
  * @author bodawei
  */
-public class Sof1Segment extends SofSegmentBase {
-    public static final int MARKER = 0xC1;
+public class ScanDescriptorTable {
+	private int unitSize;
+	private int id;
 
-    public int getMarker() {
-        return Sof1Segment.MARKER;
-    }
-
-	public Sof1Segment() {
-
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		// actually, read an array of these
+		int componentId = file.readUnsignedByte();
+		int huffmannTableId = file.readUnsignedByte();
 	}
+
 }

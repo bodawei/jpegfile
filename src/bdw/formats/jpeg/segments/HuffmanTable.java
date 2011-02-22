@@ -13,21 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Start of Frame: Extended Sequential
+ *
  * @author bodawei
  */
-public class Sof1Segment extends SofSegmentBase {
-    public static final int MARKER = 0xC1;
+public class HuffmanTable {
 
-    public int getMarker() {
-        return Sof1Segment.MARKER;
-    }
+	protected boolean isAc;	// doesn't seem to be used?
+	protected int tableId;
 
-	public Sof1Segment() {
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		int flags = file.readUnsignedByte();
+		int total = 0;
+
+		if ((flags & 0xF0) == 0x10) {
+			isAc = true;
+		} else {
+			isAc = false;
+		}
+
+		tableId = (flags & 0x0F);
+
+		for (int index = 0; index < 16; index++) {
+			total += file.readUnsignedByte();
+		}
+
+		// read in a total byte array. These are the huffman codes
 
 	}
+
 }

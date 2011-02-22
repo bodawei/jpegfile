@@ -16,7 +16,9 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * Base class for all segments.
@@ -24,7 +26,7 @@ import java.io.OutputStream;
  * and before the next ones.  The raw bytes that it represents are accessible as the "Content"
  * property.  However, subclasses of this class may have specialized accessors to access the
  * data more usefully than a raw set of bytes.
- * 
+ *
  * Segments are expected to be able to be constructed fresh (with no existing data), or
  * from an existing data source (random access file, or a stream).  In the case of a random access
  * file, the segment is free to not actually read the data into memory until it is needed.
@@ -32,11 +34,24 @@ import java.io.OutputStream;
  * all of the data into memory. At an time, however, the user can force that data into memory.
  */
 public abstract class SegmentBase {
+	protected RandomAccessFile file;
+	protected long fileOffset;
+
+	public SegmentBase() {
+		file = null;
+		fileOffset = 0;
+	}
 
 	/**
 	 * @return the code that represents this segment.
 	 */
     public abstract int getMarker();
+
+	/**
+	 *
+	 */
+	public void readFromFile(RandomAccessFile file) throws IOException {
+	}
 
 	/**
 	 * @return The number of bytes in the raw segment content
@@ -60,7 +75,7 @@ public abstract class SegmentBase {
 	 * Sets the content of this segment.  Any segment-specific data accessors will
 	 * return their portion of this data.  If any content is already here, this
 	 * replaces it.
-	 * 
+	 *
 	 * @param content The content to put in this segment.
 	 * @thros IllegalArgumentException if the content is not valid content for this segment type
 	 * */

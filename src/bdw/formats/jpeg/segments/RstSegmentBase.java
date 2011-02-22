@@ -17,17 +17,11 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * Start of Frame: Extended Sequential
- * @author bodawei
+ * Temporary for arithmetic coding.
+ * @author dburrowes
  */
-public class Sof1Segment extends SofSegmentBase {
-    public static final int MARKER = 0xC1;
+public abstract class RstSegmentBase extends SegmentBase {
 
-    public int getMarker() {
-        return Sof1Segment.MARKER;
+    public RstSegmentBase() {
     }
-
-	public Sof1Segment() {
-
-	}
 }

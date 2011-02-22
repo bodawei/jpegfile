@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Define Huffman Table
- * @author dburrowes
+ * Define Quantization Table
  */
-public class DhtSegment extends SegmentBase {
+public class DqtSegment extends SegmentBase {
+	public static final int MARKER = 0xDB;
 
-	public static final int MARKER = 0xC4;
 	protected int contentLength;
 
+	@Override
 	public int getMarker() {
-		return MARKER;
+		return DqtSegment.MARKER;
 	}
 
 	@Override
@@ -37,9 +38,13 @@ public class DhtSegment extends SegmentBase {
 		this.file = file;
 		this.fileOffset = file.getFilePointer();
 
-		// read an array of huffman blocks
+		// This is an array of QuantizationTable's.  They are potentially variably sized, so
+		// you'd have to read them in to know for sure how many there are.
+		// naturally, after reading each, you should make sure that you've not
+		// exceeded the available data.  I'm suggesting that you create a
+		// wrapper around the RAF that looks like a stream and limits what
+		// can be read.  You could wrap it aroudn the stream, too.
 
 		file.skipBytes(contentLength - 2);
 	}
-
 }

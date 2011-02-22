@@ -44,7 +44,7 @@ public class Bin2HexTest {
 		byte[] answer = new byte[(256*3) - 1];
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		ByteArrayInputStream inputStream;
-		
+
 		for (int index = 0; index < 256; index++) {
 			inputBuffer[index] = (byte) index;
 		}
@@ -56,7 +56,7 @@ public class Bin2HexTest {
 				} else {
 					answer[((ansHigh*16) + ansLow) * 3] = (byte)((ansHigh-10) + 'a');
 				}
-				
+
 				if (ansLow < 10) {
 					answer[(((ansHigh*16) + ansLow) * 3) + 1] = (byte)(ansLow + '0');
 				} else {
@@ -68,11 +68,33 @@ public class Bin2HexTest {
 				}
 			}
 		}
-		
+
 		inputStream = new ByteArrayInputStream(inputBuffer);
-		
+
 		encoder.convert(inputStream, outputStream);
-		
+
+		byte[] output = outputStream.toByteArray();
+		assertArrayEquals(answer, output);
+	}
+
+    @Test
+    public void testLineBreakingWorks() throws IOException {
+		Bin2Hex encoder = new Bin2Hex();
+		byte[] inputBuffer = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+		byte[] answer = {
+			'0', '0'+1, ' ', '0', '0'+2, ' ', '0', '0'+3, 0x0a,
+			'0', '0'+4, ' ', '0', '0'+5, ' ', '0', '0'+6, 0x0a,
+			'0', '0'+7, ' ', '0', '0'+8, ' ', '0', '0'+9, 0x0a,
+			'0', 'a' };
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ByteArrayInputStream inputStream;
+
+		encoder.setBytesPerLine(3);
+
+		inputStream = new ByteArrayInputStream(inputBuffer);
+
+		encoder.convert(inputStream, outputStream);
+
 		byte[] output = outputStream.toByteArray();
 		assertArrayEquals(answer, output);
 	}

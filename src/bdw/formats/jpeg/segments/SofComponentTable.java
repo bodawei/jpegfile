@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
+
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Start of Frame: Extended Sequential
+ *
  * @author bodawei
  */
-public class Sof1Segment extends SofSegmentBase {
-    public static final int MARKER = 0xC1;
+public class SofComponentTable {
+	private int componentId;
+	private int samplingValues;
+	private int quantizationTableId;
 
-    public int getMarker() {
-        return Sof1Segment.MARKER;
-    }
-
-	public Sof1Segment() {
-
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		// actually, read an array of these.
+		componentId = file.readUnsignedByte();
+		samplingValues = file.readUnsignedByte();
+		quantizationTableId = file.readUnsignedByte();
 	}
+
 }

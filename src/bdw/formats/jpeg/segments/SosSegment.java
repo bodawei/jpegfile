@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Define Huffman Table
- * @author dburrowes
+ * Start of Scan marker
  */
-public class DhtSegment extends SegmentBase {
+public class SosSegment extends SegmentBase {
+	public static final int MARKER = 0xDA;
 
-	public static final int MARKER = 0xC4;
 	protected int contentLength;
 
+	@Override
 	public int getMarker() {
-		return MARKER;
+		return DqtSegment.MARKER;
 	}
 
 	@Override
@@ -37,9 +38,14 @@ public class DhtSegment extends SegmentBase {
 		this.file = file;
 		this.fileOffset = file.getFilePointer();
 
-		// read an array of huffman blocks
+		// int componentCount = file.readUnsignedByte();
+
+		// read componentCount ScanDescriptorTable entries
+
+		// spectralSelectionStart = file.readUnsignedByte();
+		// spectralSectionEnt = file.readUnsignedByte();
+		// successiveApproximation = file.readUnsignedByte();
 
 		file.skipBytes(contentLength - 2);
 	}
-
 }

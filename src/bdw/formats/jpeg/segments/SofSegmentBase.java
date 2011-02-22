@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Define Huffman Table
+ * Start Of Frame
  * @author dburrowes
  */
-public class DhtSegment extends SegmentBase {
+public abstract class SofSegmentBase extends SegmentBase {
 
-	public static final int MARKER = 0xC4;
 	protected int contentLength;
-
-	public int getMarker() {
-		return MARKER;
-	}
+	protected int samplePrecision;
+	protected int imageHeight;
+	protected int imageWidth;
+	protected int numComponents;
 
 	@Override
 	public void readFromFile(RandomAccessFile file) throws IOException {
@@ -37,9 +37,14 @@ public class DhtSegment extends SegmentBase {
 		this.file = file;
 		this.fileOffset = file.getFilePointer();
 
-		// read an array of huffman blocks
+		samplePrecision = file.readUnsignedByte();
+		imageHeight = file.readUnsignedShort();
+		imageWidth = file.readUnsignedShort();
+		numComponents = file.readByte();
 
-		file.skipBytes(contentLength - 2);
+		// read an array of components
+
+		file.skipBytes(contentLength - 2 - 6); // 2 for size itself, 6 for the fixed ata
 	}
 
 }

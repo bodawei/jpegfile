@@ -19,13 +19,12 @@ package bdw.formats.jpeg.segments;
  * Base class for all segments
  */
 public class JpgSegment extends SegmentBase {
-    // use static initializer to let jpegfile know about this?
-    private static final int MARKER = 0xC8;
+    public static final int MARKER = 0xC8;
 
     public int getMarker() {
         return MARKER;
     }
-	
+
     public JpgSegment() {
     }
 }

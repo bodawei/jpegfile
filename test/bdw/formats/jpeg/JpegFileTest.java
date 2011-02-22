@@ -57,11 +57,25 @@ public class JpegFileTest {
     public void testReadingTrivialFile() throws Exception {
 		JpegFile file = new JpegFile();
 		file.addStandardSegments();
-		
+
 		URI uri = this.getClass().getResource("trivial.jpg").toURI();
-		
+
 		file.readFromFile(new File(uri));
-		
+
+		assertEquals(2, file.getSegments().size());
+		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
+		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(1).getMarker());
+	}
+
+    @Test
+    public void testReadingSampleFile() throws Exception {
+		JpegFile file = new JpegFile();
+		file.addStandardSegments();
+
+		URI uri = this.getClass().getResource("knuth.jpg").toURI();
+
+		file.readFromFile(new File(uri));
+
 		assertEquals(2, file.getSegments().size());
 		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
 		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(1).getMarker());

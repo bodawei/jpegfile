@@ -16,9 +16,30 @@
 
 package bdw.formats.jpeg;
 
+import bdw.formats.jpeg.segments.App0Segment;
+import bdw.formats.jpeg.segments.DacSegment;
+import bdw.formats.jpeg.segments.DhtSegment;
+import bdw.formats.jpeg.segments.DqtSegment;
 import bdw.formats.jpeg.segments.EoiSegment;
+import bdw.formats.jpeg.segments.JpgSegment;
+import bdw.formats.jpeg.segments.Rst0Segment;
 import bdw.formats.jpeg.segments.SegmentBase;
+import bdw.formats.jpeg.segments.Sof0Segment;
+import bdw.formats.jpeg.segments.Sof1Segment;
+import bdw.formats.jpeg.segments.Sof2Segment;
+import bdw.formats.jpeg.segments.Sof3Segment;
+import bdw.formats.jpeg.segments.Sof5Segment;
+import bdw.formats.jpeg.segments.Sof6Segment;
+import bdw.formats.jpeg.segments.Sof7Segment;
+import bdw.formats.jpeg.segments.Sof9Segment;
+import bdw.formats.jpeg.segments.Sof10Segment;
+import bdw.formats.jpeg.segments.Sof11Segment;
+import bdw.formats.jpeg.segments.Sof13Segment;
+import bdw.formats.jpeg.segments.Sof14Segment;
+import bdw.formats.jpeg.segments.Sof15Segment;
 import bdw.formats.jpeg.segments.SoiSegment;
+import bdw.formats.jpeg.segments.SosSegment;
+import bdw.formats.jpeg.segments.TemSegment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,7 +60,7 @@ public class JpegFile implements Iterable<SegmentBase> {
     protected List<SegmentBase> segments;
 	protected File diskVersion;
 
-	
+
 	/**
 	 * Creates a new JpegFile with an empty list of segments.
 	 */
@@ -51,7 +72,7 @@ public class JpegFile implements Iterable<SegmentBase> {
 	public JpegFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		this();
     }
-    
+
 
 	/**
 	 * Adds all standard Jpeg segments to this instance.
@@ -59,12 +80,43 @@ public class JpegFile implements Iterable<SegmentBase> {
 	public void addStandardSegments() {
         addSegmentHandler(SoiSegment.MARKER, SoiSegment.class);
         addSegmentHandler(EoiSegment.MARKER, EoiSegment.class);
+        addSegmentHandler(App0Segment.MARKER, App0Segment.class);
+        addSegmentHandler(DqtSegment.MARKER, DqtSegment.class);
+        addSegmentHandler(Sof0Segment.MARKER, Sof0Segment.class);
+        addSegmentHandler(Sof1Segment.MARKER, Sof1Segment.class);
+        addSegmentHandler(Sof2Segment.MARKER, Sof2Segment.class);
+        addSegmentHandler(Sof3Segment.MARKER, Sof3Segment.class);
+        addSegmentHandler(Sof5Segment.MARKER, Sof5Segment.class);
+        addSegmentHandler(Sof6Segment.MARKER, Sof6Segment.class);
+        addSegmentHandler(Sof7Segment.MARKER, Sof7Segment.class);
+        addSegmentHandler(Sof9Segment.MARKER, Sof9Segment.class);
+        addSegmentHandler(Sof10Segment.MARKER, Sof10Segment.class);
+        addSegmentHandler(Sof11Segment.MARKER, Sof11Segment.class);
+        addSegmentHandler(Sof13Segment.MARKER, Sof13Segment.class);
+        addSegmentHandler(Sof14Segment.MARKER, Sof14Segment.class);
+        addSegmentHandler(Sof15Segment.MARKER, Sof15Segment.class);
+        addSegmentHandler(DhtSegment.MARKER, DhtSegment.class);
+        addSegmentHandler(SosSegment.MARKER, SosSegment.class);
+
+		// test
+        addSegmentHandler(TemSegment.MARKER, TemSegment.class);
+        addSegmentHandler(DacSegment.MARKER, DacSegment.class);
+
+        addSegmentHandler(JpgSegment.MARKER, JpgSegment.class);
+        addSegmentHandler(Rst0Segment.MARKER, Rst0Segment.class);
+        addSegmentHandler(Rst1Segment.MARKER, Rst1Segment.class);
+        addSegmentHandler(Rst2Segment.MARKER, Rst2Segment.class);
+        addSegmentHandler(Rst3Segment.MARKER, Rst3Segment.class);
+        addSegmentHandler(Rst4Segment.MARKER, Rst4Segment.class);
+        addSegmentHandler(Rst5Segment.MARKER, Rst5Segment.class);
+        addSegmentHandler(Rst6Segment.MARKER, Rst6Segment.class);
+        addSegmentHandler(Rst7Segment.MARKER, Rst7Segment.class);
 	}
-	
+
 	public void addSegmentHandler(int marker, Class aClass) {
 		segmentManagers.put(marker, aClass);
 	}
-	
+
 	public void readFromFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		RandomAccessFile file = new RandomAccessFile(jpegFile, "r");
         int aByte;
@@ -76,6 +128,7 @@ public class JpegFile implements Iterable<SegmentBase> {
                 int markerByte = file.readUnsignedByte();
                 Class managerClass = this.segmentManagers.get(markerByte);
                 SegmentBase manager = (SegmentBase) managerClass.newInstance();
+				manager.readFromFile(file);
                 this.segments.add(manager);
             }
         }
@@ -134,7 +187,7 @@ public class JpegFile implements Iterable<SegmentBase> {
 		} else if (index < 0) {
 			index = 0;
 		}
-		
+
 		if ((segment != null) && ( ! segments.contains(segment))) {
 			segments.add(index, segment);
 		}
@@ -149,7 +202,7 @@ public class JpegFile implements Iterable<SegmentBase> {
 		if ((index >= 0) && (index <= segments.size())) {
 			return segments.get(index);
 		}
-		
+
         return null;
     }
 
@@ -159,9 +212,9 @@ public class JpegFile implements Iterable<SegmentBase> {
 	 */
     public List<SegmentBase> getSegments() {
 		List<SegmentBase> copy = new ArrayList<SegmentBase>();
-		
+
 		copy.addAll(segments);
-		
+
         return copy;
     }
 
