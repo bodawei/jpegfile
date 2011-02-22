@@ -37,6 +37,12 @@ public class QuantizationTable {
 
 		id = (flags & 0x0F);
 
+//		  - QT information (1 byte):
+//     bit 0..3: number of QT (0..3, otherwise error)
+//     bit 4..7: precision of QT, 0 = 8 bit, otherwise 16 bit
+//  - n bytes QT, n = 64*(precision+1)
+//  - For precision=1 (16 bit), the order is high-low for each of the 64 words.
+
 		// read in a 64 byte * unitSize block of entries
 	}
 

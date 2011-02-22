@@ -31,9 +31,11 @@ public class SofComponentTable {
 
 	public void readFromFile(RandomAccessFile file) throws IOException {
 		// actually, read an array of these.
-		componentId = file.readUnsignedByte();
-		samplingValues = file.readUnsignedByte();
+		componentId = file.readUnsignedByte(); //  (1 = Y, 2 = Cb, 3 = Cr, 4 = I, 5 = Q)
+		samplingValues = file.readUnsignedByte(); //(bit 0-3 vert., 4-7 hor.)
 		quantizationTableId = file.readUnsignedByte();
+
+		//- JFIF uses either 1 component (Y, greyscaled) or 3 components (YCbCr, sometimes called YUV, colour).
 	}
 
 }

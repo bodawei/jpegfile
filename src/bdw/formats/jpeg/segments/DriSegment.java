@@ -35,6 +35,10 @@ public class DriSegment extends SegmentBase {
 		if (contentLength != 4) {
 			// we have a problem
 		}
+//  - restart interval (high byte, low byte) in units of MCU blocks,
+//    meaning that every n MCU blocks a RSTn marker can be found.
+//    The first marker will be RST0, then RST1 etc, after RST7
+//    repeating from RST0.
 
 		restartInterval = file.readUnsignedShort();
 	}

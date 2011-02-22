@@ -43,6 +43,15 @@ public class HuffmanTable {
 			total += file.readUnsignedByte();
 		}
 
+//		  - HT information (1 byte):
+//     bit 0..3: number of HT (0..3, otherwise error)
+//     bit 4   : type of HT, 0 = DC table, 1 = AC table
+//     bit 5..7: not used, must be 0
+//  - 16 bytes: number of symbols with codes of length 1..16, the sum of these
+//    bytes is the total number of codes, which must be <= 256
+//  - n bytes: table containing the symbols in order of increasing code length
+//    (n = total number of codes)
+
 		// read in a total byte array. These are the huffman codes
 
 	}

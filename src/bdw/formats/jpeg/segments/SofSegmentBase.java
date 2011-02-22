@@ -39,7 +39,7 @@ public abstract class SofSegmentBase extends SegmentBase {
 		samplePrecision = file.readUnsignedByte();
 		imageHeight = file.readUnsignedShort();
 		imageWidth = file.readUnsignedShort();
-		numComponents = file.readByte();
+		numComponents = file.readByte(); //usually 1 = grey scaled, 3 = color YCbCr or YIQ, 4 = color CMYK)
 
 		// read an array of components
 

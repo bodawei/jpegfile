@@ -80,10 +80,17 @@ public class App0Segment extends SegmentBase {
 			versionMajor = file.readUnsignedByte();
 			versionMinor = file.readUnsignedByte();
 			units = file.readUnsignedByte();
+			//      0 = no units, x/y-density specify the aspect ratio instead
+			//     1 = x/y-density are dots/inch
+			//	2 = x/y-density are dots/cm
+
+
 			xDensity = file.readUnsignedShort();
 			yDensity = file.readUnsignedShort();
 			xThumbnail = file.readUnsignedByte();
 			yThumbnail = file.readUnsignedByte();
+			//  - n bytes for thumbnail (RGB 24 bit), n = width*height*3
+		//  - Normally units=0, x-dens=1, y-dens=1, meaning that the aspect ratio is 1:1 (evenly scaled).
 		}
 		// if it is JFXX then ... probably read in the rest of the stuff after the string.
 	}
