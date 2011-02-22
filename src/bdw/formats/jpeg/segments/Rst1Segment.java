@@ -1,5 +1,3 @@
-package bdw.formats.jpeg.segments;
-
 /*
  *  Copyright 2011 柏大衛
  *
@@ -15,12 +13,10 @@ package bdw.formats.jpeg.segments;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
+package bdw.formats.jpeg.segments;
 
 /**
  * Restart Marker 1
- * @author dburrowes
  */
 public class Rst1Segment extends RstSegmentBase {
     public static final int MARKER = 0xd1;

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Restart Marker 0
+ * Define Heirarchical Progression
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public class DhpSegment extends SegmentBase {
+	public static final int MARKER = 0xDE;
+	protected int restartInterval;
 
-    public int getMarker() {
-        return MARKER;
-    }
-
-    public Rst0Segment() {
-    }
+	public int getMarker() {
+		return MARKER;
+	}
 }

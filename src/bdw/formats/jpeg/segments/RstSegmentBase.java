@@ -18,7 +18,6 @@ package bdw.formats.jpeg.segments;
 
 /**
  * Temporary for arithmetic coding.
- * @author dburrowes
  */
 public abstract class RstSegmentBase extends SegmentBase {
 

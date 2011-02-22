@@ -17,12 +17,53 @@
 package bdw.formats.jpeg;
 
 import bdw.formats.jpeg.segments.App0Segment;
+import bdw.formats.jpeg.segments.App10Segment;
+import bdw.formats.jpeg.segments.App11Segment;
+import bdw.formats.jpeg.segments.App12Segment;
+import bdw.formats.jpeg.segments.App13Segment;
+import bdw.formats.jpeg.segments.App14Segment;
+import bdw.formats.jpeg.segments.App15Segment;
+import bdw.formats.jpeg.segments.App1Segment;
+import bdw.formats.jpeg.segments.App2Segment;
+import bdw.formats.jpeg.segments.App3Segment;
+import bdw.formats.jpeg.segments.App4Segment;
+import bdw.formats.jpeg.segments.App5Segment;
+import bdw.formats.jpeg.segments.App6Segment;
+import bdw.formats.jpeg.segments.App7Segment;
+import bdw.formats.jpeg.segments.App8Segment;
+import bdw.formats.jpeg.segments.App9Segment;
+import bdw.formats.jpeg.segments.ComSegment;
 import bdw.formats.jpeg.segments.DacSegment;
+import bdw.formats.jpeg.segments.DhpSegment;
 import bdw.formats.jpeg.segments.DhtSegment;
+import bdw.formats.jpeg.segments.DnlSegment;
 import bdw.formats.jpeg.segments.DqtSegment;
+import bdw.formats.jpeg.segments.DriSegment;
 import bdw.formats.jpeg.segments.EoiSegment;
+import bdw.formats.jpeg.segments.ExpSegment;
+import bdw.formats.jpeg.segments.Jpg0Segment;
+import bdw.formats.jpeg.segments.Jpg10Segment;
+import bdw.formats.jpeg.segments.Jpg11Segment;
+import bdw.formats.jpeg.segments.Jpg12Segment;
+import bdw.formats.jpeg.segments.Jpg13Segment;
+import bdw.formats.jpeg.segments.Jpg1Segment;
+import bdw.formats.jpeg.segments.Jpg2Segment;
+import bdw.formats.jpeg.segments.Jpg3Segment;
+import bdw.formats.jpeg.segments.Jpg4Segment;
+import bdw.formats.jpeg.segments.Jpg5Segment;
+import bdw.formats.jpeg.segments.Jpg6Segment;
+import bdw.formats.jpeg.segments.Jpg7Segment;
+import bdw.formats.jpeg.segments.Jpg8Segment;
+import bdw.formats.jpeg.segments.Jpg9Segment;
 import bdw.formats.jpeg.segments.JpgSegment;
 import bdw.formats.jpeg.segments.Rst0Segment;
+import bdw.formats.jpeg.segments.Rst1Segment;
+import bdw.formats.jpeg.segments.Rst2Segment;
+import bdw.formats.jpeg.segments.Rst3Segment;
+import bdw.formats.jpeg.segments.Rst4Segment;
+import bdw.formats.jpeg.segments.Rst5Segment;
+import bdw.formats.jpeg.segments.Rst6Segment;
+import bdw.formats.jpeg.segments.Rst7Segment;
 import bdw.formats.jpeg.segments.SegmentBase;
 import bdw.formats.jpeg.segments.Sof0Segment;
 import bdw.formats.jpeg.segments.Sof1Segment;
@@ -66,7 +107,7 @@ public class JpegFile implements Iterable<SegmentBase> {
 	 */
     public JpegFile() {
         segments = new ArrayList<SegmentBase>();
-		segmentManagers = new HashMap();
+		segmentManagers = new HashMap<Integer,Class<? extends SegmentBase>>();
     }
 
 	public JpegFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
@@ -101,7 +142,7 @@ public class JpegFile implements Iterable<SegmentBase> {
 		// test
         addSegmentHandler(TemSegment.MARKER, TemSegment.class);
         addSegmentHandler(DacSegment.MARKER, DacSegment.class);
-
+        addSegmentHandler(DnlSegment.MARKER, DnlSegment.class);
         addSegmentHandler(JpgSegment.MARKER, JpgSegment.class);
         addSegmentHandler(Rst0Segment.MARKER, Rst0Segment.class);
         addSegmentHandler(Rst1Segment.MARKER, Rst1Segment.class);
@@ -111,25 +152,77 @@ public class JpegFile implements Iterable<SegmentBase> {
         addSegmentHandler(Rst5Segment.MARKER, Rst5Segment.class);
         addSegmentHandler(Rst6Segment.MARKER, Rst6Segment.class);
         addSegmentHandler(Rst7Segment.MARKER, Rst7Segment.class);
+        addSegmentHandler(DriSegment.MARKER, DriSegment.class);
+        addSegmentHandler(DhpSegment.MARKER, DhpSegment.class);
+        addSegmentHandler(ExpSegment.MARKER, ExpSegment.class);
+        addSegmentHandler(ComSegment.MARKER, ComSegment.class);
+		// This is clearly the wrong design. Need something better
+        addSegmentHandler(Jpg0Segment.MARKER, Jpg0Segment.class);
+        addSegmentHandler(Jpg1Segment.MARKER, Jpg1Segment.class);
+        addSegmentHandler(Jpg2Segment.MARKER, Jpg2Segment.class);
+        addSegmentHandler(Jpg3Segment.MARKER, Jpg3Segment.class);
+        addSegmentHandler(Jpg4Segment.MARKER, Jpg4Segment.class);
+        addSegmentHandler(Jpg5Segment.MARKER, Jpg5Segment.class);
+        addSegmentHandler(Jpg6Segment.MARKER, Jpg6Segment.class);
+        addSegmentHandler(Jpg7Segment.MARKER, Jpg7Segment.class);
+        addSegmentHandler(Jpg8Segment.MARKER, Jpg8Segment.class);
+        addSegmentHandler(Jpg9Segment.MARKER, Jpg9Segment.class);
+        addSegmentHandler(Jpg10Segment.MARKER, Jpg10Segment.class);
+        addSegmentHandler(Jpg11Segment.MARKER, Jpg11Segment.class);
+        addSegmentHandler(Jpg12Segment.MARKER, Jpg12Segment.class);
+        addSegmentHandler(Jpg13Segment.MARKER, Jpg13Segment.class);
+        addSegmentHandler(App1Segment.MARKER, App1Segment.class);
+        addSegmentHandler(App2Segment.MARKER, App2Segment.class);
+        addSegmentHandler(App3Segment.MARKER, App3Segment.class);
+        addSegmentHandler(App4Segment.MARKER, App4Segment.class);
+        addSegmentHandler(App5Segment.MARKER, App5Segment.class);
+        addSegmentHandler(App6Segment.MARKER, App6Segment.class);
+        addSegmentHandler(App7Segment.MARKER, App7Segment.class);
+        addSegmentHandler(App8Segment.MARKER, App8Segment.class);
+        addSegmentHandler(App9Segment.MARKER, App9Segment.class);
+        addSegmentHandler(App10Segment.MARKER, App10Segment.class);
+        addSegmentHandler(App11Segment.MARKER, App11Segment.class);
+        addSegmentHandler(App12Segment.MARKER, App12Segment.class);
+        addSegmentHandler(App13Segment.MARKER, App13Segment.class);
+        addSegmentHandler(App14Segment.MARKER, App14Segment.class);
+        addSegmentHandler(App15Segment.MARKER, App15Segment.class);
+		// reserved between 0x02 and BF
 	}
 
-	public void addSegmentHandler(int marker, Class aClass) {
+	public void addSegmentHandler(int marker, Class<? extends SegmentBase> aClass) {
 		segmentManagers.put(marker, aClass);
 	}
 
 	public void readFromFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		RandomAccessFile file = new RandomAccessFile(jpegFile, "r");
         int aByte;
+		int markerByte;
         while (file.getFilePointer() < file.length()) {
             aByte = file.readUnsignedByte();
-            if (aByte != 0xFF) {
-                // we have a problem
-            } else {
-                int markerByte = file.readUnsignedByte();
-                Class managerClass = this.segmentManagers.get(markerByte);
-                SegmentBase manager = (SegmentBase) managerClass.newInstance();
-				manager.readFromFile(file);
-                this.segments.add(manager);
+
+			if (aByte != 0xFF) {
+				// do nothing.  we must be encountering raw data.
+				// the last marker should have been sos.
+				// and isn't this just a strange file format?  all this structured data, and then suddenly a raw spew of data with no sense of size,
+				// escapes (0xff00), etc.
+			} else {
+				markerByte = 0;
+				if (file.getFilePointer() < file.length()) {
+					markerByte = file.readUnsignedByte();
+				}
+				if (markerByte == 0x00) {
+					// last segment should have been SOS
+					// skip it, and keep going
+					// this apparently is a way to escape 0xff in the data, and the 00 isn't real data
+				} else if (markerByte == 0xFF) {
+					// evidently we should just ignore spare ff's.
+					// the question is is this the start of a new segment?
+				} else {
+					Class managerClass = this.segmentManagers.get(markerByte);
+					SegmentBase manager = (SegmentBase) managerClass.newInstance();
+					manager.readFromFile(file);
+					this.segments.add(manager);
+				}
             }
         }
 	}

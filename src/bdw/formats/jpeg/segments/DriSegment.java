@@ -13,19 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Restart Marker 0
+ * Define Restart Interval
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public class DriSegment extends SegmentBase {
+	public static final int MARKER = 0xDD;
+	protected int restartInterval;
 
-    public int getMarker() {
-        return MARKER;
-    }
+	public int getMarker() {
+		return MARKER;
+	}
 
-    public Rst0Segment() {
-    }
+	@Override
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		int contentLength = file.readUnsignedShort();
+		if (contentLength != 4) {
+			// we have a problem
+		}
+
+		restartInterval = file.readUnsignedShort();
+	}
+
+
 }

@@ -18,7 +18,6 @@ package bdw.formats.jpeg.segments;
 
 /**
  * Temporary for arithmetic coding.
- * @author dburrowes
  */
 public class TemSegment extends SegmentBase {
     public static final int MARKER = 0x01;

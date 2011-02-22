@@ -18,7 +18,6 @@ package bdw.formats.jpeg.segments;
 
 /**
  *Define Arithmetic coding conditions
- * @author dburrowes
  */
 public class DacSegment extends SegmentBase {
     public static final int MARKER = 0xCC;

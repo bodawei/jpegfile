@@ -16,7 +16,6 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * Base class for all segments
  */
 public class JpgSegment extends SegmentBase {
     public static final int MARKER = 0xC8;

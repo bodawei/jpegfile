@@ -13,19 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Restart Marker 0
+ * Expand reference components
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public class ExpSegment extends SegmentBase {
 
-    public int getMarker() {
-        return MARKER;
-    }
+	public static final int MARKER = 0xDF;
+	protected int contentLength;
 
-    public Rst0Segment() {
-    }
+	public int getMarker() {
+		return MARKER;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		this.contentLength = file.readUnsignedShort();
+		this.file = file;
+		this.fileOffset = file.getFilePointer();
+
+		// read an array of huffman blocks
+
+		file.skipBytes(contentLength - 2);
+	}
+
 }

@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
 /**
- * Restart Marker 0
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public class Jpg13Segment extends SegmentBase {
+	public static final int MARKER = 0xFD;
 
-    public int getMarker() {
-        return MARKER;
-    }
+	public int getMarker() {
+		return MARKER;
+	}
 
-    public Rst0Segment() {
-    }
 }

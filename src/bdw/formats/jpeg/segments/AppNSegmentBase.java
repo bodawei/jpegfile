@@ -16,16 +16,22 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * Restart Marker 0
+ *
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public abstract class AppNSegmentBase extends SegmentBase {
+	/**
+	 *
+	 */
+	@Override
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		int contentLength = file.readUnsignedShort();
 
-    public int getMarker() {
-        return MARKER;
-    }
+		file.skipBytes(contentLength - 2);
+	}
 
-    public Rst0Segment() {
-    }
+
 }

@@ -75,13 +75,17 @@ public class App0Segment extends SegmentBase {
 			}
 		}
 		identifier = builder.toString();
-		versionMajor = file.readUnsignedByte();
-		versionMinor = file.readUnsignedByte();
-		units = file.readUnsignedByte();
-		xDensity = file.readUnsignedShort();
-		yDensity = file.readUnsignedShort();
-		xThumbnail = file.readUnsignedByte();
-		yThumbnail = file.readUnsignedByte();
+
+		if (identifier.equals("JFIF")) {
+			versionMajor = file.readUnsignedByte();
+			versionMinor = file.readUnsignedByte();
+			units = file.readUnsignedByte();
+			xDensity = file.readUnsignedShort();
+			yDensity = file.readUnsignedShort();
+			xThumbnail = file.readUnsignedByte();
+			yThumbnail = file.readUnsignedByte();
+		}
+		// if it is JFXX then ... probably read in the rest of the stuff after the string.
 	}
 
 

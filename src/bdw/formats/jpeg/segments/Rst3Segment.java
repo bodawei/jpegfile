@@ -17,7 +17,6 @@ package bdw.formats.jpeg.segments;
 
 /**
  * Restart Marker 2
- * @author dburrowes
  */
 public class Rst3Segment extends RstSegmentBase {
     public static final int MARKER = 0xd3;

@@ -20,7 +20,6 @@ import java.io.RandomAccessFile;
 
 /**
  * Define Huffman Table
- * @author dburrowes
  */
 public class DhtSegment extends SegmentBase {
 

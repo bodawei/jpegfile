@@ -21,7 +21,6 @@ import java.io.RandomAccessFile;
 
 /**
  * Start Of Frame
- * @author dburrowes
  */
 public abstract class SofSegmentBase extends SegmentBase {
 

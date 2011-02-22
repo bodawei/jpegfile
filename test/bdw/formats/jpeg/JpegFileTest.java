@@ -17,7 +17,6 @@
 package bdw.formats.jpeg;
 
 import java.net.URI;
-import java.net.URL;
 import java.io.File;
 import bdw.formats.jpeg.segments.EoiSegment;
 import bdw.formats.jpeg.segments.SoiSegment;
@@ -76,9 +75,9 @@ public class JpegFileTest {
 
 		file.readFromFile(new File(uri));
 
-		assertEquals(2, file.getSegments().size());
+		assertEquals(8, file.getSegments().size());
 		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(1).getMarker());
+		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(7).getMarker());
 	}
 
 }
