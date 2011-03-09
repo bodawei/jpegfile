@@ -16,6 +16,12 @@
 
 package bdw.formats.jpeg;
 
+import java.io.IOException;
+import bdw.formats.encode.Hex2Bin;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.io.File;
 import bdw.formats.jpeg.segments.EoiSegment;
@@ -31,9 +37,9 @@ import static org.junit.Assert.*;
  *
  * @author bodawei
  */
-public class JpegFileTest {
+public class JpegParserTest {
 
-    public JpegFileTest() {
+    public JpegParserTest() {
     }
 
 	@BeforeClass
@@ -54,7 +60,7 @@ public class JpegFileTest {
 
     @Test
     public void testReadingTrivialFile() throws Exception {
-		JpegFile file = new JpegFile();
+		JpegParser file = new JpegParser();
 		file.addStandardSegments();
 
 		URI uri = this.getClass().getResource("trivial.jpg").toURI();
@@ -68,7 +74,7 @@ public class JpegFileTest {
 
     @Test
     public void testReadingSampleFile() throws Exception {
-		JpegFile file = new JpegFile();
+		JpegParser file = new JpegParser();
 		file.addStandardSegments();
 
 		URI uri = this.getClass().getResource("knuth.jpg").toURI();
@@ -80,4 +86,61 @@ public class JpegFileTest {
 		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(7).getMarker());
 	}
 
+    @Test
+    public void testStartBeforeEndIsValid() throws Exception {
+		JpegParser file = new JpegParser();
+		file.addStandardSegments();
+
+		InputStream jpegStream = prepareInputStream("ff d8 ff d9");
+
+		file.readFromStream(jpegStream);
+
+		assertTrue(file.isValid());
+	}
+
+    @Test
+    public void testEndBeforeStartIsInvalid() throws Exception {
+		JpegParser file = new JpegParser();
+		file.addStandardSegments();
+
+		InputStream jpegStream = prepareInputStream("ff d9 ff d8");
+
+		file.readFromStream(jpegStream);
+
+		assertFalse(file.isValid());
+	}
+
+    @Test
+    public void testNoEndIsInvalid() throws Exception {
+		JpegParser file = new JpegParser();
+		file.addStandardSegments();
+
+		InputStream jpegStream = prepareInputStream("ff d9");
+
+		file.readFromStream(jpegStream);
+
+		assertFalse(file.isValid());
+	}
+
+
+	protected InputStream prepareInputStream(String rawInput) throws IOException {
+		StringReader inputReader = new StringReader(rawInput);
+		byte[] rawInputBytes = new byte[rawInput.length()];
+		int aChar = inputReader.read();
+		int index = 0;
+		while (aChar != -1) {
+			rawInputBytes[index] = (byte)aChar;
+			aChar = inputReader.read();
+			index++;
+		}
+
+		Hex2Bin encoder = new Hex2Bin();
+		InputStream inputStream = new ByteArrayInputStream(rawInputBytes);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		encoder.convert(inputStream, outputStream);
+
+		return new ByteArrayInputStream(outputStream.toByteArray());
+	}
 }

@@ -81,9 +81,12 @@ import bdw.formats.jpeg.segments.Sof15Segment;
 import bdw.formats.jpeg.segments.SoiSegment;
 import bdw.formats.jpeg.segments.SosSegment;
 import bdw.formats.jpeg.segments.TemSegment;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -95,7 +98,7 @@ import java.util.Map;
 /**
  *
  */
-public class JpegFile implements Iterable<SegmentBase> {
+public class JpegParser implements Iterable<SegmentBase> {
 
     protected Map<Integer,Class<? extends SegmentBase>> segmentManagers;
     protected List<SegmentBase> segments;
@@ -105,12 +108,12 @@ public class JpegFile implements Iterable<SegmentBase> {
 	/**
 	 * Creates a new JpegFile with an empty list of segments.
 	 */
-    public JpegFile() {
+    public JpegParser() {
         segments = new ArrayList<SegmentBase>();
 		segmentManagers = new HashMap<Integer,Class<? extends SegmentBase>>();
     }
 
-	public JpegFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
+	public JpegParser(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		this();
     }
 
@@ -227,6 +230,42 @@ public class JpegFile implements Iterable<SegmentBase> {
         }
 	}
 
+	public void readFromStream(InputStream stream) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
+		DataInputStream dataStream = new DataInputStream(stream);
+		int aByte;
+		int markerByte;
+
+        try {
+			while (true) {
+				aByte = dataStream.readUnsignedByte();
+
+				if (aByte != 0xFF) {
+					// do nothing.  we must be encountering raw data.
+					// the last marker should have been sos.
+					// and isn't this just a strange file format?  all this structured data, and then suddenly a raw spew of data with no sense of size,
+					// escapes (0xff00), etc.
+				} else {
+					markerByte = dataStream.readUnsignedByte();
+					if (markerByte == 0x00) {
+						// last segment should have been SOS
+						// skip it, and keep going
+						// this apparently is a way to escape 0xff in the data, and the 00 isn't real data
+					} else if (markerByte == 0xFF) {
+						// evidently we should just ignore spare ff's.
+						// the question is is this the start of a new segment?
+					} else {
+						Class managerClass = this.segmentManagers.get(markerByte);
+						SegmentBase manager = (SegmentBase) managerClass.newInstance();
+						manager.readFromStream(dataStream);
+						this.segments.add(manager);
+					}
+				}
+			}
+        } catch (EOFException exception) {
+			// we're done.  so gracefully quit.
+		}
+	}
+
 	/**
 	 * Writes a copy of the contents of this file to the specified stream.
 	 * Note that this is a copy of whatever the set of segments have, not necessarily what
@@ -247,7 +286,29 @@ public class JpegFile implements Iterable<SegmentBase> {
 	 * @return true if the segments describe a legitimate Jpeg file
 	 */
     public boolean isValid() {
-        return false;
+        boolean foundBegin = false;
+		boolean foundEnd = false;
+
+		Iterator<SegmentBase> i = iterator();
+		while (i.hasNext()) {
+			SegmentBase segment = i.next();
+
+			if (segment instanceof SoiSegment) {
+				foundBegin = true;
+			} else if (segment instanceof EoiSegment) {
+				if ( ! foundBegin) {
+					return false;
+				} else {
+					foundEnd = true;
+				}
+			}
+		}
+
+		if ((foundBegin == false) || (foundEnd == false)) {
+			return false;
+		}
+
+		return true;
     }
 
 	/**

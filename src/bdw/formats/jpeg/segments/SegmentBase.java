@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
@@ -53,6 +54,11 @@ public abstract class SegmentBase {
 	public void readFromFile(RandomAccessFile file) throws IOException {
 	}
 
+	/**
+	 *
+	 */
+	public void readFromStream(InputStream stream) throws IOException {
+	}
 	/**
 	 * @return The number of bytes in the raw segment content
 	 */
