@@ -1,0 +1,10 @@
+* Allow HexToBin to accept /* */
+* Clean up SosSegment and ScanDataEntry code
+* Deal with reading in data segment
+* isValid should allow for sos being followed by data
+* delegate isValid to individual segments
+* Get jpegfileformatexception created
+* Create a subtype of DataInput which keeps track of what byte one is at (so can be put in error, and perhaps reported usefully in jpeg file?
+* Get a way to collapse the 15 Sof segments into one
+* Test other segments
+* Exif or other metadata added

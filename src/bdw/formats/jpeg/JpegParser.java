@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg;
 
 import bdw.formats.jpeg.segments.App0Segment;
@@ -100,95 +99,93 @@ import java.util.Map;
  */
 public class JpegParser implements Iterable<SegmentBase> {
 
-    protected Map<Integer,Class<? extends SegmentBase>> segmentManagers;
-    protected List<SegmentBase> segments;
+	protected Map<Integer, Class<? extends SegmentBase>> segmentManagers;
+	protected List<SegmentBase> segments;
 	protected File diskVersion;
-
 
 	/**
 	 * Creates a new JpegFile with an empty list of segments.
 	 */
-    public JpegParser() {
-        segments = new ArrayList<SegmentBase>();
-		segmentManagers = new HashMap<Integer,Class<? extends SegmentBase>>();
-    }
+	public JpegParser() {
+		segments = new ArrayList<SegmentBase>();
+		segmentManagers = new HashMap<Integer, Class<? extends SegmentBase>>();
+	}
 
 	public JpegParser(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		this();
-    }
-
+	}
 
 	/**
 	 * Adds all standard Jpeg segments to this instance.
 	 * */
 	public void addStandardSegments() {
-        addSegmentHandler(SoiSegment.MARKER, SoiSegment.class);
-        addSegmentHandler(EoiSegment.MARKER, EoiSegment.class);
-        addSegmentHandler(App0Segment.MARKER, App0Segment.class);
-        addSegmentHandler(DqtSegment.MARKER, DqtSegment.class);
-        addSegmentHandler(Sof0Segment.MARKER, Sof0Segment.class);
-        addSegmentHandler(Sof1Segment.MARKER, Sof1Segment.class);
-        addSegmentHandler(Sof2Segment.MARKER, Sof2Segment.class);
-        addSegmentHandler(Sof3Segment.MARKER, Sof3Segment.class);
-        addSegmentHandler(Sof5Segment.MARKER, Sof5Segment.class);
-        addSegmentHandler(Sof6Segment.MARKER, Sof6Segment.class);
-        addSegmentHandler(Sof7Segment.MARKER, Sof7Segment.class);
-        addSegmentHandler(Sof9Segment.MARKER, Sof9Segment.class);
-        addSegmentHandler(Sof10Segment.MARKER, Sof10Segment.class);
-        addSegmentHandler(Sof11Segment.MARKER, Sof11Segment.class);
-        addSegmentHandler(Sof13Segment.MARKER, Sof13Segment.class);
-        addSegmentHandler(Sof14Segment.MARKER, Sof14Segment.class);
-        addSegmentHandler(Sof15Segment.MARKER, Sof15Segment.class);
-        addSegmentHandler(DhtSegment.MARKER, DhtSegment.class);
-        addSegmentHandler(SosSegment.MARKER, SosSegment.class);
+		addSegmentHandler(SoiSegment.MARKER, SoiSegment.class);
+		addSegmentHandler(EoiSegment.MARKER, EoiSegment.class);
+		addSegmentHandler(App0Segment.MARKER, App0Segment.class);
+		addSegmentHandler(DqtSegment.MARKER, DqtSegment.class);
+		addSegmentHandler(Sof0Segment.MARKER, Sof0Segment.class);
+		addSegmentHandler(Sof1Segment.MARKER, Sof1Segment.class);
+		addSegmentHandler(Sof2Segment.MARKER, Sof2Segment.class);
+		addSegmentHandler(Sof3Segment.MARKER, Sof3Segment.class);
+		addSegmentHandler(Sof5Segment.MARKER, Sof5Segment.class);
+		addSegmentHandler(Sof6Segment.MARKER, Sof6Segment.class);
+		addSegmentHandler(Sof7Segment.MARKER, Sof7Segment.class);
+		addSegmentHandler(Sof9Segment.MARKER, Sof9Segment.class);
+		addSegmentHandler(Sof10Segment.MARKER, Sof10Segment.class);
+		addSegmentHandler(Sof11Segment.MARKER, Sof11Segment.class);
+		addSegmentHandler(Sof13Segment.MARKER, Sof13Segment.class);
+		addSegmentHandler(Sof14Segment.MARKER, Sof14Segment.class);
+		addSegmentHandler(Sof15Segment.MARKER, Sof15Segment.class);
+		addSegmentHandler(DhtSegment.MARKER, DhtSegment.class);
+		addSegmentHandler(SosSegment.MARKER, SosSegment.class);
 
 		// test
-        addSegmentHandler(TemSegment.MARKER, TemSegment.class);
-        addSegmentHandler(DacSegment.MARKER, DacSegment.class);
-        addSegmentHandler(DnlSegment.MARKER, DnlSegment.class);
-        addSegmentHandler(JpgSegment.MARKER, JpgSegment.class);
-        addSegmentHandler(Rst0Segment.MARKER, Rst0Segment.class);
-        addSegmentHandler(Rst1Segment.MARKER, Rst1Segment.class);
-        addSegmentHandler(Rst2Segment.MARKER, Rst2Segment.class);
-        addSegmentHandler(Rst3Segment.MARKER, Rst3Segment.class);
-        addSegmentHandler(Rst4Segment.MARKER, Rst4Segment.class);
-        addSegmentHandler(Rst5Segment.MARKER, Rst5Segment.class);
-        addSegmentHandler(Rst6Segment.MARKER, Rst6Segment.class);
-        addSegmentHandler(Rst7Segment.MARKER, Rst7Segment.class);
-        addSegmentHandler(DriSegment.MARKER, DriSegment.class);
-        addSegmentHandler(DhpSegment.MARKER, DhpSegment.class);
-        addSegmentHandler(ExpSegment.MARKER, ExpSegment.class);
-        addSegmentHandler(ComSegment.MARKER, ComSegment.class);
+		addSegmentHandler(TemSegment.MARKER, TemSegment.class);
+		addSegmentHandler(DacSegment.MARKER, DacSegment.class);
+		addSegmentHandler(DnlSegment.MARKER, DnlSegment.class);
+		addSegmentHandler(JpgSegment.MARKER, JpgSegment.class);
+		addSegmentHandler(Rst0Segment.MARKER, Rst0Segment.class);
+		addSegmentHandler(Rst1Segment.MARKER, Rst1Segment.class);
+		addSegmentHandler(Rst2Segment.MARKER, Rst2Segment.class);
+		addSegmentHandler(Rst3Segment.MARKER, Rst3Segment.class);
+		addSegmentHandler(Rst4Segment.MARKER, Rst4Segment.class);
+		addSegmentHandler(Rst5Segment.MARKER, Rst5Segment.class);
+		addSegmentHandler(Rst6Segment.MARKER, Rst6Segment.class);
+		addSegmentHandler(Rst7Segment.MARKER, Rst7Segment.class);
+		addSegmentHandler(DriSegment.MARKER, DriSegment.class);
+		addSegmentHandler(DhpSegment.MARKER, DhpSegment.class);
+		addSegmentHandler(ExpSegment.MARKER, ExpSegment.class);
+		addSegmentHandler(ComSegment.MARKER, ComSegment.class);
 		// This is clearly the wrong design. Need something better
-        addSegmentHandler(Jpg0Segment.MARKER, Jpg0Segment.class);
-        addSegmentHandler(Jpg1Segment.MARKER, Jpg1Segment.class);
-        addSegmentHandler(Jpg2Segment.MARKER, Jpg2Segment.class);
-        addSegmentHandler(Jpg3Segment.MARKER, Jpg3Segment.class);
-        addSegmentHandler(Jpg4Segment.MARKER, Jpg4Segment.class);
-        addSegmentHandler(Jpg5Segment.MARKER, Jpg5Segment.class);
-        addSegmentHandler(Jpg6Segment.MARKER, Jpg6Segment.class);
-        addSegmentHandler(Jpg7Segment.MARKER, Jpg7Segment.class);
-        addSegmentHandler(Jpg8Segment.MARKER, Jpg8Segment.class);
-        addSegmentHandler(Jpg9Segment.MARKER, Jpg9Segment.class);
-        addSegmentHandler(Jpg10Segment.MARKER, Jpg10Segment.class);
-        addSegmentHandler(Jpg11Segment.MARKER, Jpg11Segment.class);
-        addSegmentHandler(Jpg12Segment.MARKER, Jpg12Segment.class);
-        addSegmentHandler(Jpg13Segment.MARKER, Jpg13Segment.class);
-        addSegmentHandler(App1Segment.MARKER, App1Segment.class);
-        addSegmentHandler(App2Segment.MARKER, App2Segment.class);
-        addSegmentHandler(App3Segment.MARKER, App3Segment.class);
-        addSegmentHandler(App4Segment.MARKER, App4Segment.class);
-        addSegmentHandler(App5Segment.MARKER, App5Segment.class);
-        addSegmentHandler(App6Segment.MARKER, App6Segment.class);
-        addSegmentHandler(App7Segment.MARKER, App7Segment.class);
-        addSegmentHandler(App8Segment.MARKER, App8Segment.class);
-        addSegmentHandler(App9Segment.MARKER, App9Segment.class);
-        addSegmentHandler(App10Segment.MARKER, App10Segment.class);
-        addSegmentHandler(App11Segment.MARKER, App11Segment.class);
-        addSegmentHandler(App12Segment.MARKER, App12Segment.class);
-        addSegmentHandler(App13Segment.MARKER, App13Segment.class);
-        addSegmentHandler(App14Segment.MARKER, App14Segment.class);
-        addSegmentHandler(App15Segment.MARKER, App15Segment.class);
+		addSegmentHandler(Jpg0Segment.MARKER, Jpg0Segment.class);
+		addSegmentHandler(Jpg1Segment.MARKER, Jpg1Segment.class);
+		addSegmentHandler(Jpg2Segment.MARKER, Jpg2Segment.class);
+		addSegmentHandler(Jpg3Segment.MARKER, Jpg3Segment.class);
+		addSegmentHandler(Jpg4Segment.MARKER, Jpg4Segment.class);
+		addSegmentHandler(Jpg5Segment.MARKER, Jpg5Segment.class);
+		addSegmentHandler(Jpg6Segment.MARKER, Jpg6Segment.class);
+		addSegmentHandler(Jpg7Segment.MARKER, Jpg7Segment.class);
+		addSegmentHandler(Jpg8Segment.MARKER, Jpg8Segment.class);
+		addSegmentHandler(Jpg9Segment.MARKER, Jpg9Segment.class);
+		addSegmentHandler(Jpg10Segment.MARKER, Jpg10Segment.class);
+		addSegmentHandler(Jpg11Segment.MARKER, Jpg11Segment.class);
+		addSegmentHandler(Jpg12Segment.MARKER, Jpg12Segment.class);
+		addSegmentHandler(Jpg13Segment.MARKER, Jpg13Segment.class);
+		addSegmentHandler(App1Segment.MARKER, App1Segment.class);
+		addSegmentHandler(App2Segment.MARKER, App2Segment.class);
+		addSegmentHandler(App3Segment.MARKER, App3Segment.class);
+		addSegmentHandler(App4Segment.MARKER, App4Segment.class);
+		addSegmentHandler(App5Segment.MARKER, App5Segment.class);
+		addSegmentHandler(App6Segment.MARKER, App6Segment.class);
+		addSegmentHandler(App7Segment.MARKER, App7Segment.class);
+		addSegmentHandler(App8Segment.MARKER, App8Segment.class);
+		addSegmentHandler(App9Segment.MARKER, App9Segment.class);
+		addSegmentHandler(App10Segment.MARKER, App10Segment.class);
+		addSegmentHandler(App11Segment.MARKER, App11Segment.class);
+		addSegmentHandler(App12Segment.MARKER, App12Segment.class);
+		addSegmentHandler(App13Segment.MARKER, App13Segment.class);
+		addSegmentHandler(App14Segment.MARKER, App14Segment.class);
+		addSegmentHandler(App15Segment.MARKER, App15Segment.class);
 		// reserved between 0x02 and BF
 	}
 
@@ -198,10 +195,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 	public void readFromFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		RandomAccessFile file = new RandomAccessFile(jpegFile, "r");
-        int aByte;
+		int aByte;
 		int markerByte;
-        while (file.getFilePointer() < file.length()) {
-            aByte = file.readUnsignedByte();
+		while (file.getFilePointer() < file.length()) {
+			aByte = file.readUnsignedByte();
 
 			if (aByte != 0xFF) {
 				// do nothing.  we must be encountering raw data.
@@ -226,16 +223,17 @@ public class JpegParser implements Iterable<SegmentBase> {
 					manager.readFromFile(file);
 					this.segments.add(manager);
 				}
-            }
-        }
+			}
+		}
 	}
 
 	public void readFromStream(InputStream stream) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		DataInputStream dataStream = new DataInputStream(stream);
 		int aByte;
 		int markerByte;
+		boolean expectData = false;
 
-        try {
+		try {
 			while (true) {
 				aByte = dataStream.readUnsignedByte();
 
@@ -258,10 +256,13 @@ public class JpegParser implements Iterable<SegmentBase> {
 						SegmentBase manager = (SegmentBase) managerClass.newInstance();
 						manager.readFromStream(dataStream);
 						this.segments.add(manager);
+						if (manager instanceof SosSegment) {
+							expectData = true;
+						}
 					}
 				}
 			}
-        } catch (EOFException exception) {
+		} catch (EOFException exception) {
 			// we're done.  so gracefully quit.
 		}
 	}
@@ -272,10 +273,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 * was in the file this was passed in the constructor.
 	 * @param stream the stream to write to
 	 */
-	public void write(OutputStream stream) {
+	public void write(OutputStream stream) throws IOException {
 		Iterator<SegmentBase> i = iterator();
 		while (i.hasNext()) {
-			i.next().writeToFile(stream);
+			i.next().write(stream);
 		}
 	}
 
@@ -285,8 +286,8 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 * are generally OK even if not defined by the spec.
 	 * @return true if the segments describe a legitimate Jpeg file
 	 */
-    public boolean isValid() {
-        boolean foundBegin = false;
+	public boolean isValid() {
+		boolean foundBegin = false;
 		boolean foundEnd = false;
 
 		Iterator<SegmentBase> i = iterator();
@@ -296,7 +297,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 			if (segment instanceof SoiSegment) {
 				foundBegin = true;
 			} else if (segment instanceof EoiSegment) {
-				if ( ! foundBegin) {
+				if (!foundBegin) {
 					return false;
 				} else {
 					foundEnd = true;
@@ -309,14 +310,14 @@ public class JpegParser implements Iterable<SegmentBase> {
 		}
 
 		return true;
-    }
+	}
 
 	/**
 	 * @return true if the segments describe a jpeg file that exactly matches the jpeg spec.
 	 */
-    public boolean isStrictlyValid() {
-        return false;
-    }
+	public boolean isStrictlyValid() {
+		return false;
+	}
 
 	/*
 	 * Adds the specified segment to the list, unless it is already there,
@@ -324,10 +325,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 * @param segment The segment to be added (null is ignored)
 	 */
 	public void addSegment(SegmentBase segment) {
-		if ((segment != null) && ( ! segments.contains(segment))) {
+		if ((segment != null) && (!segments.contains(segment))) {
 			segments.add(segment);
 		}
-    }
+	}
 
 	/**
 	 * Inserts the segment at the specified location. If the segment is already in the file,
@@ -335,71 +336,70 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 * @param segment The segment to be inserted (null is ignored)
 	 * @param index The index to add the segment at. If out of range, will be put at the start or end of the list
 	 */
-    public void insertSegmentAt(SegmentBase segment, int index) {
+	public void insertSegmentAt(SegmentBase segment, int index) {
 		if (index >= segments.size()) {
 			index = segments.size();
 		} else if (index < 0) {
 			index = 0;
 		}
 
-		if ((segment != null) && ( ! segments.contains(segment))) {
+		if ((segment != null) && (!segments.contains(segment))) {
 			segments.add(index, segment);
 		}
-    }
+	}
 
 	/**
 	 * Returns the segment at the specified index.
 	 * @param index the index of the segment
 	 * @return the segment at the specified index in the file, or null if no such segment.
 	 */
-    public SegmentBase getSegmentAt(int index) {
+	public SegmentBase getSegmentAt(int index) {
 		if ((index >= 0) && (index <= segments.size())) {
 			return segments.get(index);
 		}
 
-        return null;
-    }
+		return null;
+	}
 
 	/**
 	 * Returns a list of all the segments in the file.
 	 * @return a new (possibly empty) array containing all the segments in the file in order
 	 */
-    public List<SegmentBase> getSegments() {
+	public List<SegmentBase> getSegments() {
 		List<SegmentBase> copy = new ArrayList<SegmentBase>();
 
 		copy.addAll(segments);
 
-        return copy;
-    }
+		return copy;
+	}
 
 	/**
 	 * Removes the specified segment from the file.  If the segment is not in the file
 	 * does nothing.
 	 * @param segment The segment to remove from the file
 	 */
-    public void removeSegment(SegmentBase segment) {
+	public void removeSegment(SegmentBase segment) {
 		int index = segments.indexOf(segment);
 		if (index != -1) {
 			removeSegmentAt(index);
 		}
-    }
+	}
 
 	/**
 	 * Removes the segment from the specified index in the file
 	 * If no segment at that position, nothing is changed
 	 * @param index index of the segment to remove
 	 */
-    public void removeSegmentAt(int index) {
+	public void removeSegmentAt(int index) {
 		if ((index >= 0) && (index <= segments.size())) {
 			segments.remove(index);
 		}
-    }
+	}
 
 	/**
 	 * @return An iterator that will iterate over all the segments in the file
 	 */
-    public Iterator<SegmentBase> iterator() {
-        return segments.listIterator();
-    }
-
+	public Iterator<SegmentBase> iterator() {
+		return segments.listIterator();
+	}
 }

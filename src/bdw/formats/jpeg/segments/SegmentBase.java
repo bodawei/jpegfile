@@ -59,34 +59,6 @@ public abstract class SegmentBase {
 	 */
 	public void readFromStream(InputStream stream) throws IOException {
 	}
-	/**
-	 * @return The number of bytes in the raw segment content
-	 */
-    public int getContentLength() {
-        return 0;
-    }
-
-	/**
-	 * Returns a copy of the raw content of this segument.  Note that if the
-	 * content is not already in memory, this will load it. Thus this may be
-	 * quite slow the first time it is called.
-	 *
-	 * @return The raw bytes that make up the content of this segment.
-	 */
-    public byte[] getContent() {
-        return new byte[0];
-    }
-
-	/**
-	 * Sets the content of this segment.  Any segment-specific data accessors will
-	 * return their portion of this data.  If any content is already here, this
-	 * replaces it.
-	 *
-	 * @param content The content to put in this segment.
-	 * @thros IllegalArgumentException if the content is not valid content for this segment type
-	 * */
-    public void setContent(byte[] content) {
-    }
 
 	/**
 	 * If this segment has not read all of its content from disk, this will force it to
@@ -97,12 +69,12 @@ public abstract class SegmentBase {
 
 	/**
 	 * Writes the contents of this segment to the output stream, including the size info,
-	 * if appropraite, but not the 0xFF and marker info.
+	 * if appropriate, but not the 0xFF and marker info.
 	 *
 	 * @param stream a non-null stream to write data to.
 	 * @throw IllegalArgumentException if param is null
 	 * */
-    public void writeToFile(OutputStream stream) {
+    public void write(OutputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IllegalArgumentException("Stream may not be null");
 		}
