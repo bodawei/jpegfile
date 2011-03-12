@@ -17,7 +17,7 @@ package bdw.formats.jpeg.segments;
 
 /**
  */
-public abstract class JpgNSegment extends MultiMarkerSegmentBase {
+public class JpgNSegment extends MultiMarkerSegmentBase {
 	public static final int START_MARKER = 0xF0;
 	public static final int END_MARKER = 0xFD;
 }

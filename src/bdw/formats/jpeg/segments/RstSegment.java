@@ -19,7 +19,7 @@ package bdw.formats.jpeg.segments;
 /**
  * Temporary for arithmetic coding.
  */
-public abstract class RstSegment extends MultiMarkerSegmentBase {
+public class RstSegment extends MultiMarkerSegmentBase {
     public static final int START_MARKER = 0xd0;
     public static final int END_MARKER = 0xd7;
 

@@ -22,7 +22,7 @@ import java.io.RandomAccessFile;
 /**
  *
  */
-public abstract class AppNSegment extends MultiMarkerSegmentBase {
+public class AppNSegment extends MultiMarkerSegmentBase {
 	public static final int START_MARKER = 0xE1;
 	public static final int END_MARKER = 0xEF;
 	/**

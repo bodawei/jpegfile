@@ -22,7 +22,7 @@ import java.io.RandomAccessFile;
 /**
  * Start Of Frame
  */
-public abstract class SofSegment extends MultiMarkerSegmentBase {
+public class SofSegment extends MultiMarkerSegmentBase {
     public static final int RANGE1_START = 0xc0;
     public static final int RANGE1_END = 0xc3;
 
@@ -56,5 +56,6 @@ public abstract class SofSegment extends MultiMarkerSegmentBase {
 
 		file.skipBytes(contentLength - 2 - 6); // 2 for size itself, 6 for the fixed ata
 	}
+
 
 }

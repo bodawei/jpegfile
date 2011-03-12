@@ -9,9 +9,13 @@ package bdw.formats.jpeg.segments;
  *
  * @author dburrowes
  */
-public abstract class MultiMarkerSegmentBase extends SegmentBase {
+public class MultiMarkerSegmentBase extends SegmentBase {
+    private int marker;
 
+    public int getMarker() {
+	return marker;
+    }
     public void setMarker(int newMarker) {
-
+	marker = newMarker;
     }
 }
