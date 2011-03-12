@@ -1,0 +1,11 @@
+Redo isvalid
+Merge readFile and readStream
+Figure out how to do the segment registration
+Parse the data segment
+	Validate: Should come right after the SOS segment
+Parse junk segment
+Parse each of the other segment types
+Write each segment out
+segment array handling (add/remove)
+
+

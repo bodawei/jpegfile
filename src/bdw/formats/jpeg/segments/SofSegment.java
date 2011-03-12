@@ -22,9 +22,20 @@ import java.io.RandomAccessFile;
 /**
  * Start Of Frame
  */
-public abstract class SofSegmentBase extends SegmentBase {
+public abstract class SofSegment extends MultiMarkerSegmentBase {
+    public static final int RANGE1_START = 0xc0;
+    public static final int RANGE1_END = 0xc3;
 
-	protected int contentLength;
+    public static final int RANGE2_START = 0xc5;
+    public static final int RANGE2_END = 0xc7;
+
+    public static final int RANGE3_START = 0xc9;
+    public static final int RANGE3_END = 0xcb;
+
+    public static final int RANGE4_START = 0xcd;
+    public static final int RANGE4_END = 0xcf;
+    
+    protected int contentLength;
 	protected int samplePrecision;
 	protected int imageHeight;
 	protected int imageWidth;

@@ -17,15 +17,12 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * Restart Marker 0
+ * Temporary for arithmetic coding.
  */
-public class Rst0Segment extends RstSegmentBase {
-    public static final int MARKER = 0xd0;
+public abstract class RstSegment extends MultiMarkerSegmentBase {
+    public static final int START_MARKER = 0xd0;
+    public static final int END_MARKER = 0xd7;
 
-    public int getMarker() {
-        return MARKER;
-    }
-
-    public Rst0Segment() {
+    public RstSegment() {
     }
 }

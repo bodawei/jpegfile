@@ -13,32 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 /**
- *
  */
-public abstract class App13Segment extends AppNSegmentBase {
-	public static final int MARKER = 0xED;
-
-	@Override
-	public int getMarker() {
-		return App13Segment.MARKER;
-	}
-
-	/**
-	 *
-	 */
-	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException {
-		int contentLength = file.readUnsignedShort();
-
-		file.skipBytes(contentLength - 2);
-	}
-
-
+public abstract class JpgNSegment extends MultiMarkerSegmentBase {
+	public static final int START_MARKER = 0xF0;
+	public static final int END_MARKER = 0xFD;
 }
