@@ -19,6 +19,7 @@ import bdw.formats.jpeg.segments.App0Segment;
 import bdw.formats.jpeg.segments.AppNSegment;
 import bdw.formats.jpeg.segments.ComSegment;
 import bdw.formats.jpeg.segments.DacSegment;
+import bdw.formats.jpeg.segments.DataSegment;
 import bdw.formats.jpeg.segments.DhpSegment;
 import bdw.formats.jpeg.segments.DhtSegment;
 import bdw.formats.jpeg.segments.DnlSegment;
@@ -28,6 +29,7 @@ import bdw.formats.jpeg.segments.EoiSegment;
 import bdw.formats.jpeg.segments.ExpSegment;
 import bdw.formats.jpeg.segments.JpgNSegment;
 import bdw.formats.jpeg.segments.JpgSegment;
+import bdw.formats.jpeg.segments.JunkSegment;
 import bdw.formats.jpeg.segments.MultiMarkerSegmentBase;
 import bdw.formats.jpeg.segments.RstSegment;
 import bdw.formats.jpeg.segments.SegmentBase;
@@ -122,30 +124,25 @@ public class JpegParser implements Iterable<SegmentBase> {
 	    aByte = file.readUnsignedByte();
 
 	    if (aByte != 0xFF) {
-		// do nothing.  we must be encountering raw data.
-		// the last marker should have been sos.
-		// and isn't this just a strange file format?  all this structured data, and then suddenly a raw spew of data with no sense of size,
-		// escapes (0xff00), etc.
+		JunkSegment data = new JunkSegment();
+		data.readFromFile(file);
+		this.segments.add(data);
 	    } else {
 		markerByte = 0;
 		if (file.getFilePointer() < file.length()) {
 		    markerByte = file.readUnsignedByte();
 		}
-		if (markerByte == 0x00) {
-		    // last segment should have been SOS
-		    // skip it, and keep going
-		    // this apparently is a way to escape 0xff in the data, and the 00 isn't real data
-		} else if (markerByte == 0xFF) {
-		    // evidently we should just ignore spare ff's.
-		    // the question is is this the start of a new segment?
-		} else {
-		    Class managerClass = this.segmentManagers[markerByte];
-		    SegmentBase manager = (SegmentBase) managerClass.newInstance();
-		    if (manager instanceof MultiMarkerSegmentBase) {
-			((MultiMarkerSegmentBase)manager).setMarker(markerByte);
-		    }
-		    manager.readFromFile(file);
-		    this.segments.add(manager);
+		Class managerClass = this.segmentManagers[markerByte];
+		SegmentBase manager = (SegmentBase) managerClass.newInstance();
+		if (manager instanceof MultiMarkerSegmentBase) {
+		    ((MultiMarkerSegmentBase)manager).setMarker(markerByte);
+		}
+		manager.readFromFile(file);
+		this.segments.add(manager);
+		if (manager instanceof SosSegment) {
+		    DataSegment data = new DataSegment();
+		    data.readFromFile(file);
+		    this.segments.add(data);
 		}
 	    }
 	}

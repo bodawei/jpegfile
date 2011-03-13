@@ -81,7 +81,7 @@ public class JpegParserTest {
 
 		file.readFromFile(new File(uri));
 
-		assertEquals(8, file.getSegments().size());
+		assertEquals(9, file.getSegments().size());
 		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
 		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(7).getMarker());
 	}
