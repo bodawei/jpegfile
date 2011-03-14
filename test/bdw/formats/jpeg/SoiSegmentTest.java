@@ -57,11 +57,6 @@ public class SoiSegmentTest {
 	}
 
 	@Test
-	public void testNewInstanceIsValid() {
-		assertEquals(true, new SoiSegment().isValid());
-	}
-
-	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 

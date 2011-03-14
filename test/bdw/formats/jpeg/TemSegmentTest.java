@@ -44,11 +44,6 @@ public class TemSegmentTest {
 	}
 
 	@Test
-	public void testNewInstanceIsValid() {
-		assertEquals(true, new TemSegment().isValid());
-	}
-
-	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 

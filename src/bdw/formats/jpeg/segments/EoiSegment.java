@@ -31,7 +31,6 @@ public class EoiSegment extends SegmentBase {
 	 */
 	public EoiSegment() {
 		setMarker(EoiSegment.MARKER);
-		isValid = true;
 	}
 
 	/**

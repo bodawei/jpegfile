@@ -47,11 +47,6 @@ public class EoiSegmentTest {
 	}
 
 	@Test
-	public void testNewInstanceIsValid() {
-		assertEquals(true, new EoiSegment().isValid());
-	}
-
-	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 

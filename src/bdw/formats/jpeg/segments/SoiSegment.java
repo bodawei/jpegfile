@@ -31,7 +31,6 @@ public class SoiSegment extends SegmentBase {
 	 */
 	public SoiSegment() {
 		setMarker(SoiSegment.MARKER);
-		isValid = true;
 	}
 
 	/**

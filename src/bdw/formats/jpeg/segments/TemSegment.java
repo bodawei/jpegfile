@@ -25,8 +25,7 @@ public class TemSegment extends SegmentBase {
 
     public TemSegment() {
 		setMarker(TemSegment.MARKER);
-		isValid = true;
-    }
+  }
 
 	/**
 	 * All TemSegments are equal.

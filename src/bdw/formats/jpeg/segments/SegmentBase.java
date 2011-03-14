@@ -39,12 +39,10 @@ public abstract class SegmentBase {
 	protected RandomAccessFile file;
 	protected long fileOffset;
 	protected int marker;
-	protected boolean isValid;
 
 	public SegmentBase() {
 		file = null;
 		fileOffset = 0;
-		isValid = false;
 	}
 
 	/**
@@ -56,10 +54,6 @@ public abstract class SegmentBase {
 
 	public void setMarker(int newMarker) {
 		marker = newMarker;
-	}
-
-	public boolean isValid() {
-		return isValid;
 	}
 
 	/**
