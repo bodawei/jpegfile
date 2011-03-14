@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,76 +35,62 @@ import java.io.RandomAccessFile;
  * all of the data into memory. At an time, however, the user can force that data into memory.
  */
 public abstract class SegmentBase {
+
 	protected RandomAccessFile file;
 	protected long fileOffset;
+	protected int marker;
+	protected boolean isValid;
 
 	public SegmentBase() {
 		file = null;
 		fileOffset = 0;
+		isValid = false;
 	}
 
 	/**
 	 * @return the code that represents this segment.
 	 */
-    public abstract int getMarker();
+	public int getMarker() {
+		return marker;
+	}
 
-	/**
-	 *
-	 */
-	public void readFromFile(RandomAccessFile file) throws IOException {
+	public void setMarker(int newMarker) {
+		marker = newMarker;
+	}
+
+	public boolean isValid() {
+		return isValid;
 	}
 
 	/**
 	 *
 	 */
-	public void readFromStream(InputStream stream) throws IOException {
+	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
 	}
-	/**
-	 * @return The number of bytes in the raw segment content
-	 */
-    public int getContentLength() {
-        return 0;
-    }
 
 	/**
-	 * Returns a copy of the raw content of this segument.  Note that if the
-	 * content is not already in memory, this will load it. Thus this may be
-	 * quite slow the first time it is called.
 	 *
-	 * @return The raw bytes that make up the content of this segment.
 	 */
-    public byte[] getContent() {
-        return new byte[0];
-    }
-
-	/**
-	 * Sets the content of this segment.  Any segment-specific data accessors will
-	 * return their portion of this data.  If any content is already here, this
-	 * replaces it.
-	 *
-	 * @param content The content to put in this segment.
-	 * @thros IllegalArgumentException if the content is not valid content for this segment type
-	 * */
-    public void setContent(byte[] content) {
-    }
+	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
+	}
 
 	/**
 	 * If this segment has not read all of its content from disk, this will force it to
 	 * be read.  However, if the content has already been read, this will have no effect.
 	 */
-    public void forceContentLoading() {
-    }
+	public void forceContentLoading() {
+	}
 
 	/**
 	 * Writes the contents of this segment to the output stream, including the size info,
-	 * if appropraite, but not the 0xFF and marker info.
+	 * if appropriate, but not the 0xFF and marker info.
 	 *
 	 * @param stream a non-null stream to write data to.
 	 * @throw IllegalArgumentException if param is null
 	 * */
-    public void writeToFile(OutputStream stream) {
+	public void write(OutputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IllegalArgumentException("Stream may not be null");
 		}
-    }
+	}
 }

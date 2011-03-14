@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package bdw.formats.jpeg.segments;
+package bdw.formats.jpeg.segments.support;
 
 /**
+ *
  */
-public class JpgNSegment extends SegmentBase {
-	public static final int START_MARKER = 0xF0;
-	public static final int END_MARKER = 0xFD;
+public class InvalidJpegFormat extends Exception{
+	public InvalidJpegFormat(String info) {
+		
+	}
 }

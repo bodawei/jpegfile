@@ -17,15 +17,33 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * Temporary for arithmetic coding.
+ * "Temporary for arithmetic coding" segment.
+ * This seems to carry no data
  */
 public class TemSegment extends SegmentBase {
     public static final int MARKER = 0x01;
 
-    public int getMarker() {
-        return MARKER;
+    public TemSegment() {
+		setMarker(TemSegment.MARKER);
+		isValid = true;
     }
 
-    public TemSegment() {
-    }
+	/**
+	 * All TemSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof TemSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 }

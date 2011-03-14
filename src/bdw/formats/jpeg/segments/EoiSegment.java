@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
 /**
@@ -21,6 +20,7 @@ package bdw.formats.jpeg.segments;
  * This contains no content
  */
 public class EoiSegment extends SegmentBase {
+
 	/**
 	 * The marker code corresponding to this type of segment
 	 */
@@ -29,14 +29,27 @@ public class EoiSegment extends SegmentBase {
 	/**
 	 * Construct
 	 */
-    public EoiSegment() {
-    }
+	public EoiSegment() {
+		setMarker(EoiSegment.MARKER);
+		isValid = true;
+	}
+
+	/**
+	 * All EoiSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof EoiSegment)) ? false : true;
+	}
 
 	/**
 	 * @inheritdoc
 	 */
 	@Override
-	public int getMarker() {
-		return EoiSegment.MARKER;
+	public int hashCode() {
+		int hash = 3;
+		return hash;
 	}
 }

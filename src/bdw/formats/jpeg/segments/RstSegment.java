@@ -17,12 +17,36 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * Temporary for arithmetic coding.
+ * "Restart" segment
  */
-public class RstSegment extends MultiMarkerSegmentBase {
+public class RstSegment extends SegmentBase {
+	/**
+	 * First of the conventional markers that are used with this
+	 */
     public static final int START_MARKER = 0xd0;
+
+	/**
+	 * Last of the markers that are used with this
+	 */
     public static final int END_MARKER = 0xd7;
 
     public RstSegment() {
+		setMarker(0);
     }
+
+	/**
+	 * All RstSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof RstSegment)) ? false : true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		return hash;
+	}
 }
