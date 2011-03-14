@@ -16,14 +16,38 @@
 package bdw.formats.jpeg.segments;
 
 /**
+ * The "JPG" segment
+ * This carries no data
  */
 public class JpgSegment extends SegmentBase {
+	/**
+	 * Marker for this kind of segment
+	 */
     public static final int MARKER = 0xC8;
 
-    public int getMarker() {
-        return MARKER;
+	/**
+	 * Constructor
+	 */
+    public JpgSegment() {
+		setMarker(JpgSegment.MARKER);
     }
 
-    public JpgSegment() {
-    }
+	/**
+	 * All JpgSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof JpgSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 }

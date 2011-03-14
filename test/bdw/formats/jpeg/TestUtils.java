@@ -17,7 +17,7 @@ import java.io.StringReader;
  */
 public class TestUtils {
 
-	public InputStream makeInputStreamFromString(String rawInput) throws IOException {
+	public byte[] makeByteArrayFromString(String rawInput) throws IOException {
 		StringReader inputReader = new StringReader(rawInput);
 		byte[] rawInputBytes = new byte[rawInput.length()];
 		int aChar = inputReader.read();
@@ -35,6 +35,10 @@ public class TestUtils {
 
 		encoder.convert(inputStream, outputStream);
 
-		return new ByteArrayInputStream(outputStream.toByteArray());
+		return outputStream.toByteArray();
+	}
+
+	public InputStream makeInputStreamFromString(String rawInput) throws IOException {
+		return new ByteArrayInputStream(makeByteArrayFromString(rawInput));
 	}
 }

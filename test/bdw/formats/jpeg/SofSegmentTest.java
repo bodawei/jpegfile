@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg;
 
+import java.io.ByteArrayOutputStream;
 import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,11 +43,6 @@ public class SofSegmentTest {
 	@Test
 	public void newInstanceHasZeroMarkerByDefault() {
 		assertEquals(0, new SofSegment().getMarker());
-	}
-
-	@Test
-	public void newInstanceIsNotValidByDefault() {
-		assertEquals(false, new SofSegment().isValid());
 	}
 
 	@Test
@@ -286,4 +282,56 @@ public class SofSegmentTest {
 			assertTrue(e instanceof InvalidJpegFormat);
 		}
 	}
+
+	@Test
+	public void writeSegmentWithNoComponents() throws IOException, InvalidJpegFormat {
+		SofSegment segment = new SofSegment();
+		byte[] rawData = utils.makeByteArrayFromString("00 08 44 0033 1045 00");
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+		segment.setSamplePrecision(0x44);
+		segment.setImageHeight(0x33);
+		segment.setImageWidth(0x1045);
+
+		segment.write(stream);
+
+		assertArrayEquals("written bytes", rawData, stream.toByteArray());
+	}
+
+	@Test
+	public void writeSegmentWithThreeComponents() throws IOException, InvalidJpegFormat {
+		SofSegment segment = new SofSegment();
+		byte[] rawData = utils.makeByteArrayFromString("00 11 44 0033 1045 03 01 12 03 04 75 06 07 E8 09");
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		SofComponentEntry entry;
+
+		segment.setSamplePrecision(0x44);
+		segment.setImageHeight(0x33);
+		segment.setImageWidth(0x1045);
+		entry  = new SofComponentEntry();
+		entry.setId(1);
+		entry.setSamplingX(1);
+		entry.setSamplingY(0x2);
+		entry.setQuantizationId(3);
+		segment.addComponent(0, entry);
+
+		entry  = new SofComponentEntry();
+		entry.setId(4);
+		entry.setSamplingX(7);
+		entry.setSamplingY(5);
+		entry.setQuantizationId(6);
+		segment.addComponent(1, entry);
+
+		entry  = new SofComponentEntry();
+		entry.setId(7);
+		entry.setSamplingX(0xE);
+		entry.setSamplingY(8);
+		entry.setQuantizationId(9);
+		segment.addComponent(2, entry);
+
+		segment.write(stream);
+
+		assertArrayEquals("written bytes", rawData, stream.toByteArray());
+	}
+
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
 /**
@@ -21,11 +20,15 @@ package bdw.formats.jpeg.segments;
  * This seems to carry no data
  */
 public class TemSegment extends SegmentBase {
-    public static final int MARKER = 0x01;
 
-    public TemSegment() {
+	/**
+	 * Marker for this type of segment
+	 */
+	public static final int MARKER = 0x01;
+
+	public TemSegment() {
 		setMarker(TemSegment.MARKER);
-  }
+	}
 
 	/**
 	 * All TemSegments are equal.

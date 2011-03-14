@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg.segments;
+package bdw.formats.jpeg.segments.support;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

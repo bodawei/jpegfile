@@ -16,8 +16,42 @@
 package bdw.formats.jpeg.segments;
 
 /**
+ * JpgN segment type
  */
 public class JpgNSegment extends SegmentBase {
+	/**
+	 * The first of the allowable markers that this can be used with
+	 */
 	public static final int START_MARKER = 0xF0;
+
+	/**
+	 * Last of the allowable markers this can be used with
+	 */
 	public static final int END_MARKER = 0xFD;
+
+	/**
+	 * Constructor
+	 */
+    public JpgNSegment() {
+		setMarker(JpgNSegment.START_MARKER);
+    }
+
+	/**
+	 * All JpgSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof JpgNSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 }

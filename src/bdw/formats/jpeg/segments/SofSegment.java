@@ -106,38 +106,6 @@ public class SofSegment extends SegmentBase {
 	}
 
 	/**
-	 * @inheritdoc
-	 * @param file The file to read from (not null)
-	 * @throws IOException If an error occurs while reading
-	 */
-	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		if (file == null) {
-			throw new IllegalArgumentException("Input file may not be null");
-		}
-
-		readData(file);
-	}
-
-	/**
-	 * @inheritdoc
-	 * @param stream The stream to read from (not null)
-	 * @throws IOException If an error occurs while reading
-	 */
-	@Override
-	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
-		if (stream == null) {
-			throw new IllegalArgumentException("Input stream may not be null");
-		}
-
-		if (stream instanceof DataInputStream) {
-			readData((DataInputStream) stream);
-		} else {
-			readData(new DataInputStream(stream));
-		}
-	}
-
-	/**
 	 * Read all the data and populate this instance.
 	 * This resets all contents of this segment. This means that this is like
 	 * deleting all components and then setting all properties afresh.
@@ -151,6 +119,7 @@ public class SofSegment extends SegmentBase {
 	 *
 	 * @throws IOException If something happens while reading
 	 */
+	@Override
 	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
 		int precision;
 		int height;
