@@ -16,31 +16,34 @@
 package bdw.formats.jpeg.segments;
 
 /**
- * The End Of Image segment
- * This contains no content
+ * JpgN segment type
  */
-public class EoiSegment extends SegmentBase {
-
+public class JpgNSegment extends SegmentBase {
 	/**
-	 * The marker code corresponding to this type of segment
+	 * The first of the allowable markers that this can be used with
 	 */
-	public static final int MARKER = 0xD9;
+	public static final int START_MARKER = 0xF0;
 
 	/**
-	 * Construct
+	 * Last of the allowable markers this can be used with
 	 */
-	public EoiSegment() {
-		setMarker(EoiSegment.MARKER);
-	}
+	public static final int END_MARKER = 0xFD;
 
 	/**
-	 * All EoiSegments are equal.
+	 * Constructor
+	 */
+    public JpgNSegment() {
+		setMarker(JpgNSegment.START_MARKER);
+    }
+
+	/**
+	 * All JpgSegments are equal.
 	 * @param other The other object to test
 	 * @return If other and this are equal
 	 */
 	@Override
 	public boolean equals(Object other) {
-		return ((other == null) || !(other instanceof EoiSegment)) ? false : true;
+		return ((other == null) || !(other instanceof JpgNSegment)) ? false : true;
 	}
 
 	/**

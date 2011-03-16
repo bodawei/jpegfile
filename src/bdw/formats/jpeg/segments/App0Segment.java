@@ -67,7 +67,7 @@ public class App0Segment extends SegmentBase {
 		for (int index = 0; index < stringLength; index++) {
 			int aChar = file.readUnsignedByte();
 			if (index != stringLength -1) {
-				builder.append(aChar);
+				builder.append((char)aChar);
 			} else {
 				if (aChar != 0x00) {
 					throw new IllegalArgumentException();

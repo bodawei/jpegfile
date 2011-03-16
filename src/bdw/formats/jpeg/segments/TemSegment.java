@@ -13,19 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
 /**
- * Temporary for arithmetic coding.
+ * "Temporary for arithmetic coding" segment.
+ * This seems to carry no data
  */
 public class TemSegment extends SegmentBase {
-    public static final int MARKER = 0x01;
 
-    public int getMarker() {
-        return MARKER;
-    }
+	/**
+	 * Marker for this type of segment
+	 */
+	public static final int MARKER = 0x01;
 
-    public TemSegment() {
-    }
+	public TemSegment() {
+		setMarker(TemSegment.MARKER);
+	}
+
+	/**
+	 * All TemSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof TemSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 }

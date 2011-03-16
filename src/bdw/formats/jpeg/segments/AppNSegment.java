@@ -13,42 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
- * The End Of Image segment
- * This contains no content
+ *
  */
-public class EoiSegment extends SegmentBase {
-
+public class AppNSegment extends SegmentBase {
+	public static final int START_MARKER = 0xE1;
+	public static final int END_MARKER = 0xEF;
 	/**
-	 * The marker code corresponding to this type of segment
-	 */
-	public static final int MARKER = 0xD9;
-
-	/**
-	 * Construct
-	 */
-	public EoiSegment() {
-		setMarker(EoiSegment.MARKER);
-	}
-
-	/**
-	 * All EoiSegments are equal.
-	 * @param other The other object to test
-	 * @return If other and this are equal
+	 *
 	 */
 	@Override
-	public boolean equals(Object other) {
-		return ((other == null) || !(other instanceof EoiSegment)) ? false : true;
+	public void readFromFile(RandomAccessFile file) throws IOException {
+		int contentLength = file.readUnsignedShort();
+
+		file.skipBytes(contentLength - 2);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	@Override
-	public int hashCode() {
-		int hash = 3;
-		return hash;
-	}
+
 }

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,8 +37,10 @@ import java.io.RandomAccessFile;
  * all of the data into memory. At an time, however, the user can force that data into memory.
  */
 public abstract class SegmentBase {
+
 	protected RandomAccessFile file;
 	protected long fileOffset;
+	protected int marker;
 
 	public SegmentBase() {
 		file = null;
@@ -46,26 +50,59 @@ public abstract class SegmentBase {
 	/**
 	 * @return the code that represents this segment.
 	 */
-    public abstract int getMarker();
+	public int getMarker() {
+		return marker;
+	}
 
-	/**
-	 *
-	 */
-	public void readFromFile(RandomAccessFile file) throws IOException {
+	public void setMarker(int newMarker) {
+		marker = newMarker;
 	}
 
 	/**
-	 *
+	 * @param file The file to read from (not null)
+	 * @throws IOException If an error occurs while reading
 	 */
-	public void readFromStream(InputStream stream) throws IOException {
+	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		if (file == null) {
+			throw new IllegalArgumentException("Input file may not be null");
+		}
+
+		readData(file);
+	}
+
+	/**
+	 * @param stream The stream to read from (not null)
+	 * @throws IOException If an error occurs while reading
+	 */
+	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
+		if (stream == null) {
+			throw new IllegalArgumentException("Input stream may not be null");
+		}
+
+		if (stream instanceof DataInputStream) {
+			readData((DataInputStream) stream);
+		} else {
+			readData(new DataInputStream(stream));
+		}
+	}
+
+	/**
+	 * Read all the data and populate this instance.
+	 * This resets all contents of this segment.
+	 *
+	 * @param dataSource The input source to read from
+	 *
+	 * @throws IOException If something happens while reading
+	 */
+	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
 	}
 
 	/**
 	 * If this segment has not read all of its content from disk, this will force it to
 	 * be read.  However, if the content has already been read, this will have no effect.
 	 */
-    public void forceContentLoading() {
-    }
+	public void forceContentLoading() throws IOException {
+	}
 
 	/**
 	 * Writes the contents of this segment to the output stream, including the size info,
@@ -74,9 +111,9 @@ public abstract class SegmentBase {
 	 * @param stream a non-null stream to write data to.
 	 * @throw IllegalArgumentException if param is null
 	 * */
-    public void write(OutputStream stream) throws IOException {
+	public void write(OutputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IllegalArgumentException("Stream may not be null");
 		}
-    }
+	}
 }

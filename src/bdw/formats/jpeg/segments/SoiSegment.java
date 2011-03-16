@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.jpeg.segments;
 
 /**
@@ -21,22 +20,35 @@ package bdw.formats.jpeg.segments;
  * This segment has no content data.
  */
 public class SoiSegment extends SegmentBase {
+
 	/**
-	 * The marker code corresponding to this type of segment
+	 * The start of image marker
 	 */
 	public static final int MARKER = 0xD8;
 
 	/**
 	 * Construct
 	 */
-    public SoiSegment() {
-    }
+	public SoiSegment() {
+		setMarker(SoiSegment.MARKER);
+	}
+
+	/**
+	 * All SoiSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof SoiSegment)) ? false : true;
+	}
 
 	/**
 	 * @inheritdoc
 	 */
 	@Override
-	public int getMarker() {
-		return SoiSegment.MARKER;
+	public int hashCode() {
+		int hash = 3;
+		return hash;
 	}
 }

@@ -17,7 +17,7 @@
 package bdw.formats.jpeg;
 
 import bdw.formats.encode.Hex2Bin;
-import bdw.formats.jpeg.segments.ScanDescriptorEntry;
+import bdw.formats.jpeg.segments.support.ScanDescriptorEntry;
 import bdw.formats.jpeg.segments.SosSegment;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

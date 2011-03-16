@@ -13,42 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 /**
- * The End Of Image segment
- * This contains no content
+ * "Restart" segment
  */
-public class EoiSegment extends SegmentBase {
-
+public class RstSegment extends SegmentBase {
 	/**
-	 * The marker code corresponding to this type of segment
+	 * First of the conventional markers that are used with this
 	 */
-	public static final int MARKER = 0xD9;
+    public static final int START_MARKER = 0xd0;
 
 	/**
-	 * Construct
+	 * Last of the markers that are used with this
 	 */
-	public EoiSegment() {
-		setMarker(EoiSegment.MARKER);
-	}
+    public static final int END_MARKER = 0xd7;
+
+    public RstSegment() {
+		setMarker(0);
+    }
 
 	/**
-	 * All EoiSegments are equal.
+	 * All RstSegments are equal.
 	 * @param other The other object to test
 	 * @return If other and this are equal
 	 */
 	@Override
 	public boolean equals(Object other) {
-		return ((other == null) || !(other instanceof EoiSegment)) ? false : true;
+		return ((other == null) || !(other instanceof RstSegment)) ? false : true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	@Override
 	public int hashCode() {
-		int hash = 3;
+		int hash = 7;
 		return hash;
 	}
 }

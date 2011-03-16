@@ -63,7 +63,7 @@ public class JpegParserTest {
 		JpegParser file = new JpegParser();
 		file.addStandardSegments();
 
-		URI uri = this.getClass().getResource("trivial.jpg").toURI();
+		URI uri = this.getClass().getResource("resources/trivial.jpg").toURI();
 
 		file.readFromFile(new File(uri));
 
@@ -77,13 +77,13 @@ public class JpegParserTest {
 		JpegParser file = new JpegParser();
 		file.addStandardSegments();
 
-		URI uri = this.getClass().getResource("knuth.jpg").toURI();
+		URI uri = this.getClass().getResource("resources/knuth.jpg").toURI();
 
 		file.readFromFile(new File(uri));
 
-		assertEquals(8, file.getSegments().size());
+		assertEquals(9, file.getSegments().size());
 		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(7).getMarker());
+		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(8).getMarker());
 	}
 
     @Test

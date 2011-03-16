@@ -15,6 +15,7 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.support.ScanDescriptorEntry;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -70,7 +71,8 @@ public class SosSegment extends SegmentBase {
 	/**
 	 *
 	 */
-	private void readData(DataInput input) throws IOException {
+	@Override
+	protected void readData(DataInput input) throws IOException {
 		int contentLength = input.readUnsignedShort();
 		int componentCount = input.readUnsignedByte();
 
