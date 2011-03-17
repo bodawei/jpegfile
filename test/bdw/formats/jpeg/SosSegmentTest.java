@@ -17,7 +17,8 @@
 package bdw.formats.jpeg;
 
 import bdw.formats.encode.Hex2Bin;
-import bdw.formats.jpeg.segments.support.ScanDescriptorEntry;
+import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
+import bdw.formats.jpeg.segments.support.SosDescriptor;
 import bdw.formats.jpeg.segments.SosSegment;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,11 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Iterator;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SosSegmentTest {
@@ -47,24 +45,11 @@ public class SosSegmentTest {
 			+ "FF 01 02 03 04 05	# components\n"
 			+ "01 02 03				# spectral start, end etc\n";
 
-
-	public SosSegmentTest() {
-	}
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-	}
+	private TestUtils utils;
 
 	@Before
 	public void setUp() {
-	}
-
-	@After
-	public void tearDown() {
+		utils = new TestUtils();
 	}
 
 	@Test
@@ -73,23 +58,127 @@ public class SosSegmentTest {
 		Assert.assertEquals("Marker ID", SosSegment.MARKER, segment.getMarker());
 	}
 
+	@Test
+	public void testSetSpectralSelectionStartZeroIsOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSpectralSelectionStart(0);
+		} catch (Exception e) {
+			Assert.fail("Got an exception when we shouldn't have");
+		}
+
+		Assert.assertEquals(0, segment.getSpectralSelectionStart());
+	}
 
 	@Test
-	public void testReadSegmentFromStream() throws IOException {
-		int count = 0;
+	public void testSetSpectralSelectionStartNegOneIsNotOK() {
 		SosSegment segment = new SosSegment();
-		segment.readFromStream(prepareInputStream(SOSSEGMENT_1));
+
+		try {
+			segment.setSpectralSelectionStart(-1);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testSetSpectralSelectionStart256IsNotOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSpectralSelectionStart(256);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testSetSpectralSelectionEndZeroIsOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSpectralSelectionEnd(0);
+		} catch (Exception e) {
+			Assert.fail("Got an exception when we shouldn't have");
+		}
+
+		Assert.assertEquals(0, segment.getSpectralSelectionStart());
+	}
+
+	@Test
+	public void testSetSpectralSelectionEndNegOneIsNotOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSpectralSelectionEnd(-1);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testSetSpectralSelectionEnd256IsNotOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSpectralSelectionEnd(256);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testSetSuccessiveApproximationZeroIsOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSuccessiveApproximation(0);
+		} catch (Exception e) {
+			Assert.fail("Got an exception when we shouldn't have");
+		}
+
+		Assert.assertEquals(0, segment.getSpectralSelectionStart());
+	}
+
+	@Test
+	public void testSetSuccessiveApproximationNegOneIsNotOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSuccessiveApproximation(-1);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testSetSuccessiveApproximationEnd256IsNotOK() {
+		SosSegment segment = new SosSegment();
+
+		try {
+			segment.setSuccessiveApproximation(256);
+			Assert.fail("Should have failed");
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof IllegalArgumentException);
+		}
+	}
+
+	@Test
+	public void testReadSegmentFromStream() throws IOException, InvalidJpegFormat {
+		SosSegment segment = new SosSegment();
+		segment.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		Assert.assertEquals("Spectral Selection Start", 1, segment.getSpectralSelectionStart());
 		Assert.assertEquals("Spectral Selection End", 2, segment.getSpectralSelectionEnd());
 		Assert.assertEquals("Successive Approximation", 3, segment.getSuccessiveApproximation());
 
-		Iterator<ScanDescriptorEntry> i = segment.iterator();
-		while (i.hasNext()) {
-			count ++;
-			i.next();
-		}
-		Assert.assertEquals("ScanDescriptor count", 3, count);
+		Assert.assertEquals("ScanDescriptor count", 3, segment.getDescriptorCount());
 	}
 
 	@Test
@@ -97,7 +186,7 @@ public class SosSegmentTest {
 		int count = 0;
 		SosSegment segment = new SosSegment();
 		try {
-			segment.readFromStream(prepareInputStream(SOSSEGMENT_BAD_COMPONENT_COUNT));
+			segment.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_BAD_COMPONENT_COUNT));
 			Assert.fail("Should have failed to read the segment");
 		} catch (Exception e) {
 
@@ -105,62 +194,37 @@ public class SosSegmentTest {
 	}
 
 	@Test
-	public void testEquals() throws IOException {
+	public void testEquals() throws IOException, InvalidJpegFormat {
 		SosSegment one = new SosSegment();
 		SosSegment two = new SosSegment();
-		one.readFromStream(prepareInputStream(SOSSEGMENT_1));
-		two.readFromStream(prepareInputStream(SOSSEGMENT_1));
+		one.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		two.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		Assert.assertTrue("one equals two", one.equals(two));
 		Assert.assertTrue("two equals one", two.equals(one));
 	}
 
 	@Test
-	public void testEqualsFailsForUnequalSegments() throws IOException {
+	public void testEqualsFailsForUnequalSegments() throws IOException, InvalidJpegFormat {
 		SosSegment one = new SosSegment();
 		SosSegment two = new SosSegment();
-		one.readFromStream(prepareInputStream(SOSSEGMENT_1));
-		two.readFromStream(prepareInputStream(SOSSEGMENT_2));
+		one.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		two.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_2));
 
 		Assert.assertFalse("one doesn't equal two", one.equals(two));
 		Assert.assertFalse("two doesn't equal one", two.equals(one));
 	}
 
 	@Test
-	public void testWrite() throws IOException {
+	public void testWrite() throws IOException, InvalidJpegFormat {
 		SosSegment one = new SosSegment();
-		one.readFromStream(prepareInputStream(SOSSEGMENT_1));
+		one.readFromStream(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		one.write(out);
 
-		Assert.assertArrayEquals(prepareInputBytes(SOSSEGMENT_1), out.toByteArray());
+		Assert.assertArrayEquals(utils.makeByteArrayFromString(SOSSEGMENT_1), out.toByteArray());
 	}
 
 
-	protected byte[] prepareInputBytes(String rawInput) throws IOException {
-		StringReader inputReader = new StringReader(rawInput);
-		byte[] rawInputBytes = new byte[rawInput.length()];
-		int aChar = inputReader.read();
-		int index = 0;
-		while (aChar != -1) {
-			rawInputBytes[index] = (byte) aChar;
-			aChar = inputReader.read();
-			index++;
-		}
-
-		Hex2Bin encoder = new Hex2Bin();
-		InputStream inputStream = new ByteArrayInputStream(rawInputBytes);
-
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-		encoder.convert(inputStream, outputStream);
-
-		return outputStream.toByteArray();
-	}
-
-	protected InputStream prepareInputStream(String rawInput) throws IOException {
-
-		return new ByteArrayInputStream(prepareInputBytes(rawInput));
-	}
 }

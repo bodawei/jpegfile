@@ -15,6 +15,8 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
+
 /**
  * The Start Of Image segment
  * This segment has no content data.

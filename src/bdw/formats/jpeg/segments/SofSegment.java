@@ -15,18 +15,15 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
-import bdw.formats.jpeg.segments.support.SofComponentEntry;
-import bdw.formats.jpeg.segments.support.Utils;
+import bdw.formats.jpeg.segments.support.SofComponent;
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,21 +92,111 @@ public class SofSegment extends SegmentBase {
 	/**
 	 * The ordered list of components defined by this segment
 	 */
-	protected List<SofComponentEntry> components;
+	protected List<SofComponent> components;
 
 	/**
 	 * Construct
 	 */
 	public SofSegment() {
 		setMarker(0);
-		components = new ArrayList<SofComponentEntry>();
+		components = new ArrayList<SofComponent>();
+	}
+
+	/**
+	 * @return The sample precision
+	 */
+	public int getSamplePrecision() {
+		return samplePrecision;
+	}
+
+	/**
+	 * Sets the sample precision
+	 */
+	public void setSamplePrecision(int precision) {
+		this.paramIsUInt8(precision);
+
+		samplePrecision = precision;
+	}
+
+	/**
+	 * @return The height of the image
+	 */
+	public int getImageHeight() {
+		return imageHeight;
+	}
+
+	/**
+	 * Sets the height of the image
+	 */
+	public void setImageHeight(int height) {
+		this.paramIsUInt16(height);
+
+		imageHeight = height;
+	}
+
+	/**
+	 * @return The width of the image
+	 */
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	/**
+	 * @param width The width of the image. This may be between 0 and 65,536
+	 */
+	public void setImageWidth(int width) {
+		this.paramIsUInt16(width);
+
+		imageWidth = width;
+	}
+
+	/**
+	 * @return The number of components in this segment
+	 */
+	public int getComponentCount() {
+		return components.size();
+	}
+
+	/**
+	 * @param index Index of the component to be returned
+	 * @return The component at the specified index
+	 * @throws IndexOutOfBoundsException If the index is negative or larger than the number of components
+	 */
+	public SofComponent getComponent(int index) throws IndexOutOfBoundsException {
+		return components.get(index);
+	}
+
+	/**
+	 * @param index The index to put the new component (others are moved "right"
+	 * @param component The component to add
+	 * @throws IndexOutOfBoundsException If the index is negative or larger than where can be added
+	 * @throws IllegalArgumentException if component is null, or if there are already 256 entries in the set
+	 */
+	public void addComponent(int index, SofComponent component) throws
+			IndexOutOfBoundsException {
+		if (component == null) {
+			throw new IllegalArgumentException("Entry may not be null");
+		}
+
+		if (components.size() >= 256) {
+			throw new IllegalArgumentException("Too many components already in the list");
+		}
+		components.add(index, component);
+	}
+
+	/**
+	 * @param index Index of the component to delete
+	 * @throws IndexOutOfBoundsException If the index is out of range
+	 */
+	public void deleteComponent(int index) throws IndexOutOfBoundsException {
+		components.remove(index);
 	}
 
 	/**
 	 * Read all the data and populate this instance.
 	 * This resets all contents of this segment. This means that this is like
 	 * deleting all components and then setting all properties afresh.
-	 * 
+	 *
 	 * Because this will never be more than 1 kilobyte of data, we never defer
 	 * reading until later.
 	 * Note: If any errors occur while reading, this instance will not be
@@ -124,8 +211,8 @@ public class SofSegment extends SegmentBase {
 		int precision;
 		int height;
 		int width;
-		List<SofComponentEntry> comps = new ArrayList<SofComponentEntry>();
-		
+		List<SofComponent> comps = new ArrayList<SofComponent>();
+
 		try {
 			int contentLength = dataSource.readUnsignedShort();
 
@@ -138,7 +225,7 @@ public class SofSegment extends SegmentBase {
 			width = dataSource.readUnsignedShort();
 			int numComponents = dataSource.readUnsignedByte();
 
-			if (contentLength != 8 + (SofComponentEntry.DISK_SIZE * numComponents)) {
+			if (contentLength != 8 + (SofComponent.DISK_SIZE * numComponents)) {
 				throw new InvalidJpegFormat("Sof segment found not enough length");
 			}
 
@@ -148,7 +235,7 @@ public class SofSegment extends SegmentBase {
 			// 4 = color CMYK
 
 			for (int index = 0; index < numComponents; index++) {
-				SofComponentEntry entry = new SofComponentEntry();
+				SofComponent entry = new SofComponent();
 				entry.read(dataSource);
 				comps.add(entry);
 			}
@@ -177,108 +264,15 @@ public class SofSegment extends SegmentBase {
 		} else {
 			out = new DataOutputStream(output);
 		}
-		out.writeShort(2 + 6 + (SofComponentEntry.DISK_SIZE * components.size()));
+		out.writeShort(2 + 6 + (SofComponent.DISK_SIZE * components.size()));
 		out.writeByte(getSamplePrecision());
 		out.writeShort(getImageHeight());
 		out.writeShort(getImageWidth());
 		out.writeByte(components.size());
 		for (int index = 0; index < components.size(); index++) {
-			SofComponentEntry entry = components.get(index);
+			SofComponent entry = components.get(index);
 			entry.write(out);
 		}
-	}
-
-	/**
-	 * @return The sample precision
-	 */
-	public int getSamplePrecision() {
-		return samplePrecision;
-	}
-
-	/**
-	 * Sets the sample precision
-	 */
-	public void setSamplePrecision(int precision) {
-		if (!Utils.inUInt8Range(precision)) {
-			throw new IllegalArgumentException("Precision out of range ([0-255]).");
-		}
-		samplePrecision = precision;
-	}
-
-	/**
-	 * @return The height of the image
-	 */
-	public int getImageHeight() {
-		return imageHeight;
-	}
-
-	/**
-	 * Sets the height of the image
-	 */
-	public void setImageHeight(int height) {
-		if (!Utils.inUInt16Range(height)) {
-			throw new IllegalArgumentException("Precision out of range ([0-65535]).");
-		}
-		imageHeight = height;
-	}
-
-	/**
-	 * @return The width of the image
-	 */
-	public int getImageWidth() {
-		return imageWidth;
-	}
-
-	/**
-	 * @param width The width of the image. This may be between 0 and 65,536
-	 */
-	public void setImageWidth(int width) {
-		if (!Utils.inUInt16Range(width)) {
-			throw new IllegalArgumentException("Precision out of range ([0-65535]).");
-		}
-		imageWidth = width;
-	}
-
-	/**
-	 * @return The number of components in this segment
-	 */
-	public int getComponentCount() {
-		return components.size();
-	}
-
-	/**
-	 * @param index Index of the component to be returned
-	 * @return The component at the specified index
-	 * @throws IndexOutOfBoundsException If the index is negative or larger than the number of components
-	 */
-	public SofComponentEntry getComponent(int index) throws IndexOutOfBoundsException {
-		return components.get(index);
-	}
-
-	/**
-	 * @param index The index to put the new component (others are moved "right"
-	 * @param component The component to add
-	 * @throws IndexOutOfBoundsException If the index is negative or larger than where can be added
-	 * @throws IllegalArgumentException if component is null, or if there are already 256 entries in the set
-	 */
-	public void addComponent(int index, SofComponentEntry component) throws
-			IndexOutOfBoundsException {
-		if (component == null) {
-			throw new IllegalArgumentException("Entry may not be null");
-		}
-
-		if (components.size() >= 256) {
-			throw new IllegalArgumentException("Too many components already in the list");
-		}
-		components.add(index, component);
-	}
-
-	/**
-	 * @param index Index of the component to delete
-	 * @throws IndexOutOfBoundsException If the index is out of range
-	 */
-	public void deleteComponent(int index) throws IndexOutOfBoundsException {
-		components.remove(index);
 	}
 
 	@Override
@@ -306,8 +300,8 @@ public class SofSegment extends SegmentBase {
 			}
 
 			for (int index = 0; index < components.size(); index++) {
-				SofComponentEntry myEntry = components.get(index);
-				SofComponentEntry otherEntry = segment.getComponent(index);
+				SofComponent myEntry = components.get(index);
+				SofComponent otherEntry = segment.getComponent(index);
 				if ( ! myEntry.equals(otherEntry)) {
 					return false;
 				}

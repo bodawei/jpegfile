@@ -15,6 +15,8 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
+
 /**
  * The "JPG" segment
  * This carries no data

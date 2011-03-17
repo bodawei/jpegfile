@@ -13,30 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.formats.encode;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.io.InputStreamReader;
-
+import java.io.OutputStream;
 
 /**
  * Given an input stream of textual data, interpret as a stream of hexadecimal digits.
  * and write out a binary version of the same.
  * Thus, an input of "40 41 42" would be written out as "ABC".
- * 
+ *
  * Notes:
  * <ul>
  * <li>0-9a-fA-F are considered hexadecimal digits</li>
  * <li>White space (space, newlines, etc) is ignored</li>
  * <li>The # character is interpreted as line comment. Everything after it to a newline is ignored.</li>
+ * <li>/* ... * / can be used to surround things that should be ignore</li>
  * <li>Other characters are simply ignored.</li>
  * <li>If a single trailing nibble is at the end of the file, it will simply be ignored</li>
  * </ul>
- * 
+ *
  * Instances of this class have a variety of configuration properties that control
  * how the output is formatted, exactly.
  */
@@ -45,7 +44,7 @@ public class Hex2Bin {
 	/**
 	 * Using any configuration properties set on the instance, convert the contents of
 	 * the input stream to the output stream.
-	 * 
+	 *
 	 * @param input The stream to read characters from (not null)
 	 * @param outputStream The stream to write the binary representation to (not null)
 	 * @throws IOException If something goes wonky on io.
@@ -55,17 +54,17 @@ public class Hex2Bin {
 		if (inputStream == null) {
 			throw new IllegalArgumentException("Input may not be null");
 		}
-		
+
 		if (output == null) {
 			throw new IllegalArgumentException("Output may not be null");
 		}
-		
-		Reader input = new InputStreamReader(inputStream);
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(inputStream));
 		int aChar = input.read();
 		boolean ignoreChars = false;
 		boolean doHighNibble = true;
 		int aByte = 0;
-		
+
 		while (aChar != -1) {
 			switch (aChar) {
 				case '#':
@@ -76,6 +75,16 @@ public class Hex2Bin {
 					break;
 				case '\r':
 					ignoreChars = false;
+					break;
+				case '/':
+					ignoreChars = false;
+					input.mark(1);
+					aChar = input.read();
+					if (aChar != '*') {
+						input.reset();
+					} else {
+						skipComment(input);
+					}
 					break;
 				case '0':
 				case '1':
@@ -108,7 +117,7 @@ public class Hex2Bin {
 						} else {
 							nibble = (aChar - 'a') + 10;
 						}
-						
+
 						if (doHighNibble) {
 							aByte = nibble << 4;
 							doHighNibble = false;
@@ -117,15 +126,45 @@ public class Hex2Bin {
 							doHighNibble = true;
 							output.write(aByte);
 							aByte = 0;
-						}						
+						}
 					}
 					break;
 				default:
 					break;
 			}
-			
+
 			aChar = input.read();
 		}
 		output.flush();
+	}
+
+	protected void skipComment(BufferedReader stream) throws IOException {
+		boolean sawStar = false;
+
+		while (true) {
+			int aChar = stream.read();
+			switch (aChar) {
+				case '*':
+					sawStar = true;
+					break;
+				case '/':
+					if (sawStar == true) {
+						return;
+					} else {
+						sawStar = false;
+						stream.mark(1);
+						aChar = stream.read();
+						if (aChar != '*') {
+							stream.reset();
+						} else {
+							skipComment(stream);
+						}
+					}
+					break;
+				default:
+					sawStar = false;
+					break;
+			}
+		}
 	}
 }

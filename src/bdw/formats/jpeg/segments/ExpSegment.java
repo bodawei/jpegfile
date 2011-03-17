@@ -15,30 +15,42 @@
  */
 package bdw.formats.jpeg.segments;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import bdw.formats.jpeg.segments.base.SegmentBase;
 
 /**
  * Expand reference components
  */
 public class ExpSegment extends SegmentBase {
 
+	/**
+	 * The marker type for this class
+	 */
 	public static final int MARKER = 0xDF;
-	protected int contentLength;
 
-	public int getMarker() {
-		return MARKER;
+	/**
+	 * Constructor
+	 */
+	public ExpSegment() {
+		setMarker(ExpSegment.MARKER);
 	}
 
+	/**
+	 * All ExpSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
 	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException {
-		this.contentLength = file.readUnsignedShort();
-		this.file = file;
-		this.fileOffset = file.getFilePointer();
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof ExpSegment)) ? false : true;
+	}
 
-		// read an array of huffman blocks
-
-		file.skipBytes(contentLength - 2);
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		return hash;
 	}
 
 }

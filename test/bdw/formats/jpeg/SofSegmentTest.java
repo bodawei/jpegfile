@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.IOException;
 import java.io.InputStream;
-import bdw.formats.jpeg.segments.support.SofComponentEntry;
+import bdw.formats.jpeg.segments.support.SofComponent;
 import bdw.formats.jpeg.segments.SofSegment;
 import org.junit.After;
 import org.junit.Before;
@@ -122,10 +122,10 @@ public class SofSegmentTest {
 	@Test
 	public void canInsertAComponent() {
 		SofSegment segment = new SofSegment();
-		SofComponentEntry comp = new SofComponentEntry();
+		SofComponent comp = new SofComponent();
 
 		segment.addComponent(0, comp);
-		
+
 		assertEquals("Component count", 1, segment.getComponentCount());
 		assertEquals("Inserted component", comp, segment.getComponent(0));
 	}
@@ -133,9 +133,9 @@ public class SofSegmentTest {
 	@Test
 	public void insertAComponentOutOfRangeErrors() {
 		SofSegment segment = new SofSegment();
-		SofComponentEntry comp = new SofComponentEntry();
+		SofComponent comp = new SofComponent();
 
-		segment.addComponent(0, new SofComponentEntry());
+		segment.addComponent(0, new SofComponent());
 		try {
 			segment.addComponent(7, comp);
 			fail("Should have failed to insert at position 7");
@@ -147,9 +147,9 @@ public class SofSegmentTest {
 	@Test
 	public void insertAComponentAtBeginningMovesOthersDown() {
 		SofSegment segment = new SofSegment();
-		SofComponentEntry comp = new SofComponentEntry();
+		SofComponent comp = new SofComponent();
 
-		segment.addComponent(0, new SofComponentEntry());
+		segment.addComponent(0, new SofComponent());
 		segment.addComponent(0, comp);
 
 		assertEquals("Component count", 2, segment.getComponentCount());
@@ -159,7 +159,7 @@ public class SofSegmentTest {
 	@Test
 	public void caNotDeleteComponentThatDoesntExist() {
 		SofSegment segment = new SofSegment();
-		SofComponentEntry comp1 = new SofComponentEntry();
+		SofComponent comp1 = new SofComponent();
 
 		segment.addComponent(0, comp1);
 		try {
@@ -176,7 +176,7 @@ public class SofSegmentTest {
 	@Test
 	public void canDeleteComponent() {
 		SofSegment segment = new SofSegment();
-		SofComponentEntry comp1 = new SofComponentEntry();
+		SofComponent comp1 = new SofComponent();
 
 		segment.addComponent(0, comp1);
 		segment.addComponent(1, comp1);
@@ -190,11 +190,11 @@ public class SofSegmentTest {
 		SofSegment segment = new SofSegment();
 
 		for (int index = 0; index < 256; index++) {
-			segment.addComponent(index, new SofComponentEntry());
+			segment.addComponent(index, new SofComponent());
 		}
 
 		try {
-			segment.addComponent(0, new SofComponentEntry());
+			segment.addComponent(0, new SofComponent());
 			fail("Should have thrown an exception");
 		} catch (Exception exception) {
 			assertTrue(exception instanceof IllegalArgumentException);
@@ -207,8 +207,8 @@ public class SofSegmentTest {
 		SofSegment segment = new SofSegment();
 		InputStream stream = utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12");
 		SofSegment answerFormat = new SofSegment();
-		SofComponentEntry entry = new SofComponentEntry();
-		
+		SofComponent entry = new SofComponent();
+
 		answerFormat.setSamplePrecision(0x44);
 		answerFormat.setImageHeight(0x33);
 		answerFormat.setImageWidth(0x1045);
@@ -219,7 +219,7 @@ public class SofSegmentTest {
 		answerFormat.addComponent(0, entry);
 
 		segment.readFromStream(stream);
-		
+
 		assertEquals("SofSegment", answerFormat, segment);
 	}
 
@@ -228,7 +228,7 @@ public class SofSegmentTest {
 		SofSegment segment = new SofSegment();
 		InputStream stream = utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12");
 		SofSegment answerFormat = new SofSegment();
-		SofComponentEntry entry = new SofComponentEntry();
+		SofComponent entry = new SofComponent();
 
 		answerFormat.setSamplePrecision(0x44);
 		answerFormat.setImageHeight(0x33);
@@ -303,26 +303,26 @@ public class SofSegmentTest {
 		SofSegment segment = new SofSegment();
 		byte[] rawData = utils.makeByteArrayFromString("00 11 44 0033 1045 03 01 12 03 04 75 06 07 E8 09");
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SofComponentEntry entry;
+		SofComponent entry;
 
 		segment.setSamplePrecision(0x44);
 		segment.setImageHeight(0x33);
 		segment.setImageWidth(0x1045);
-		entry  = new SofComponentEntry();
+		entry  = new SofComponent();
 		entry.setId(1);
 		entry.setSamplingX(1);
 		entry.setSamplingY(0x2);
 		entry.setQuantizationId(3);
 		segment.addComponent(0, entry);
 
-		entry  = new SofComponentEntry();
+		entry  = new SofComponent();
 		entry.setId(4);
 		entry.setSamplingX(7);
 		entry.setSamplingY(5);
 		entry.setQuantizationId(6);
 		segment.addComponent(1, entry);
 
-		entry  = new SofComponentEntry();
+		entry  = new SofComponent();
 		entry.setId(7);
 		entry.setSamplingX(0xE);
 		entry.setSamplingY(8);

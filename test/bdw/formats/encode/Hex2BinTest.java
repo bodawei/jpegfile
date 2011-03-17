@@ -118,6 +118,46 @@ public class Hex2BinTest {
 		assertArrayEquals(answer, output);
 	}
 
+    @Test
+    public void testCanUseComment() throws IOException {
+		Hex2Bin encoder = new Hex2Bin();
+		byte[] answer = {(byte)0x00, (byte)0x01};
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream inputStream = buildInputStreamFromString("00 /* 05 */ 01");
+
+		encoder.convert(inputStream, outputStream);
+
+		byte[] output = outputStream.toByteArray();
+		assertArrayEquals(answer, output);
+	}
+
+
+    @Test
+    public void testCanEmbedComments() throws IOException {
+		Hex2Bin encoder = new Hex2Bin();
+		byte[] answer = {(byte)0x00, (byte)0x01};
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream inputStream = buildInputStreamFromString("00 /* 02 /* 05 */ 03 */ 01");
+
+		encoder.convert(inputStream, outputStream);
+
+		byte[] output = outputStream.toByteArray();
+		assertArrayEquals(answer, output);
+	}
+
+    @Test
+    public void testFunkyComment() throws IOException {
+		Hex2Bin encoder = new Hex2Bin();
+		byte[] answer = {(byte)0x00, (byte)0x05, (byte)0x03, (byte)0x01};
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream inputStream = buildInputStreamFromString("00 /* 02 */* 05 */ 03 */ 01");
+
+		encoder.convert(inputStream, outputStream);
+
+		byte[] output = outputStream.toByteArray();
+		assertArrayEquals(answer, output);
+	}
+
 
 	protected InputStream buildInputStreamFromString(String inputString) throws IOException {
 		StringReader inputReader = new StringReader(inputString);

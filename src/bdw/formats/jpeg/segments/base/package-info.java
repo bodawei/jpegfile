@@ -13,20 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package bdw.formats.jpeg.segments;
-
-import bdw.formats.jpeg.segments.base.SegmentBase;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
- * Define Heirarchical Progression
+ * This package contains several classes the serve as superclasses for some of
+ * the Segment classes.  They exist here to keep the main segments package 
+ * "clean" and focused on actual usable segments.
  */
-public class DhpSegment extends SegmentBase {
-	public static final int MARKER = 0xDE;
-	protected int restartInterval;
+package bdw.formats.jpeg.segments.base;
 
-	public int getMarker() {
-		return MARKER;
-	}
-}
+

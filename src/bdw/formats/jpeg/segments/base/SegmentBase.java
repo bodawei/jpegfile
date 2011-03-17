@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package bdw.formats.jpeg.segments;
+package bdw.formats.jpeg.segments.base;
 
 import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.DataInput;
@@ -36,7 +36,7 @@ import java.io.RandomAccessFile;
  * This allows users to analyze the structure of a potentially large JPEG file without loading
  * all of the data into memory. At an time, however, the user can force that data into memory.
  */
-public abstract class SegmentBase {
+public abstract class SegmentBase extends JpegDataBase {
 
 	protected RandomAccessFile file;
 	protected long fileOffset;
@@ -46,6 +46,8 @@ public abstract class SegmentBase {
 		file = null;
 		fileOffset = 0;
 	}
+
+	//public abstract static SegmentBase createInstance(int subType);
 
 	/**
 	 * @return the code that represents this segment.

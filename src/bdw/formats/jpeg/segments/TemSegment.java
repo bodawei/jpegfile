@@ -15,6 +15,8 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
+
 /**
  * "Temporary for arithmetic coding" segment.
  * This seems to carry no data

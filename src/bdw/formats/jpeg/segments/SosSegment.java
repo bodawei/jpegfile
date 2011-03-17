@@ -15,14 +15,12 @@
  */
 package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.support.ScanDescriptorEntry;
+import bdw.formats.jpeg.segments.base.SegmentBase;
+import bdw.formats.jpeg.segments.support.SosDescriptor;
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,44 +30,145 @@ import java.util.List;
  */
 public class SosSegment extends SegmentBase {
 
+	/**
+	 * The marker that this type accepts
+	 */
 	public static final int MARKER = 0xDA;
-	private List<ScanDescriptorEntry> scanDescriptors;
+
+	/**
+	 * Array of ScanDescriptors
+	 */
+	private List<SosDescriptor> scanDescriptors;
+
+	/**
+	 * Start of spectral selection
+	 */
 	private int spectralSelectionStart;
+
+	/**
+	 * End of spectral selection
+	 */
 	private int spectralSelectionEnd;
+
+	/**
+	 * Successive approximation
+	 */
 	private int successiveApproximation;
 
+	/**
+	 * Constructs an instance with all properties empty
+	 */
 	public SosSegment() {
-		scanDescriptors = new ArrayList<ScanDescriptorEntry>();
+		scanDescriptors = new ArrayList<SosDescriptor>();
 		spectralSelectionStart = 0;
 		spectralSelectionEnd = 0;
 		successiveApproximation = 0;
-	}
-
-	@Override
-	public int getMarker() {
-		return SosSegment.MARKER;
-	}
-
-	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException {
-		readData(file);
+		setMarker(SosSegment.MARKER);
 	}
 
 	/**
-	 *
+	 * @inheritdoc
 	 */
 	@Override
-	public void readFromStream(InputStream stream) throws IOException {
-		if (stream instanceof DataInputStream) {
-			readData((DataInputStream) stream);
-		} else {
-			DataInputStream newStream = new DataInputStream(stream);
-			readData(newStream);
-		}
+	public int getMarker() {
+		return marker;
 	}
 
 	/**
-	 *
+	 * @return the start of the spectral selection
+	 */
+	public int getSpectralSelectionStart() {
+		return spectralSelectionStart;
+	}
+
+	/**
+	 * Sets the start spectral selection value
+	 * @param start a value between 0 and 255 indicating the start
+	 */
+	public void setSpectralSelectionStart(int start) {
+		paramIsUInt8(start);
+
+		spectralSelectionStart = start;
+	}
+
+	/**
+	 * @return the end of the spectral selection
+	 */
+	public int getSpectralSelectionEnd() {
+		return spectralSelectionEnd;
+	}
+
+	/**
+	 * Sets the end spectral selection value
+	 * @param start a value between 0 and 255 indicating the start
+	 */
+	public void setSpectralSelectionEnd(int end) {
+		paramIsUInt8(end);
+
+		spectralSelectionEnd = end;
+	}
+
+	/**
+	 * @return the successive approximation value
+	 */
+	public int getSuccessiveApproximation() {
+		return successiveApproximation;
+	}
+
+	/**
+	 * Sets the end spectral selection value
+	 * @param start a value between 0 and 255 indicating the start
+	 */
+	public void setSuccessiveApproximation(int approx) {
+		paramIsUInt8(approx);
+
+		successiveApproximation = approx;
+	}
+
+	/**
+	 * @return The number of descriptors in this segment
+	 */
+	public int getDescriptorCount() {
+		return scanDescriptors.size();
+	}
+
+	/**
+	 * @param index Index of the descriptor to be returned
+	 * @return The descriptor at the specified index
+	 * @throws IndexOutOfBoundsException If the index is negative or larger than the number of components
+	 */
+	public SosDescriptor getDescriptor(int index) throws IndexOutOfBoundsException {
+		return scanDescriptors.get(index);
+	}
+
+	/**
+	 * @param index The index to put the new descriptor (others are moved "right"
+	 * @param component The descriptor to add
+	 * @throws IndexOutOfBoundsException If the index is negative or larger than where can be added
+	 * @throws IllegalArgumentException if component is null, or if there are already 256 entries in the set
+	 */
+	public void addDescriptor(int index, SosDescriptor descriptor) throws
+			IndexOutOfBoundsException {
+		if (descriptor == null) {
+			throw new IllegalArgumentException("Entry may not be null");
+		}
+
+		if (scanDescriptors.size() >= 256) {
+			throw new IllegalArgumentException("Too many descriptors already in the list");
+		}
+		scanDescriptors.add(index, descriptor);
+	}
+
+	/**
+	 * @param index Index of the descriptor to delete
+	 * @throws IndexOutOfBoundsException If the index is out of range
+	 */
+	public void deleteDescriptor(int index) throws IndexOutOfBoundsException {
+		scanDescriptors.remove(index);
+	}
+
+	/**
+	 * @inheritdoc
 	 */
 	@Override
 	protected void readData(DataInput input) throws IOException {
@@ -81,40 +180,23 @@ public class SosSegment extends SegmentBase {
 		}
 
 		for (int index = 0; index < componentCount; index++) {
-			ScanDescriptorEntry entry = new ScanDescriptorEntry();
+			SosDescriptor entry = new SosDescriptor();
 			entry.readData(input);
-			scanDescriptors.add(entry);
+			addDescriptor(index, entry);
 		}
 
-		spectralSelectionStart = input.readUnsignedByte();
-		spectralSelectionEnd = input.readUnsignedByte();
-		successiveApproximation = input.readUnsignedByte();
-	}
-
-	public int getSpectralSelectionStart() {
-		return spectralSelectionStart;
-	}
-
-	public int getSpectralSelectionEnd() {
-		return spectralSelectionEnd;
-	}
-
-	public int getSuccessiveApproximation() {
-		return successiveApproximation;
+		setSpectralSelectionStart(input.readUnsignedByte());
+		setSpectralSelectionEnd(input.readUnsignedByte());
+		setSuccessiveApproximation(input.readUnsignedByte());
 	}
 
 	/**
-	 * @return An iterator that will iterate over all the segments in the file
+	 * @inheritdoc
 	 */
-	public Iterator<ScanDescriptorEntry> iterator() {
-		return scanDescriptors.listIterator();
-	}
-
 	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
 		DataOutputStream dataStream;
-		Iterator<ScanDescriptorEntry> iterator;
 
 		if (stream instanceof DataOutputStream) {
 			dataStream = (DataOutputStream) stream;
@@ -122,21 +204,23 @@ public class SosSegment extends SegmentBase {
 			dataStream = new DataOutputStream(stream);
 		}
 
-		dataStream.writeShort(2 + 1 + (scanDescriptors.size() * 2) + 3);
+		dataStream.writeShort(2 + 1 + (getDescriptorCount() * 2) + 3);
 
-		dataStream.writeByte(scanDescriptors.size());
+		dataStream.writeByte(getDescriptorCount());
 
-		iterator = iterator();
-		while (iterator.hasNext()) {
-			ScanDescriptorEntry entry = iterator.next();
+		for (int index = 0; index < getDescriptorCount(); index++) {
+			SosDescriptor entry = getDescriptor(index);
 			entry.write(dataStream);
 		}
 
-		dataStream.writeByte(spectralSelectionStart);
-		dataStream.writeByte(spectralSelectionEnd);
-		dataStream.writeByte(successiveApproximation);
+		dataStream.writeByte(getSpectralSelectionStart());
+		dataStream.writeByte(getSpectralSelectionEnd());
+		dataStream.writeByte(getSuccessiveApproximation());
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {
@@ -145,25 +229,18 @@ public class SosSegment extends SegmentBase {
 			return false;
 		} else if (other != this) {
 			SosSegment castOther = (SosSegment) other;
-			if ((spectralSelectionStart == castOther.getSpectralSelectionStart())
-					&& (spectralSelectionEnd == castOther.getSpectralSelectionEnd())
-					&& (successiveApproximation == castOther.getSuccessiveApproximation())) {
-				Iterator<ScanDescriptorEntry> myIterator = iterator();
-				Iterator<ScanDescriptorEntry> otherIterator = castOther.iterator();
-				while (otherIterator.hasNext()) {
-					if (myIterator.hasNext() == false) {
-						return false;
-					} else {
-						ScanDescriptorEntry myEntry = myIterator.next();
-						ScanDescriptorEntry otherEntry = otherIterator.next();
-						if ( ! myEntry.equals(otherEntry)) {
-							return false;
-						}
-					}
-				}
-
-				if (myIterator.hasNext()) {
+			if ((getSpectralSelectionStart() == castOther.getSpectralSelectionStart())
+					&& (getSpectralSelectionEnd() == castOther.getSpectralSelectionEnd())
+					&& (getSuccessiveApproximation() == castOther.getSuccessiveApproximation())) {
+				if (getDescriptorCount() != castOther.getDescriptorCount()) {
 					return false;
+				}
+				for (int index = 0; index < getDescriptorCount(); index++) {
+					SosDescriptor myEntry = getDescriptor(index);
+					SosDescriptor otherEntry = castOther.getDescriptor(index);
+					if ( ! myEntry.equals(otherEntry)) {
+						return false;
+					}
 				}
 			}
 		}
@@ -171,6 +248,9 @@ public class SosSegment extends SegmentBase {
 		return true;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	@Override
 	public int hashCode() {
 		int hash = 7;
@@ -180,4 +260,5 @@ public class SosSegment extends SegmentBase {
 		hash = 37 * hash + this.successiveApproximation;
 		return hash;
 	}
+
 }

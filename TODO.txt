@@ -1,22 +1,61 @@
-* Allow HexToBin to accept /* */
-* Clean up SosSegment and ScanDataEntry code
-* Deal with reading in data segment
-* isValid should allow for sos being followed by data
-* delegate isValid to individual segments
-* Get jpegfileformatexception created
-* Create a subtype of DataInput which keeps track of what byte one is at (so can be put in error, and perhaps reported usefully in jpeg file?
-* Get a way to collapse the 15 Sof segments into one
-* Test other segments
+* DqtSegment
+* DnlSegment
+* Dht
+* dhp
+* dac
+* com
+* appn
+* app0
+* Move guts of JunkSegment to BlobSegmentBase
+* Test JunkSegment
+* Test DataSegment
+* Redo how markers are done (see below)
+* In JpegParser
+** what should isValid do?
+** Create a subtype of DataInput which keeps track of what byte one is at (so can be put in error, and perhaps reported usefully in jpeg file?
 * Exif or other metadata added
+* Finish JpegParser
+* Do a jpeg scanner? (e.g. find me this one segment without reading everything in so much)
 
-Redo isvalid
-Merge readFile and readStream
-Figure out how to do the segment registration
-Parse the data segment
-	Validate: Should come right after the SOS segment
-Parse junk segment
-Parse each of the other segment types
-Write each segment out
-segment array handling (add/remove)
+----
+Resolve what to do about markers
+
+Basic thrust is to use loki's suggestion: can ask a factory method for an instance.
+Best of all ask the factory "can you do this marker code?"
+
+Resolve this issue:
+1) Do the factory with a static
+	- no inheritance system to promise that one will be there
+	- have to do reflection
+
+2) Do it as an instance method
+	- have to instantiate an instance just to create more
+	- aesthetics seem odd (ask an instance for an instance)
+
+
+	@Override
+	public SegmentBase createInstance(int subType) throws IllegalArgumentException {
+		return new EoiSegment(subType);
+	}
+	
+	/**
+	 * Construct
+	 */
+	public EoiSegment(int subType) {
+		if (subType != EoiSegment.MARKER) {
+			throw new IllegalArgumentException("Only " + EoiSegment.MARKER +
+					" may be passed as a subtype");
+		}
+
+
+	@Test
+	public void getGetInstance() throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class<?> c = EoiSegment.class;
+		Class<?>[] params = new Class<?>[] { Integer.class };
+		Method m = c.getMethod("createInstance", params);
+		EoiSegment s = (EoiSegment) m.invoke(null, new Integer(5));
+		
+		assertTrue(s instanceof EoiSegment);
+	}
 
 

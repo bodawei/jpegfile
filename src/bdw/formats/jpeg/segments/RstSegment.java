@@ -16,6 +16,8 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
+
 /**
  * "Restart" segment
  */

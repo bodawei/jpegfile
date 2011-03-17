@@ -15,6 +15,8 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
+
 /**
  * The End Of Image segment
  * This contains no content

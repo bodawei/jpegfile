@@ -31,7 +31,7 @@ import bdw.formats.jpeg.segments.JpgNSegment;
 import bdw.formats.jpeg.segments.JpgSegment;
 import bdw.formats.jpeg.segments.JunkSegment;
 import bdw.formats.jpeg.segments.RstSegment;
-import bdw.formats.jpeg.segments.SegmentBase;
+import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.SofSegment;
 import bdw.formats.jpeg.segments.SoiSegment;
 import bdw.formats.jpeg.segments.SosSegment;

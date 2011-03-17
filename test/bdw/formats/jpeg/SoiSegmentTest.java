@@ -31,24 +31,9 @@ public class SoiSegmentTest {
 
 	private TestUtils utils;
 
-	public SoiSegmentTest() {
-	}
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-	}
-
 	@Before
 	public void setUp() {
 		utils = new TestUtils();
-	}
-
-	@After
-	public void tearDown() {
 	}
 
 	@Test

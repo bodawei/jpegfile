@@ -15,6 +15,7 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.segments.base.SegmentBase;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 

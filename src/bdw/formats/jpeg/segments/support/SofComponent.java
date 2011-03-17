@@ -15,6 +15,7 @@
  */
 package bdw.formats.jpeg.segments.support;
 
+import bdw.formats.jpeg.segments.base.JpegDataBase;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.EOFException;
@@ -23,7 +24,7 @@ import java.io.IOException;
 /**
  * A single component as managed by a SofSegment
  */
-public class SofComponentEntry {
+public class SofComponent extends JpegDataBase {
 	/**
 	 * Convenience value for how large this data is if written to disk (bytes)
 	 */
@@ -62,9 +63,7 @@ public class SofComponentEntry {
 	 * @param value the id for this component (0-255)
 	 */
 	public void setId(int id) {
-		if (!Utils.inUInt8Range(id)) {
-			throw new IllegalArgumentException("id must be [0,255]. Was " + id);
-		}
+		this.paramIsUInt8(id);
 
 		componentId = id;
 	}
@@ -82,9 +81,7 @@ public class SofComponentEntry {
 	 * @param value the sampling value for X (between 0 and 15)
 	 */
 	public void setSamplingX(int value) {
-		if (!Utils.inUInt4Range(value)) {
-			throw new IllegalArgumentException("id must be [0,15]. Was " + value);
-		}
+		this.paramIsUInt4(value);
 
 		samplingX = value;
 	}
@@ -102,9 +99,7 @@ public class SofComponentEntry {
 	 * @param value the sampling value for Y (between 0 and 15)
 	 */
 	public void setSamplingY(int value) {
-		if (!Utils.inUInt4Range(value)) {
-			throw new IllegalArgumentException("id must be [0,15]. Was " + value);
-		}
+		this.paramIsUInt4(value);
 
 		samplingY = value;
 	}
@@ -122,9 +117,7 @@ public class SofComponentEntry {
 	 * @param id The quantization table id (between 0 and 255)
 	 */
 	public void setQuantizationId(int id) {
-		if (!Utils.inUInt8Range(id)) {
-			throw new IllegalArgumentException("id must be [0,255]. Was " + id);
-		}
+		this.paramIsUInt8(id);
 
 		quantizationTableId = id;
 	}
@@ -134,10 +127,10 @@ public class SofComponentEntry {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if ((other == null) || !(other instanceof SofComponentEntry)) {
+		if ((other == null) || !(other instanceof SofComponent)) {
 			return false;
 		} else {
-			SofComponentEntry otherEntry = (SofComponentEntry) other;
+			SofComponent otherEntry = (SofComponent) other;
 
 			if ((componentId != otherEntry.getId())
 					|| (samplingX != otherEntry.getSamplingX())
