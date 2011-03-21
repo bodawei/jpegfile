@@ -16,7 +16,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.segments.base.SegmentBase;
-import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
+import bdw.formats.jpeg.InvalidJpegFormat;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -17,7 +17,6 @@
 package bdw.formats.jpeg;
 
 import bdw.formats.encode.Hex2Bin;
-import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import bdw.formats.jpeg.segments.support.SosDescriptor;
 import bdw.formats.jpeg.segments.SosSegment;
 import java.io.ByteArrayInputStream;

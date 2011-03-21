@@ -1,8 +1,4 @@
-* DqtSegment
-* DnlSegment
 * Dht
-* dhp
-* dac
 * com
 * appn
 * app0
@@ -16,7 +12,8 @@
 * Exif or other metadata added
 * Finish JpegParser
 * Do a jpeg scanner? (e.g. find me this one segment without reading everything in so much)
-
+* Probably need to make a distinction in errors between those which are just flawed data, versus unrecoverable situations.
+* dqt should cope if there's more than 1K of data.
 ----
 Resolve what to do about markers
 

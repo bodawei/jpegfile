@@ -17,7 +17,6 @@
 package bdw.formats.jpeg;
 
 import bdw.formats.jpeg.segments.RstSegment;
-import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;

@@ -7,7 +7,6 @@ package bdw.formats.jpeg;
 
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
-import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.IOException;
 import bdw.formats.jpeg.segments.DriSegment;
 import org.junit.Before;

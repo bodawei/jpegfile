@@ -19,13 +19,37 @@ import bdw.formats.jpeg.segments.base.SegmentBase;
 
 /**
  * Define number of lines
+ * This appears to have no data
  */
 public class DnlSegment extends SegmentBase {
+	/**
+	 * Marker for this segment type
+	 */
 	public static final int MARKER = 0xDC;
 
-	@Override
-	public int getMarker() {
-		return DnlSegment.MARKER;
+	/**
+	 * Construct
+	 */
+	public DnlSegment() {
+		setMarker(DnlSegment.MARKER);
 	}
 
+	/**
+	 * All DnlSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof DnlSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 }

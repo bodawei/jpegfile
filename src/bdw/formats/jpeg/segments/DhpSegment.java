@@ -16,17 +16,41 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.segments.base.SegmentBase;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
- * Define Heirarchical Progression
+ * Define Hierarchical Progression
  */
 public class DhpSegment extends SegmentBase {
+	/**
+	 * Marker for this segment type
+	 */
 	public static final int MARKER = 0xDE;
-	protected int restartInterval;
 
-	public int getMarker() {
-		return MARKER;
+	/**
+	 * Construct
+	 */
+	public DhpSegment() {
+		setMarker(DhpSegment.MARKER);
 	}
+
+	/**
+	 * All SoiSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof DhpSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		return hash;
+	}
+
 }

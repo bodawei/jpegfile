@@ -22,12 +22,35 @@ import bdw.formats.jpeg.segments.base.SegmentBase;
  *Define Arithmetic coding conditions
  */
 public class DacSegment extends SegmentBase {
+	/**
+	 * Standard marker for this type
+	 */
     public static final int MARKER = 0xCC;
 
-    public int getMarker() {
-        return MARKER;
-    }
+	/**
+	 * Construct
+	 */
+	public DacSegment() {
+		setMarker(DacSegment.MARKER);
+	}
 
-    public DacSegment() {
-    }
+	/**
+	 * All SoiSegments are equal.
+	 * @param other The other object to test
+	 * @return If other and this are equal
+	 */
+	@Override
+	public boolean equals(Object other) {
+		return ((other == null) || !(other instanceof DacSegment)) ? false : true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
+
 }

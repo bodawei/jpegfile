@@ -36,7 +36,6 @@ import bdw.formats.jpeg.segments.SofSegment;
 import bdw.formats.jpeg.segments.SoiSegment;
 import bdw.formats.jpeg.segments.SosSegment;
 import bdw.formats.jpeg.segments.TemSegment;
-import bdw.formats.jpeg.segments.support.InvalidJpegFormat;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
