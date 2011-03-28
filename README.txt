@@ -20,4 +20,5 @@ Others:
 * http://www.cs.clemson.edu/~westall/481/notes/jpegimage.pdf
 * http://www.imperialviolet.org/binary/jpeg/
 * http://www.impulseadventure.com/
+* http://www.w3.org/Graphics/JPEG/jfif3.pdf
 

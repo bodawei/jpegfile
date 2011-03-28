@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
 import bdw.formats.encode.Hex2Bin;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
 import bdw.formats.jpeg.segments.support.SosDescriptor;
 import bdw.formats.jpeg.segments.SosSegment;
 import java.io.ByteArrayInputStream;

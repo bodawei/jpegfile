@@ -18,6 +18,7 @@ package bdw.formats.jpeg;
 
 import java.io.IOException;
 import bdw.formats.encode.Hex2Bin;
+import bdw.formats.jpeg.JpegParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -25,6 +26,8 @@ import java.io.StringReader;
 import java.net.URI;
 import java.io.File;
 import bdw.formats.jpeg.segments.EoiSegment;
+import bdw.formats.jpeg.segments.EoiSegment;
+import bdw.formats.jpeg.segments.SoiSegment;
 import bdw.formats.jpeg.segments.SoiSegment;
 import org.junit.After;
 import org.junit.AfterClass;

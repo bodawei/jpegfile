@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.EoiSegment;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
+import bdw.formats.jpeg.segments.RstSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
@@ -24,11 +26,11 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class EoiSegmentTest {
+public class RstSegmentTest {
 
 	private TestUtils utils;
 
-	public EoiSegmentTest() {
+	public RstSegmentTest() {
 	}
 
 	@Before
@@ -42,14 +44,14 @@ public class EoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(EoiSegment.MARKER, new EoiSegment().getMarker());
+		assertEquals(0, new RstSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		EoiSegment segment = new EoiSegment();
+		RstSegment segment = new RstSegment();
 
 		segment.readFromStream(stream);
 
@@ -57,12 +59,12 @@ public class EoiSegmentTest {
 	}
 
 	@Test
-	public void eoiSegmentsEqual() throws IOException {
-		assertTrue(new EoiSegment().equals(new EoiSegment()));
+	public void rstSegmentsEqual() throws IOException {
+		assertTrue(new RstSegment().equals(new RstSegment()));
 	}
 
 	@Test
-	public void eoiSegmentNotEqualToOther() throws IOException {
-		assertFalse(new EoiSegment().equals(new Object()));
+	public void rstSegmentNotEqualToOther() throws IOException {
+		assertFalse(new RstSegment().equals(new Object()));
 	}
 }

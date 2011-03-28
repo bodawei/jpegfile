@@ -15,7 +15,7 @@
  */
 package bdw.formats.jpeg.segments.support;
 
-import bdw.formats.jpeg.segments.base.JpegDataBase;
+import bdw.formats.jpeg.segments.base.JpegDataStructureBase;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.EOFException;
@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * A single component as managed by a SofSegment
  */
-public class SofComponent extends JpegDataBase {
+public class SofComponent extends JpegDataStructureBase {
 	/**
 	 * Convenience value for how large this data is if written to disk (bytes)
 	 */

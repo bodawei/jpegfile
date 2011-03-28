@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
 import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
 import bdw.formats.jpeg.segments.DqtSegment;

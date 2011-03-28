@@ -17,7 +17,7 @@
 package bdw.formats.jpeg.segments.support;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.segments.base.JpegDataBase;
+import bdw.formats.jpeg.segments.base.JpegDataStructureBase;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.EOFException;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 /**
  * A table of quantization entries used by the DqtSegment
  */
-public class DqtQuantizationTable extends JpegDataBase  {
+public class DqtQuantizationTable extends JpegDataStructureBase  {
 	/**
 	 * Preserves the unit size read from a jpeg file.  This is not used if
 	 * this table is built by hand rather than by reading from a file.

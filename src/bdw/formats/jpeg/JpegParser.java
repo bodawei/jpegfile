@@ -15,7 +15,6 @@
  */
 package bdw.formats.jpeg;
 
-import bdw.formats.jpeg.segments.App0Segment;
 import bdw.formats.jpeg.segments.AppNSegment;
 import bdw.formats.jpeg.segments.ComSegment;
 import bdw.formats.jpeg.segments.DacSegment;
@@ -75,7 +74,6 @@ public class JpegParser implements Iterable<SegmentBase> {
 	public void addStandardSegments() {
 		addSegmentHandler(SoiSegment.MARKER, SoiSegment.class);
 		addSegmentHandler(EoiSegment.MARKER, EoiSegment.class);
-		addSegmentHandler(App0Segment.MARKER, App0Segment.class);
 		addSegmentHandler(DqtSegment.MARKER, DqtSegment.class);
 		addSegmentHandler(SofSegment.RANGE1_START, SofSegment.RANGE1_END, SofSegment.class);
 		addSegmentHandler(SofSegment.RANGE2_START, SofSegment.RANGE2_END, SofSegment.class);

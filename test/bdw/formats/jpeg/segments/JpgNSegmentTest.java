@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.TemSegment;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
+import bdw.formats.jpeg.segments.JpgNSegment;
+import bdw.formats.jpeg.segments.JpgSegment;
 import java.io.IOException;
 import java.io.InputStream;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class TemSegmentTest {
+public class JpgNSegmentTest {
 
 	private TestUtils utils;
 
@@ -33,20 +35,16 @@ public class TemSegmentTest {
 		utils = new TestUtils();
 	}
 
-	@After
-	public void tearDown() {
-	}
-
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(TemSegment.MARKER, new TemSegment().getMarker());
+		assertEquals(JpgNSegment.START_MARKER, new JpgNSegment().getMarker());
 	}
 
 	@Test
-	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
+	public void testJpgNSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		TemSegment segment = new TemSegment();
+		JpgNSegment segment = new JpgNSegment();
 
 		segment.readFromStream(stream);
 
@@ -54,12 +52,12 @@ public class TemSegmentTest {
 	}
 
 	@Test
-	public void temSegmentsEqual() throws IOException {
-		assertTrue(new TemSegment().equals(new TemSegment()));
+	public void jpgSegmentsEqual() throws IOException {
+		assertTrue(new JpgSegment().equals(new JpgSegment()));
 	}
 
 	@Test
-	public void temSegmentNotEqualToOther() throws IOException {
-		assertFalse(new TemSegment().equals(new Object()));
+	public void jpgNSegmentNotEqualToOther() throws IOException {
+		assertFalse(new JpgNSegment().equals(new Object()));
 	}
 }

@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import bdw.formats.jpeg.segments.ExpSegment;

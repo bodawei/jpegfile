@@ -34,8 +34,8 @@ public class DhtSegment extends SegmentBase {
 	@Override
 	public void readFromFile(RandomAccessFile file) throws IOException {
 		this.contentLength = file.readUnsignedShort();
-		this.file = file;
-		this.fileOffset = file.getFilePointer();
+//		this.file = file;
+//		this.fileOffset = file.getFilePointer();
 
 		// read an array of huffman blocks
 

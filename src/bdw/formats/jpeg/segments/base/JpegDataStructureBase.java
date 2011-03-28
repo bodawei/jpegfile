@@ -20,7 +20,7 @@ package bdw.formats.jpeg.segments.base;
  * Serves as a superclass for Segments and entries providing parameter checking
  * routines
  */
-public class JpegDataBase {
+public class JpegDataStructureBase {
 
 	/**
 	 * Validates that the parameter is in in the range of an unsigned

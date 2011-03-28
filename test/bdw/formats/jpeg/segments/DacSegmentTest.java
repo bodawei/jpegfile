@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
+import bdw.formats.jpeg.segments.DacSegment;
 import java.io.IOException;
 import java.io.InputStream;
-import bdw.formats.jpeg.segments.SoiSegment;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class SoiSegmentTest {
+public class DacSegmentTest {
 
 	private TestUtils utils;
 
@@ -37,14 +36,14 @@ public class SoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(SoiSegment.MARKER, new SoiSegment().getMarker());
+		assertEquals(DacSegment.MARKER, new DacSegment().getMarker());
 	}
 
 	@Test
-	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
+	public void testDacSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		SoiSegment segment = new SoiSegment();
+		DacSegment segment = new DacSegment();
 
 		segment.readFromStream(stream);
 
@@ -52,12 +51,12 @@ public class SoiSegmentTest {
 	}
 
 	@Test
-	public void soiSegmentsEqual() throws IOException {
-		assertTrue(new SoiSegment().equals(new SoiSegment()));
+	public void DacSegmentsEqual() throws IOException {
+		assertTrue(new DacSegment().equals(new DacSegment()));
 	}
 
 	@Test
-	public void soiSegmentNotEqualToOther() throws IOException {
-		assertFalse(new SoiSegment().equals(new Object()));
+	public void DacSegmentNotEqualToOther() throws IOException {
+		assertFalse(new DacSegment().equals(new Object()));
 	}
 }

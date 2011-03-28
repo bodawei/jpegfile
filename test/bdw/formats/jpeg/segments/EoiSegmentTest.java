@@ -14,34 +14,44 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.DhpSegment;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
+import bdw.formats.jpeg.segments.EoiSegment;
 import java.io.IOException;
 import java.io.InputStream;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class DhpSegmentTest {
+public class EoiSegmentTest {
 
 	private TestUtils utils;
+
+	public EoiSegmentTest() {
+	}
 
 	@Before
 	public void setUp() {
 		utils = new TestUtils();
 	}
 
-	@Test
-	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(DhpSegment.MARKER, new DhpSegment().getMarker());
+	@After
+	public void tearDown() {
 	}
 
 	@Test
-	public void testDhpSegmentReadsNoData() throws IOException, InvalidJpegFormat {
+	public void testThatHasTheRightMarkerByDefault() {
+		assertEquals(EoiSegment.MARKER, new EoiSegment().getMarker());
+	}
+
+	@Test
+	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		DhpSegment segment = new DhpSegment();
+		EoiSegment segment = new EoiSegment();
 
 		segment.readFromStream(stream);
 
@@ -49,12 +59,12 @@ public class DhpSegmentTest {
 	}
 
 	@Test
-	public void DhpSegmentsEqual() throws IOException {
-		assertTrue(new DhpSegment().equals(new DhpSegment()));
+	public void eoiSegmentsEqual() throws IOException {
+		assertTrue(new EoiSegment().equals(new EoiSegment()));
 	}
 
 	@Test
-	public void DhpSegmentNotEqualToOther() throws IOException {
-		assertFalse(new DhpSegment().equals(new Object()));
+	public void eoiSegmentNotEqualToOther() throws IOException {
+		assertFalse(new EoiSegment().equals(new Object()));
 	}
 }

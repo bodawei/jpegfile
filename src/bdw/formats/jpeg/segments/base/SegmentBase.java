@@ -36,15 +36,11 @@ import java.io.RandomAccessFile;
  * This allows users to analyze the structure of a potentially large JPEG file without loading
  * all of the data into memory. At an time, however, the user can force that data into memory.
  */
-public abstract class SegmentBase extends JpegDataBase {
+public abstract class SegmentBase extends JpegDataStructureBase {
 
-	protected RandomAccessFile file;
-	protected long fileOffset;
 	protected int marker;
 
 	public SegmentBase() {
-		file = null;
-		fileOffset = 0;
 	}
 
 	//public abstract static SegmentBase createInstance(int subType);

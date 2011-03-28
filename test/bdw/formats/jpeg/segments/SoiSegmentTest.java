@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.JpgSegment;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import bdw.formats.jpeg.segments.SoiSegment;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class JpgSegmentTest {
+public class SoiSegmentTest {
 
 	private TestUtils utils;
 
@@ -34,14 +39,14 @@ public class JpgSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(JpgSegment.MARKER, new JpgSegment().getMarker());
+		assertEquals(SoiSegment.MARKER, new SoiSegment().getMarker());
 	}
 
 	@Test
-	public void testJpgSegmentReadsNoData() throws IOException, InvalidJpegFormat {
+	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		JpgSegment segment = new JpgSegment();
+		SoiSegment segment = new SoiSegment();
 
 		segment.readFromStream(stream);
 
@@ -49,12 +54,12 @@ public class JpgSegmentTest {
 	}
 
 	@Test
-	public void jpgSegmentsEqual() throws IOException {
-		assertTrue(new JpgSegment().equals(new JpgSegment()));
+	public void soiSegmentsEqual() throws IOException {
+		assertTrue(new SoiSegment().equals(new SoiSegment()));
 	}
 
 	@Test
-	public void jpgSegmentNotEqualToOther() throws IOException {
-		assertFalse(new JpgSegment().equals(new Object()));
+	public void soiSegmentNotEqualToOther() throws IOException {
+		assertFalse(new SoiSegment().equals(new Object()));
 	}
 }

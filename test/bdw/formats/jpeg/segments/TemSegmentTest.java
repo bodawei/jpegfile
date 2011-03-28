@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
+package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.RstSegment;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.TestUtils;
+import bdw.formats.jpeg.segments.TemSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
@@ -24,12 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class RstSegmentTest {
+public class TemSegmentTest {
 
 	private TestUtils utils;
-
-	public RstSegmentTest() {
-	}
 
 	@Before
 	public void setUp() {
@@ -42,14 +41,14 @@ public class RstSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(0, new RstSegment().getMarker());
+		assertEquals(TemSegment.MARKER, new TemSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		RstSegment segment = new RstSegment();
+		TemSegment segment = new TemSegment();
 
 		segment.readFromStream(stream);
 
@@ -57,12 +56,12 @@ public class RstSegmentTest {
 	}
 
 	@Test
-	public void rstSegmentsEqual() throws IOException {
-		assertTrue(new RstSegment().equals(new RstSegment()));
+	public void temSegmentsEqual() throws IOException {
+		assertTrue(new TemSegment().equals(new TemSegment()));
 	}
 
 	@Test
-	public void rstSegmentNotEqualToOther() throws IOException {
-		assertFalse(new RstSegment().equals(new Object()));
+	public void temSegmentNotEqualToOther() throws IOException {
+		assertFalse(new TemSegment().equals(new Object()));
 	}
 }

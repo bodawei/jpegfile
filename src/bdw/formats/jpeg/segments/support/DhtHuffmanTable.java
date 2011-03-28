@@ -16,7 +16,7 @@
 package bdw.formats.jpeg.segments.support;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.segments.base.JpegDataBase;
+import bdw.formats.jpeg.segments.base.JpegDataStructureBase;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * A table of huffman encoding values
  */
-public class DhtHuffmanTable extends JpegDataBase {
+public class DhtHuffmanTable extends JpegDataStructureBase {
 
 	protected boolean isAc;	// doesn't seem to be used?
 	protected int tableId;

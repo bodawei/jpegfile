@@ -15,7 +15,7 @@
  */
 package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.segments.base.SegmentBase;
+import bdw.formats.jpeg.segments.base.BlobSegmentBase;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -23,43 +23,39 @@ import java.io.RandomAccessFile;
 /**
  *
  */
-public class DataSegment extends SegmentBase {
-    public static int MARKER = 0x0100;
+public class DataSegment extends BlobSegmentBase {
 
-    private long contentLength;
-    private long dataLength;
+	public static int MARKER = 0x0100;
 
-    @Override
-    public int getMarker() {
-	return DataSegment.MARKER;
-    }
-
-    @Override
-    public void readFromFile(RandomAccessFile file) throws IOException {
-	this.file = file;
-	this.fileOffset = file.getFilePointer();
-
-	try {
-	    while (true) {
-	    int aByte = file.readUnsignedByte();
-	    dataLength ++;
-
-	    if (aByte == 0xff) {
-		int markerByte = file.readUnsignedByte();
-		if (markerByte != 0x00) {   // Assume this is a substantive marker
-		    contentLength = file.getFilePointer() - this.fileOffset;
-		    file.seek(file.getFilePointer() - 2);
-		    return;
-		} else {
-		    dataLength --;
-		}
-	    }
-	    }
-	} catch (EOFException exception) {
-	    // all done
+	public DataSegment() {
+		super();
+		this.interpretInitialByte = true;
 	}
 
-	contentLength = file.getFilePointer() - this.fileOffset;
-    }
+	@Override
+	public int getMarker() {
+		return DataSegment.MARKER;
+	}
 
+	@Override
+	public boolean equals(Object other) {
+		if ((other == null) || !(other instanceof DataSegment)) {
+			return false;
+		} else {
+			DataSegment segment = (DataSegment) other;
+			if (segment.getDataLength() != dataLength) {
+				return false;
+			}
+			try {
+				for (int index = 0; index < dataLength; index++) {
+					if (data[index] != segment.getDataAt(index)) {
+						return false;
+					}
+				}
+			} catch (IOException e) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

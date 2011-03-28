@@ -1,19 +1,26 @@
 * Dht
-* com
 * appn
-* app0
-* Move guts of JunkSegment to BlobSegmentBase
 * Test JunkSegment
 * Test DataSegment
-* Redo how markers are done (see below)
+* Comment should copde with utf8 and > 1024 bytes
+* Can DQT have more than 1K of data?  if so, deal with it
+* Architecture changes
+  * Deal with imperfect data better
+	* EOF or length too long: ?
+	* length too short  (can't happen)
+	* length and internal data say different things
+	* internal data has invalid values (we could allow)
+  * Reconsider how markers are done (instance or static method)
+  * readFromFile/Stream methods maybe should be static also?  Certainly, they need to be able to return
+    different classes based on the type.
+
 * In JpegParser
 ** what should isValid do?
 ** Create a subtype of DataInput which keeps track of what byte one is at (so can be put in error, and perhaps reported usefully in jpeg file?
 * Exif or other metadata added
 * Finish JpegParser
 * Do a jpeg scanner? (e.g. find me this one segment without reading everything in so much)
-* Probably need to make a distinction in errors between those which are just flawed data, versus unrecoverable situations.
-* dqt should cope if there's more than 1K of data.
+
 ----
 Resolve what to do about markers
 
@@ -55,4 +62,5 @@ Resolve this issue:
 		assertTrue(s instanceof EoiSegment);
 	}
 
+Arguably, readFrom...() should be a factory/class method, not an instance one.
 
