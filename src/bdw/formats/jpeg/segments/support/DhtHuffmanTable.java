@@ -84,8 +84,15 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 		if ((id < 0) || (id > 3)) {
 			throw new IllegalArgumentException("id must be between 0 and 3");
 		}
-		
+
 		this.id = id;
+	}
+
+	/**
+	 * @return the size of this element when written to disk
+	 */
+	public int getSizeOnDisk() {
+		return 17 + headers.size();
 	}
 
 	/**
@@ -231,13 +238,13 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 		for (int lengthIndex = 0; lengthIndex < 16; lengthIndex++) {
 			int codesOfThisLength = codeCounts[lengthIndex];
 			if (codesOfThisLength > (mask - bits)) {
-				// TODO: What do do about bad data?
+				throw new InvalidJpegFormat(""); // TODO: What do do about bad data?
 			}
 			for (int code = 0; code < codesOfThisLength; code++) {
 				int header = source.readUnsignedByte();
 				headers.add(new DhtRunLengthHeader(bits, lengthIndex+1, (header & 0xF0) >> 4, (header & 0x0F)));
 				if ((bits & mask) == mask) {
-					// TODO: What do do about bad data?
+					throw new InvalidJpegFormat(""); // TODO: What do do about bad data?
 				}
 				bits ++;
 			}
@@ -259,7 +266,7 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 		}
 
 		flags |= id;
-		
+
 		out.writeByte(flags);
 
 
@@ -279,7 +286,7 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 			int headerInt = header.getInitialZeroBitCount();
 			headerInt = headerInt << 4;
 			headerInt |= header.getFolowingDataBitCount();
-			
+
 			out.writeByte(headerInt);
 		}
 	}
