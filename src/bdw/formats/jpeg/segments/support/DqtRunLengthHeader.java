@@ -5,6 +5,8 @@
 
 package bdw.formats.jpeg.segments.support;
 
+import java.io.DataInput;
+
 /**
  *
  * @author bodawei
