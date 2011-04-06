@@ -16,9 +16,10 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.InputStream;
 
 /**
  *
@@ -26,81 +27,51 @@ import java.io.RandomAccessFile;
 public class AppNSegment extends SegmentBase {
 	public static final int START_MARKER = 0xE0;
 	public static final int END_MARKER = 0xEF;
-	/**
-	 *
-	 */
-	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException {
-		int contentLength = file.readUnsignedShort();
 
-		file.skipBytes(contentLength - 2);
+	protected byte[] data;
+	public AppNSegment() {
+
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
+		int contentLength = stream.readUnsignedShort();
+		byte[] buffer = new byte[contentLength];
 
-//	protected String identifier;
-//	protected int versionMajor;
-//	protected int versionMinor;
-//	protected int units;
-//	protected int xDensity;
-//	protected int yDensity;
-//	protected int xThumbnail;
-//	protected int yThumbnail;
-//
-//	public App0Segment() {
-//		identifier = null;
-//		versionMajor = 0;
-//		versionMinor = 0;
-//		units = 0;
-//		xDensity = 0;
-//		yDensity = 0;
-//		xThumbnail = 0;
-//		yThumbnail = 0;
-//	}
-//
-//	@Override
-//	public int getMarker() {
-//		return App0Segment.MARKER;
-//	}
-//
-//	/**
-//	 *
-//	 */
-//	@Override
-//	public void readFromFile(RandomAccessFile file) throws IOException {
-//		int stringLength;
-//		StringBuilder builder = new StringBuilder();
-//		int contentLength = file.readUnsignedShort();
-//		stringLength = contentLength - 2 - 9;
-//
-//		for (int index = 0; index < stringLength; index++) {
-//			int aChar = file.readUnsignedByte();
-//			if (index != stringLength -1) {
-//				builder.append((char)aChar);
-//			} else {
-//				if (aChar != 0x00) {
-//					throw new IllegalArgumentException();
-//				}
-//			}
-//		}
-//		identifier = builder.toString();
-//
-//		if (identifier.equals("JFIF")) {
-//			versionMajor = file.readUnsignedByte();
-//			versionMinor = file.readUnsignedByte();
-//			units = file.readUnsignedByte();
-//			//      0 = no units, x/y-density specify the aspect ratio instead
-//			//     1 = x/y-density are dots/inch
-//			//	2 = x/y-density are dots/cm
-//
-//
-//			xDensity = file.readUnsignedShort();
-//			yDensity = file.readUnsignedShort();
-//			xThumbnail = file.readUnsignedByte();
-//			yThumbnail = file.readUnsignedByte();
-//			//  - n bytes for thumbnail (RGB 24 bit), n = width*height*3
-//		//  - Normally units=0, x-dens=1, y-dens=1, meaning that the aspect ratio is 1:1 (evenly scaled).
-//		}
-//		// if it is JFXX then ... probably read in the rest of the stuff after the string.
-//	}
+		for (int index = 0; index < contentLength; index++) {
+			buffer[index] = (byte)stream.readByte();
+		}
 
+		data = buffer;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		raFile = file;
+		fileOffset = file.getFilePointer();
+
+		int contentLength = stream.readUnsignedShort();
+		byte[] buffer;
+
+		if (contentLength > 024) {
+
+		} else {
+			buffer = new byte[contentLength]; // if there's less than 1K of data, store it
+			int count = 0;
+
+			while (true) {
+				buffer[count] = file.readByte();;
+				count++;
+			}
+		}
+
+			data = buffer;
+			raFile = null;
+			fileOffset = 0;
+			dataRead = true;
+		}
+	}
 }
