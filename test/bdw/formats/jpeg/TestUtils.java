@@ -18,8 +18,11 @@ package bdw.formats.jpeg;
 import bdw.formats.encode.Hex2Bin;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.io.StringReader;
 
 public class TestUtils {
@@ -47,5 +50,30 @@ public class TestUtils {
 
 	public InputStream makeInputStreamFromString(String rawInput) throws IOException {
 		return new ByteArrayInputStream(makeByteArrayFromString(rawInput));
+	}
+
+	public RandomAccessFile makeRandomAccessFile(String data) throws IOException {
+		File temp = File.createTempFile("prefix", "suffix");
+		FileOutputStream output = new FileOutputStream(temp);
+
+		StringReader inputReader = new StringReader(data);
+		byte[] rawInputBytes = new byte[data.length()];
+		int aChar = inputReader.read();
+		int index = 0;
+		while (aChar != -1) {
+			rawInputBytes[index] = (byte) aChar;
+			aChar = inputReader.read();
+			index++;
+		}
+
+		Hex2Bin encoder = new Hex2Bin();
+		InputStream inputStream = new ByteArrayInputStream(rawInputBytes);
+
+		encoder.convert(inputStream, output);
+
+		output.flush();
+		output.close();
+		
+		return new RandomAccessFile(temp, "r");
 	}
 }
