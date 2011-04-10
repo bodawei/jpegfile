@@ -1,9 +1,8 @@
-* Dht
-* appn
 * Test JunkSegment
 * Test DataSegment
 * Comment should copde with utf8 and > 1024 bytes
 * Can DQT have more than 1K of data?  if so, deal with it
+* Can we explain the other structures as well as Dht?
 * Architecture changes
   * Deal with imperfect data better
 	* EOF or length too long: ?
@@ -11,8 +10,8 @@
 	* length and internal data say different things
 	* internal data has invalid values (we could allow)
   * Reconsider how markers are done (instance or static method)
-  * readFromFile/Stream methods maybe should be static also?  Certainly, they need to be able to return
-    different classes based on the type.
+  * readFromFile/Stream methods maybe should be static also?  Certainly, they need to be able to return different classes based on the type.
+	* Maybe this should be doing the java serialization scheme?
 
 * In JpegParser
 ** what should isValid do?

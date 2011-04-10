@@ -27,7 +27,7 @@ public class DataSegment extends BlobSegmentBase {
 
 	public DataSegment() {
 		super();
-		this.interpretInitialByte = true;
+		this.isDataSegment = true;
 	}
 
 	@Override
@@ -41,12 +41,12 @@ public class DataSegment extends BlobSegmentBase {
 			return false;
 		} else {
 			DataSegment segment = (DataSegment) other;
-			if (segment.getDataLength() != dataLength) {
+			if (segment.getDataLength() != getDataLength()) {
 				return false;
 			}
 			try {
-				for (int index = 0; index < dataLength; index++) {
-					if (data[index] != segment.getDataAt(index)) {
+				for (int index = 0; index < getDataLength(); index++) {
+					if (getDataAt(index) != segment.getDataAt(index)) {
 						return false;
 					}
 				}

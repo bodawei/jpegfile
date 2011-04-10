@@ -31,6 +31,11 @@ import java.util.Arrays;
 public abstract class BlobSegmentBase extends SegmentBase {
 
 	/**
+	 * Amount in increase the buffer size by
+	 */
+	private static final int BUFFER_INCREMENT = 1024;
+
+	/**
 	 * The data file we're reading from. Will be null if data has been read
 	 */
 	protected RandomAccessFile raFile;
@@ -42,6 +47,11 @@ public abstract class BlobSegmentBase extends SegmentBase {
 
 	/**
 	 * The number of bytes of data "on disk"
+	 */
+	protected long diskLength;
+
+	/**
+	 * The number of bytes of data in the data buffer
 	 */
 	protected long dataLength;
 
@@ -56,7 +66,7 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	 */
 	protected boolean dataRead;
 
-	protected boolean interpretInitialByte;
+	protected boolean isDataSegment;
 
 	/**
 	 * Construct
@@ -69,7 +79,7 @@ public abstract class BlobSegmentBase extends SegmentBase {
 		data = new byte[0];
 		dataRead = true;
 
-		interpretInitialByte = false;
+		isDataSegment = false;
 	}
 
 	public long getDataLength() {
@@ -93,8 +103,9 @@ public abstract class BlobSegmentBase extends SegmentBase {
 
 		forceContentLoading();
 
-		if (index > dataLength) {
-			data = Arrays.copyOf(data, index);
+		if (index+1 > dataLength) {
+			data = Arrays.copyOf(data, index+1);
+			dataLength = index+1;
 		}
 
 		data[index] = aByte;
@@ -106,13 +117,13 @@ public abstract class BlobSegmentBase extends SegmentBase {
 		fileOffset = file.getFilePointer();
 
 		byte[] buffer = new byte[1024]; // if there's less than 1K of data, store it
-		int count = 0;
+		int count = -1;
 
 		try {
 			// always read the first byte, and assume it is ok to not analyze
 			byte aByte;
 
-			if ( ! interpretInitialByte) {
+			if ( ! isDataSegment) {
 				aByte = file.readByte();
 				count++;
 				buffer[count] = aByte;
@@ -122,14 +133,23 @@ public abstract class BlobSegmentBase extends SegmentBase {
 				aByte = file.readByte();
 				count++;
 				if (count < 1024) {
-					buffer[count] = aByte;
+					buffer[count] = (byte) aByte;
+				} else {
+					// ??
 				}
 
 				// if this is 0xff 0x(!=0)
 				if (aByte == (byte) 0xff) {
-					int markerByte = file.readByte();
-					if (markerByte != 0x00) {   // possibly have a substantive marker.
-						dataLength = file.getFilePointer() - this.fileOffset;
+					byte markerByte = file.readByte();
+					if (markerByte == 0x00) {
+						if ( ! isDataSegment) {
+							count++;
+							buffer[count] = (byte) markerByte;
+							//check for overflow!
+						}
+					} else { // possibly have a substantive marker.
+						dataLength = count;
+						diskLength = file.getFilePointer() - this.fileOffset;
 						file.seek(file.getFilePointer() - 2);
 						count -= 2;
 						if (count < 1024) {
@@ -148,7 +168,8 @@ public abstract class BlobSegmentBase extends SegmentBase {
 		} catch (EOFException exception) {
 		}
 
-		dataLength = file.getFilePointer() - this.fileOffset;
+		dataLength = count + 1;
+		diskLength = file.getFilePointer() - this.fileOffset;
 		if (count < 1024) {
 			data = buffer;
 			raFile = null;
@@ -160,51 +181,70 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	@Override
 	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
 		byte[] buffer = new byte[1024];
-		int count = 0;
+		int bufferIndex = -1;
+		int aByte;
 
-		try {
-			// always read the first byte, and assume it is ok to not analyze
-			byte aByte;
-
-			if ( ! interpretInitialByte) {
-				aByte = (byte)stream.read();
-				count++;
-				buffer[count] = aByte;
+		if ( ! isDataSegment) {
+			aByte = stream.read();
+			if (aByte == -1) {
+				dataLength = 0;
+				raFile = null;
+				dataRead = true;
+				data = buffer;
+				return;
+			} else {
+				bufferIndex++;
+				buffer[bufferIndex] = (byte)aByte;
 			}
-
-			while (true) {
-				stream.mark(2);	// so we can roll back if we need to if we find the end
-
-				aByte = (byte)stream.read();
-				count++;
-				if (count > buffer.length) {
-					buffer = Arrays.copyOf(buffer, buffer.length + 1024);
-				}
-				buffer[count] = aByte;	// may end up ignoring this if it is 0xff
-
-				// if this is 0xff 0x(!=0)
-				if (aByte == 0xff) {
-					byte markerByte = (byte) stream.read();
-
-					if (markerByte == 0x00) {   // possibly have a substantive marker.
-						count++;
-						if (count > buffer.length) {
-							buffer = Arrays.copyOf(buffer, buffer.length + 1024);
-						}
-						buffer[count] = markerByte;
-					} else {
-						dataLength = count - 2;
-						stream.reset();
-						dataRead = true;
-						data = buffer;
-						return;
-					}
-				}
-			}
-		} catch (EOFException exception) {
 		}
 
-		dataLength = count;
+		while (true) {
+			stream.mark(2);	// so we can roll back if we need to if we find the end
+
+			aByte = stream.read();
+			if (aByte == -1) {
+				break;
+			} else if (aByte != 0xff) {
+				bufferIndex++;
+				if (bufferIndex >= buffer.length) {
+					buffer = Arrays.copyOf(buffer, buffer.length + BUFFER_INCREMENT);
+				}
+				buffer[bufferIndex] = (byte)aByte;	// may end up ignoring this if it is 0xff
+			} else {
+				int markerByte = stream.read();
+
+				if (markerByte == -1) {
+					// this is anomolous. It may be a bad jpeg file?
+					if (bufferIndex+1 > buffer.length) {
+						buffer = Arrays.copyOf(buffer, buffer.length + BUFFER_INCREMENT);
+					}
+					bufferIndex++;
+					buffer[bufferIndex] = (byte)aByte;
+					break;
+				} else if (markerByte == 0x00) {   // possibly have a substantive marker.
+					if (bufferIndex+1 > buffer.length) {
+						buffer = Arrays.copyOf(buffer, buffer.length + BUFFER_INCREMENT);
+					}
+					bufferIndex++;
+					buffer[bufferIndex] = (byte)aByte;
+					if ( ! isDataSegment) {
+						if (bufferIndex+1 > buffer.length) {
+							buffer = Arrays.copyOf(buffer, buffer.length + BUFFER_INCREMENT);
+						}
+						bufferIndex++;
+						buffer[bufferIndex] = (byte) markerByte;
+					}
+				} else {
+					dataLength = bufferIndex + 1;
+					stream.reset();
+					dataRead = true;
+					data = buffer;
+					return;
+				}
+			}
+		}
+
+		dataLength = bufferIndex + 1;
 		raFile = null;
 		dataRead = true;
 		data = buffer;
@@ -216,11 +256,12 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	 */
 	@Override
 	public void forceContentLoading() throws IOException {
-		if(dataRead == false) {
+		if (dataRead == false) {
 			long currentLoc = raFile.getFilePointer();
 			raFile.seek(fileOffset);
-			data = new byte[(int)dataLength];
+			data = new byte[(int)diskLength];
 			for (int index = 0; index < dataLength; index++) {
+				// TODO: Not good. need to deal with the 0xFF00, etc
 				data[index] = raFile.readByte();
 			}
 			dataRead = true;
@@ -246,6 +287,9 @@ public abstract class BlobSegmentBase extends SegmentBase {
 
 		for (int index = 0; index < dataLength; index++) {
 			stream.write(data[index]);
+			if (isDataSegment && (data[index] == (byte)0xFF)) {
+				stream.write(0x00);
+			}
 		}
 	}
 
