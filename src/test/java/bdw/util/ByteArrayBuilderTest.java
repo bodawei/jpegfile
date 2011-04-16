@@ -5,10 +5,7 @@
 
 package bdw.util;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -18,32 +15,65 @@ import static org.junit.Assert.*;
  */
 public class ByteArrayBuilderTest {
 
-    public ByteArrayBuilderTest() {
-    }
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-	}
+	protected ByteArrayBuilder builder;
 
     @Before
     public void setUp() {
+		builder = new ByteArrayBuilder();
     }
 
-    @After
-    public void tearDown() {
-    }
-
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
-    public void hello() {
-		ByteArrayBuilder foo = new ByteArrayBuilder();
-		assertTrue(false);
+    public void appendAddsAByteAtTheEnd() {
+		builder.append(5);
+		assertEquals(1, builder.getSize());
+		assertEquals(5, builder.getByteAt(0));
 	}
 
+    @Test
+    public void deAppendFromNoBytesDoesNothing() {
+		builder.deAppend();
+		assertEquals(0, builder.getSize());
+	}
+
+    @Test
+    public void deAppendRemovesAByteFromTheLength() {
+		builder.append(5);
+		builder.append(8);
+		builder.deAppend();
+
+		assertEquals(1, builder.getSize());
+		assertEquals(5, builder.getByteAt(0));
+	}
+
+	@Test
+    public void setExtendsTheLength() {
+		builder.setByteAt(23, 5);
+		assertEquals(24, builder.getSize());
+		assertEquals(0, builder.getByteAt(0));
+		assertEquals(5, builder.getByteAt(23));
+	}
+
+    @Test
+    public void appendUntilAReallocDone() {
+		for (int index= 0; index < 1025; index++) {
+			builder.append(index % 127);
+		}
+		assertEquals(1025, builder.getSize());
+		assertEquals(8, builder.getByteAt(1024));
+	}
+
+    @Test(expected=IllegalArgumentException.class)
+    public void appendingAnOutOfRangeValueThrowsException() {
+		builder.append(1024);
+	}
+
+    @Test
+    public void initialSizeIsZero() {
+		assertEquals(0, builder.getSize());
+	}
+
+    @Test(expected=IndexOutOfBoundsException.class)
+    public void getAByteOutOfRangeThrowsException() {
+		builder.getByteAt(2);
+	}
 }

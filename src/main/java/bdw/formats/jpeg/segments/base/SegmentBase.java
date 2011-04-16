@@ -38,6 +38,8 @@ import java.io.RandomAccessFile;
  */
 public abstract class SegmentBase extends JpegDataStructureBase {
 
+	protected static final int READ_LIMIT = 1024;
+
 	protected int marker;
 
 	public SegmentBase() {

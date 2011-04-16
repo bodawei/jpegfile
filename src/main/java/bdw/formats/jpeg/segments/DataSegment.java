@@ -41,10 +41,10 @@ public class DataSegment extends BlobSegmentBase {
 			return false;
 		} else {
 			DataSegment segment = (DataSegment) other;
-			if (segment.getDataLength() != getDataLength()) {
-				return false;
-			}
 			try {
+				if (segment.getDataLength() != getDataLength()) {
+					return false;
+				}
 				for (int index = 0; index < getDataLength(); index++) {
 					if (getDataAt(index) != segment.getDataAt(index)) {
 						return false;
@@ -56,4 +56,5 @@ public class DataSegment extends BlobSegmentBase {
 		}
 		return true;
 	}
+
 }

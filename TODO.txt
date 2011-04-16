@@ -1,8 +1,3 @@
-* Test JunkSegment
-* Test DataSegment
-* Comment should copde with utf8 and > 1024 bytes
-* Can DQT have more than 1K of data?  if so, deal with it
-* Can we explain the other structures as well as Dht?
 * Architecture changes
   * Deal with imperfect data better
 	* EOF or length too long: ?
@@ -12,6 +7,8 @@
   * Reconsider how markers are done (instance or static method)
   * readFromFile/Stream methods maybe should be static also?  Certainly, they need to be able to return different classes based on the type.
 	* Maybe this should be doing the java serialization scheme?
+* Can we explain the other structures as well as Dht?
+* Comment should cope with utf8 and > 1024 bytes
 
 * In JpegParser
 ** what should isValid do?
@@ -63,3 +60,4 @@ Resolve this issue:
 
 Arguably, readFrom...() should be a factory/class method, not an instance one.
 
+http://www.drewnoakes.com/code/exif/

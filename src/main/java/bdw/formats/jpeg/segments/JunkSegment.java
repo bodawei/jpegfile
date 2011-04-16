@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.segments.base.BlobSegmentBase;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Pseudo-segment that is used to represent data that doesn't match any known jpg
@@ -40,6 +40,7 @@ public class JunkSegment extends BlobSegmentBase {
 	 * Construct
 	 */
 	public JunkSegment() {
+		super();
 	}
 
 	/**
@@ -51,6 +52,7 @@ public class JunkSegment extends BlobSegmentBase {
 	public int getMarker() {
 		return JunkSegment.MARKER;
 	}
+	
 
 	@Override
 	public boolean equals(Object other) {
@@ -58,12 +60,12 @@ public class JunkSegment extends BlobSegmentBase {
 			return false;
 		} else {
 			JunkSegment segment = (JunkSegment) other;
-			if (segment.getDataLength() != dataLength) {
-				return false;
-			}
 			try {
-				for (int index = 0; index < dataLength; index++) {
-					if (data[index] != segment.getDataAt(index)) {
+				if (segment.getDataLength() != getDataLength()) {
+					return false;
+				}
+				for (int index = 0; index < getDataLength(); index++) {
+					if (getDataAt(index) != segment.getDataAt(index)) {
 						return false;
 					}
 				}
@@ -74,12 +76,5 @@ public class JunkSegment extends BlobSegmentBase {
 		return true;
 	}
 
-	@Override
-	public int hashCode() {
-		int hash = 7;
-		hash = 37 * hash + (int) (this.dataLength ^ (this.dataLength >>> 32));
-		hash = 37 * hash + Arrays.hashCode(this.data);
-		return hash;
-	}
 
 }

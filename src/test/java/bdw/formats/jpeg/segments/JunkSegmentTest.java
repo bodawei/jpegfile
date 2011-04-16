@@ -26,14 +26,14 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class DataSegmentTest {
+public class JunkSegmentTest {
 
 	protected TestUtils utils;
-	protected DataSegment segment;
+	protected JunkSegment segment;
 
 	@Before
     public void setUp() {
-		segment = new DataSegment();
+		segment = new JunkSegment();
 		utils = new TestUtils();
     }
 
@@ -54,10 +54,10 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void streamWithFF00ReadAsFF() throws IOException, InvalidJpegFormat {
+    public void streamWithFF00ReadAsFF00() throws IOException, InvalidJpegFormat {
 		segment.readFromStream(utils.makeInputStreamFromString("01 FF 00 04 05 06 07 08 09 0a"));
 
-		assertEquals("bytes", 9, segment.getDataLength());
+		assertEquals("bytes", 10, segment.getDataLength());
 	}
 
     @Test
@@ -80,17 +80,16 @@ public class DataSegmentTest {
 		InputStream stream = utils.makeInputStreamFromString("01 FF 00 04 05 FF D8 08 09 0a");
 		segment.readFromStream(stream);
 
-		assertEquals("bytes", 4, segment.getDataLength());
+		assertEquals("bytes", 5, segment.getDataLength());
 		assertEquals("nextByte", 0xFF, stream.read());
 	}
 
     @Test
-    public void streamStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
+    public void streamDoesNotStopAtOtherSegmentIfItIsAtTheFirstByte() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("FF D8 08 09 0a");
 		segment.readFromStream(stream);
 
-		assertEquals("bytes", 0, segment.getDataLength());
-		assertEquals("nextByte", 0xFF, stream.read());
+		assertEquals("bytes", 5, segment.getDataLength());
 	}
 
     @Test
@@ -106,10 +105,10 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void fileWithFF00ReadAsFF() throws IOException, InvalidJpegFormat {
+    public void fileWithFF00ReadAsFF00() throws IOException, InvalidJpegFormat {
 		segment.readFromFile(utils.makeRandomAccessFile("01 FF 00 04 05 06 07 08 09 0a"));
 
-		assertEquals("byteCount", 9, segment.getDataLength());
+		assertEquals("byteCount", 10, segment.getDataLength());
 	}
 
     @Test
@@ -133,17 +132,16 @@ public class DataSegmentTest {
 		RandomAccessFile file = utils.makeRandomAccessFile("01 FF 00 04 05 FF D8 08 09 0a");
 		segment.readFromFile(file);
 
-		assertEquals("byteCount", 4, segment.getDataLength());
+		assertEquals("byteCount", 5, segment.getDataLength());
 		assertEquals("nextByte", 0xFF, file.read());
 	}
 
     @Test
-    public void fileStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
+    public void fileDoesNotStopAtOtherSegmentStartWhenAtFirstByte() throws IOException, InvalidJpegFormat {
 		RandomAccessFile file = utils.makeRandomAccessFile("FF D8 08 09 0a");
 		segment.readFromFile(file);
 
-		assertEquals("byteCount", 0, segment.getDataLength());
-		assertEquals("nextByte", 0xFF, file.read());
+		assertEquals("byteCount", 5, segment.getDataLength());
 	}
 
 	@Test
@@ -173,14 +171,14 @@ public class DataSegmentTest {
 
 		segment.write(output);
 
-		assertArrayEquals("bytes", utils.makeByteArrayFromString("0a ff 00"), output.toByteArray());
+		assertArrayEquals("bytes", utils.makeByteArrayFromString("0a ff"), output.toByteArray());
 	}
 
 	@Test
     public void equalSegmentsEqual() throws IOException, InvalidJpegFormat {
 		segment.readFromStream(utils.makeInputStreamFromString("00 01 02 03 04 05 06 07 08 09"));
 
-		DataSegment other = new DataSegment();
+		JunkSegment other = new JunkSegment();
 		for (int index = 0; index < 10; index++) {
 			other.setDataAt(index, (byte)index);
 		}
@@ -192,7 +190,7 @@ public class DataSegmentTest {
     public void unequalSegmentsNotEqual() throws IOException, InvalidJpegFormat {
 		segment.readFromStream(utils.makeInputStreamFromString("01 03 03 04 05 06 07 08 09 0a"));
 
-		DataSegment other = new DataSegment();
+		JunkSegment other = new JunkSegment();
 		for (int index = 0; index < 10; index++) {
 			other.setDataAt(index, (byte)index);
 		}
