@@ -1,6 +1,17 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright 2011 柏大衛
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package bdw.formats.jpeg.segments;
@@ -15,10 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author bodawei
- */
 public class DataSegmentTest {
 
 	protected TestUtils utils;
@@ -39,7 +46,7 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void readFromAnOrdinaryStreamWorks() throws IOException, InvalidJpegFormat {
+    public void streamRead() throws IOException, InvalidJpegFormat {
 		segment.readFromStream(utils.makeInputStreamFromString("01 02 03 04 05 06 07 08 09 0a"));
 
 		assertEquals("bytes", 10, segment.getDataLength());
@@ -68,9 +75,8 @@ public class DataSegmentTest {
 		assertEquals("Last Byte", (byte)0xFF, segment.getDataAt(1));
 	}
 
-
 	@Test
-    public void readStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
+    public void sreamStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("01 FF 00 04 05 FF D8 08 09 0a");
 		segment.readFromStream(stream);
 
@@ -79,7 +85,7 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void readStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
+    public void streamStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("FF D8 08 09 0a");
 		segment.readFromStream(stream);
 
@@ -88,7 +94,7 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void readFromFileMoreThan1KOfData() throws IOException, InvalidJpegFormat {
+    public void fileWithMoreThan1KOfData() throws IOException, InvalidJpegFormat {
 		StringBuilder builder = new StringBuilder();
 
 		for (int index = 0; index < 0x1FE0; index++) {
@@ -114,7 +120,7 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void fileReadWithTrailingFFWorks() throws IOException, InvalidJpegFormat {
+    public void fileWithTrailingFFWorks() throws IOException, InvalidJpegFormat {
 		segment.readFromFile(utils.makeRandomAccessFile("02 FF"));
 
 		assertEquals("bytes", 2, segment.getDataLength());
@@ -123,7 +129,7 @@ public class DataSegmentTest {
 
 
 	@Test
-    public void fileReadStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
+    public void fileStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
 		RandomAccessFile file = utils.makeRandomAccessFile("01 FF 00 04 05 FF D8 08 09 0a");
 		segment.readFromFile(file);
 
@@ -132,12 +138,21 @@ public class DataSegmentTest {
 	}
 
     @Test
-    public void fileReadStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
+    public void fileStopsAtOtherSegmentStartEvenIfFirstByte() throws IOException, InvalidJpegFormat {
 		RandomAccessFile file = utils.makeRandomAccessFile("FF D8 08 09 0a");
 		segment.readFromFile(file);
 
 		assertEquals("bytes", 0, segment.getDataLength());
 		assertEquals("nextByte", 0xFF, file.read());
+	}
+
+	@Test
+    public void writeZeroLengthSegment() throws IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		segment.write(output);
+
+		assertArrayEquals("bytes", new byte[0], output.toByteArray());
 	}
 
 	@Test
