@@ -16,6 +16,7 @@
 package bdw.formats.jpeg.segments.support;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.JpegDataStructureBase;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,7 +36,7 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 	/**
 	 * True if this is an AC table (otherwise is DC)
 	 */
-	protected boolean isAc;
+	protected int isAc;
 
 	/**
 	 * ID of the table
@@ -51,23 +52,35 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 	 * Constructs an instance
 	 */
 	public DhtHuffmanTable() {
-		isAc = false;
+		isAc = 0;
 		id = 0;
 		headers = new ArrayList<DhtRunLengthHeader>();
+	}
+
+	public boolean isValid() {
+		if ((isAc & 0x0e) != 0x00) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
 	 * @return True if this is an AC table, false if a DC one
 	 */
 	public boolean isAc() {
-		return isAc;
+		return (isAc & 0x01) == 0x01;
 	}
 
 	/**
 	 * @param ac true if this is an AC table, false otherwise
 	 */
 	public void setAc(boolean ac) {
-		isAc = ac;
+		if (ac) {
+			isAc = 0x01;
+		} else {
+			isAc = 0x00;
+		}
 	}
 
 	/**
@@ -188,7 +201,7 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 	@Override
 	public int hashCode() {
 		int hash = 5;
-		hash = 83 * hash + (this.isAc ? 1 : 0);
+		hash = 83 * hash + this.isAc;
 		hash = 83 * hash + this.id;
 		hash = 83 * hash + (this.headers != null ? this.headers.hashCode() : 0);
 		return hash;
@@ -197,14 +210,15 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 	/**
 	 * @inheritdoc
 	 */
-	public void read(DataInput source) throws IOException, InvalidJpegFormat {
+	public void read(DataInput source, ParseMode strict) throws IOException, InvalidJpegFormat {
 		int flags = source.readUnsignedByte();
 
-		// TODO: What do do about bad data?
-		if ((flags & 0xF0) == 0x10) {
-			isAc = true;
-		} else {
-			isAc = false;
+		isAc = (flags & 0xF0) >> 4;
+
+		if ((isAc & 0x0e) != 0x00) {
+			if (strict == ParseMode.STRICT) {
+				throw new InvalidJpegFormat("AC flag isn't 0 or 1, but instead is " + isAc);
+			}
 		}
 
 		// TODO: What do do about bad data?
@@ -237,15 +251,15 @@ public class DhtHuffmanTable extends JpegDataStructureBase {
 		int mask = 1;
 		for (int lengthIndex = 0; lengthIndex < 16; lengthIndex++) {
 			int codesOfThisLength = codeCounts[lengthIndex];
-			if (codesOfThisLength > (mask - bits)) {
-				throw new InvalidJpegFormat(""); // TODO: What do do about bad data?
+			if (codesOfThisLength > (mask - (bits-1))) {
+				throw new InvalidJpegFormat("More huffman codes of length " + lengthIndex+1 + " than spots available (" + codesOfThisLength + " needed versus " + (mask - (bits-1)) + "available)");
 			}
 			for (int code = 0; code < codesOfThisLength; code++) {
+				if (bits > mask) {
+					throw new InvalidJpegFormat("Node number larger than available space (" + bits + " versus " + mask +")");
+				}
 				int header = source.readUnsignedByte();
 				headers.add(new DhtRunLengthHeader(bits, lengthIndex+1, (header & 0xF0) >> 4, (header & 0x0F)));
-				if ((bits & mask) == mask) {
-					throw new InvalidJpegFormat(""); // TODO: What do do about bad data?
-				}
 				bits ++;
 			}
 			bits = bits << 1;

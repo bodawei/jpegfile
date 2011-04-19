@@ -17,13 +17,16 @@
 package bdw.formats.jpeg.support;
 
 import bdw.formats.jpeg.segments.support.DhtRunLengthHeader;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- */
-public class DhtRunLengthHeaderTests {
+
+public class DhtRunLengthHeaderTest {
+
+	@Before
+    public void setUp() {
+    }
 
 	@Test
 	public void constructor_BuildsMask() {

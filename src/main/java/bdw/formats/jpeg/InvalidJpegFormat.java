@@ -21,7 +21,7 @@ package bdw.formats.jpeg;
 public class InvalidJpegFormat extends Exception{
 	private static final long serialVersionUID = 1L;
 
-   public InvalidJpegFormat(String info) {
-
+	public InvalidJpegFormat(String info) {
+	   super(info);
 	}
 }

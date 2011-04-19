@@ -87,7 +87,7 @@ public class DhtSegment extends SegmentBase {
 			DhtHuffmanTable table = new DhtHuffmanTable();
 
 			try {
-				table.read(limited);
+				table.read(limited, strict);
 			} catch (LimitExceeded e) {
 				throw new InvalidJpegFormat("Dht segment length doesn't match actual data");
 			}

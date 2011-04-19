@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.support;
 
+import bdw.formats.jpeg.ParseMode;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -30,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class DhtHuffmanTableTests {
+public class DhtHuffmanTableTest {
 
 	protected TestUtils utils;
 	protected DhtHuffmanTable table;
@@ -102,7 +103,31 @@ public class DhtHuffmanTableTests {
 		InputStream stream = utils.makeInputStreamFromString(SAMPLE_BYTES);
 		DataInputStream diStream = new DataInputStream(stream);
 
-		table.read(diStream);
+		table.read(diStream, ParseMode.STRICT);
+
+		DhtHuffmanTable expected = buildSampleTable();
+
+		assertEquals("Dht table", expected, table);
+	}
+
+	@Test(expected=InvalidJpegFormat.class)
+	public void readStrict_StrangeAc_ThrowsException() throws IOException, InvalidJpegFormat {
+		InputStream stream = utils.makeInputStreamFromString("33 "
+				+ "01 01 00 04 00 00 00 00 00 00 00 00 00 00 00 00"
+				+ "0A   5f   11 22 33 44");
+		DataInputStream diStream = new DataInputStream(stream);
+
+		table.read(diStream, ParseMode.STRICT);
+	}
+
+	@Test
+	public void readLax_StrangeAc_ParsesOK() throws IOException, InvalidJpegFormat {
+		InputStream stream = utils.makeInputStreamFromString("33 "
+				+ "01 01 00 04 00 00 00 00 00 00 00 00 00 00 00 00"
+				+ "0A   5f   11 22 33 44");
+		DataInputStream diStream = new DataInputStream(stream);
+
+		table.read(diStream, ParseMode.LAX);
 
 		DhtHuffmanTable expected = buildSampleTable();
 
@@ -116,7 +141,7 @@ public class DhtHuffmanTableTests {
 				+ "0A   5f   11 22 33");
 		DataInputStream diStream = new DataInputStream(stream);
 
-		table.read(diStream);
+		table.read(diStream, ParseMode.STRICT);
 	}
 
 	@Test
