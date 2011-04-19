@@ -15,6 +15,8 @@
  */
 package bdw.formats.jpeg.segments.support;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.JpegDataStructureBase;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,6 +52,13 @@ public class SofComponent extends JpegDataStructureBase {
 	 */
 	private int quantizationTableId;
 
+	public boolean isValid() {
+		if ((componentId > 5) || (componentId == 0)) {
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * @return the id for this component
 	 */
@@ -64,6 +73,7 @@ public class SofComponent extends JpegDataStructureBase {
 	 */
 	public void setId(int id) {
 		this.paramIsUInt8(id);
+		// TODO: If we really want to say 0-5 is the only valid...
 
 		componentId = id;
 	}
@@ -164,10 +174,16 @@ public class SofComponent extends JpegDataStructureBase {
 	 * @throws IOException If any problem occurs
 	 * @throws EOFException If the EOF is found while trying to read
 	 */
-	public void read(DataInput source) throws IOException, EOFException {
+	public void read(DataInput source, ParseMode mode) throws IOException, EOFException, InvalidJpegFormat {
 		int id = source.readUnsignedByte(); //  one source says: (1 = Y, 2 = Cb, 3 = Cr, 4 = I, 5 = Q)
 		int values = source.readUnsignedByte();
 		int quantId = source.readUnsignedByte();
+
+		if ((id > 5) || (id == 0)) {
+			if (mode == ParseMode.STRICT) {
+				throw new InvalidJpegFormat("SOF Component has an ID of " + id + "but that should only be 1-5");
+			}
+		}
 
 		setId(id);
 		setSamplingY(values & 0x0F);

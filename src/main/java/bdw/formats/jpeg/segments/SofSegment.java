@@ -17,6 +17,7 @@ package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.support.SofComponent;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -100,6 +101,29 @@ public class SofSegment extends SegmentBase {
 	public SofSegment() {
 		setMarker(0);
 		components = new ArrayList<SofComponent>();
+	}
+
+	/**
+	 * @return true if the segment is strictly valid
+	 */
+	@Override
+	public boolean isValid() {
+		if (! super.isValid()) {
+			return false;
+		} else {
+			if ((components.size() == 0) ||
+				(components.size() == 2) ||
+				(components.size() > 4)) {
+				return false;
+			}
+
+			for (SofComponent component : components) {
+				if ( ! component.isValid()) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -234,9 +258,19 @@ public class SofSegment extends SegmentBase {
 			// 3 = color YCbCr or YIQ
 			// 4 = color CMYK
 
+			if ((numComponents == 0) ||
+				(numComponents == 2) ||
+				(numComponents > 4)) {
+				if (strict == ParseMode.STRICT) {
+					throw new InvalidJpegFormat("Sof segment found with " + numComponents + " components. This should be 1, 3 or 4");
+				} else {
+					setValid(false);
+				}
+			}
+
 			for (int index = 0; index < numComponents; index++) {
 				SofComponent entry = new SofComponent();
-				entry.read(dataSource);
+				entry.read(dataSource, strict);
 				comps.add(entry);
 			}
 		} catch (EOFException exception) {
@@ -259,6 +293,11 @@ public class SofSegment extends SegmentBase {
 	@Override
 	public void write(OutputStream output) throws IOException {
 		DataOutput out;
+
+		if ( ! isValid()) {
+			throw new IOException("The Number of components is not valid, or the components themselves are not valid");
+		}
+
 		if (output instanceof DataOutput) {
 			out = (DataOutput) output;
 		} else {

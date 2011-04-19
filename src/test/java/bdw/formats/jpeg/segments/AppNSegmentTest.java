@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.RandomAccessFile;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import bdw.formats.jpeg.InvalidJpegFormat;
@@ -44,7 +45,7 @@ public class AppNSegmentTest {
 
     @Test
     public void readFromStreamWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0A" +
+		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
@@ -59,7 +60,7 @@ public class AppNSegmentTest {
 
     @Test
     public void readFromSmallFileWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile("00 0A" +
+		segment.readFromFile(utils.makeRandomAccessFile("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
@@ -70,7 +71,7 @@ public class AppNSegmentTest {
     public void readFromBigFileWorks() throws IOException, InvalidJpegFormat {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append("1F E0");
+		builder.append("1F E2");
 
 		for (int index = 0; index < 0x1FE0; index++) {
 			builder.append("00");
@@ -80,9 +81,28 @@ public class AppNSegmentTest {
 		assertEquals("length", 0x1FE0, segment.getBytes().length);
 	}
 
+    @Test
+    public void readFromBigFileSkipsBytes() throws IOException, InvalidJpegFormat {
+		StringBuilder builder = new StringBuilder();
+		RandomAccessFile file;
+
+		builder.append("1F E2");
+
+		for (int index = 0; index < 0x1FE0; index++) {
+			builder.append("00");
+		}
+		builder.append("77");
+		file = utils.makeRandomAccessFile(builder.toString());
+
+		segment.readFromFile(file);
+
+		assertEquals("Expected byte after reading", 0x77, file.readByte());
+	}
+
+
 	@Test
     public void twoEqualSegmentsEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0A" +
+		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		AppNSegment other = new AppNSegment();
@@ -92,7 +112,7 @@ public class AppNSegmentTest {
 
     @Test
     public void unequalSegmentsAreNotEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0A" +
+		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		AppNSegment other = new AppNSegment();

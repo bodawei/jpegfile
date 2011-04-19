@@ -111,7 +111,7 @@ public class AppNSegment extends SegmentBase {
 			diStream = new DataInputStream(stream);
 		}
 
-		int dataLength = diStream.readUnsignedShort();
+		int dataLength = diStream.readUnsignedShort() - 2;
 		byte[] buffer = new byte[dataLength];
 
 		for (int index = 0; index < dataLength; index++) {
@@ -126,13 +126,15 @@ public class AppNSegment extends SegmentBase {
 	 */
 	@Override
 	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		contentLength = file.readUnsignedShort();
+		contentLength = file.readUnsignedShort() - 2;
 		byte[] buffer;
 
 		if (contentLength > 1024) {
 			buffer = new byte[0];
 			raFile = file;
 			fileOffset = file.getFilePointer();
+			file.skipBytes(contentLength);
+			long fileOffset2 = file.getFilePointer();
 			dataRead = false;
 
 		} else {

@@ -66,14 +66,6 @@ public class SosSegment extends SegmentBase {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	@Override
-	public int getMarker() {
-		return marker;
-	}
-
-	/**
 	 * @return the start of the spectral selection
 	 */
 	public int getSpectralSelectionStart() {

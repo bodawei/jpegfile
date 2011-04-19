@@ -16,6 +16,7 @@
 package bdw.formats.jpeg.segments.base;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -40,12 +41,35 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 
 	protected static final int READ_LIMIT = 1024;
 
-	protected int marker;
+	private int marker;
+
+	private boolean valid;
 
 	public SegmentBase() {
+		valid = true;
+		strict = ParseMode.STRICT;
 	}
 
-	//public abstract static SegmentBase createInstance(int subType);
+
+	protected ParseMode strict;
+
+	public void setStrictness(ParseMode strictness) {
+		strict = strictness;
+	}
+
+	/**
+	 * @return true if the segment is strictly valid
+	 */
+	public boolean isValid() {
+		return valid;
+	}
+
+	/**
+	 * @param valid the new value for the valid flag.
+	 */
+	protected void setValid(boolean valid) {
+		this.valid = valid;
+	}
 
 	/**
 	 * @return the code that represents this segment.

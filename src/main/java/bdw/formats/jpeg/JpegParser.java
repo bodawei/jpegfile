@@ -113,26 +113,53 @@ public class JpegParser implements Iterable<SegmentBase> {
 		RandomAccessFile file = new RandomAccessFile(jpegFile, "r");
 		int aByte;
 		int markerByte;
+		boolean seenSOS = false;
+
 		while (file.getFilePointer() < file.length()) {
+			long pos = file.getFilePointer();
 			aByte = file.readUnsignedByte();
 
 			if (aByte != 0xFF) {
-				JunkSegment data = new JunkSegment();
-				data.readFromFile(file);
-				this.segments.add(data);
+				file.seek(pos);
+				if (seenSOS) {
+					DataSegment data = new DataSegment();
+					data.readFromFile(file);
+					this.segments.add(data);
+				} else {
+					JunkSegment data = new JunkSegment();
+					data.readFromFile(file);
+					this.segments.add(data);
+				}
 			} else {
 				markerByte = 0;
 				if (file.getFilePointer() < file.length()) {
 					markerByte = file.readUnsignedByte();
 				}
-				Class<? extends SegmentBase> managerClass = this.segmentManagers[markerByte];
-				SegmentBase manager = (SegmentBase) managerClass.newInstance();
-				manager.readFromFile(file);
-				this.segments.add(manager);
-				if (manager instanceof SosSegment) {
-					DataSegment data = new DataSegment();
-					data.readFromFile(file);
-					this.segments.add(data);
+				if (markerByte == 0) {
+				file.seek(pos);
+					if (seenSOS) {
+						DataSegment data = new DataSegment();
+						data.readFromFile(file);
+						this.segments.add(data);
+					} else {
+						JunkSegment data = new JunkSegment();
+						data.readFromFile(file);
+						this.segments.add(data);
+					}
+				} else {
+					Class<? extends SegmentBase> managerClass = this.segmentManagers[markerByte];
+					if (managerClass == null) {
+						JunkSegment data = new JunkSegment();
+						data.readFromFile(file);
+						this.segments.add(data);
+					} else {
+						SegmentBase manager = (SegmentBase) managerClass.newInstance();
+						manager.readFromFile(file);
+						this.segments.add(manager);
+						if (manager instanceof SosSegment) {
+							seenSOS = true;
+						}
+					}
 				}
 			}
 		}

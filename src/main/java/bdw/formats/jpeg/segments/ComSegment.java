@@ -26,7 +26,7 @@ import java.io.OutputStream;
  */
 public class ComSegment extends SegmentBase {
 
-    public static final int MARKER = 0xDF;
+    public static final int MARKER = 0xFE;
     protected String comment;
     protected boolean writeTrailingNull;
 
@@ -89,7 +89,7 @@ public class ComSegment extends SegmentBase {
         }
 
         int totalLength = 2 + comment.length();
-        
+
         if (writeTrailingNull == true) {
             totalLength ++;
         }
