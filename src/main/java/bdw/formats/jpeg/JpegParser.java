@@ -43,6 +43,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -153,11 +157,54 @@ public class JpegParser implements Iterable<SegmentBase> {
 						data.readFromFile(file);
 						this.segments.add(data);
 					} else {
-						SegmentBase manager = (SegmentBase) managerClass.newInstance();
-						manager.readFromFile(file);
+						Method handler;
+						Constructor constructor;
+						SegmentBase manager = null;
+						Exception foo;
+						try {
+							Boolean canHandle = Boolean.FALSE;
+
+//	    Method[] allMethods = managerClass.getDeclaredMethods();
+//	    for (Method m : allMethods) {
+//			String mname = m.getName();
+//			if (!mname.startsWith("canHandleMarker")
+//				|| (m.getGenericReturnType() != boolean.class)) {
+//				continue;
+//			}
+//			Type[] pType = m.getGenericParameterTypes();
+//			if ((pType.length != 1)) {
+//				continue;
+//			}
+//		}
+
+							handler = managerClass.getDeclaredMethod("canHandleMarker", int.class);
+							if (handler != null) {
+								canHandle = (Boolean) handler.invoke(managerClass, markerByte);
+							}
+
+							constructor = managerClass.getDeclaredConstructor(RandomAccessFile.class);
+
+							if (canHandle) {
+								manager = (SegmentBase) constructor.newInstance(file);
+							}
+						} catch (IllegalArgumentException ex) {
+							foo = ex;
+							ex.printStackTrace();
+						} catch (InvocationTargetException ex) {
+							foo = ex;
+						} catch (NoSuchMethodException ex) {
+							foo = ex;
+						} catch (SecurityException ex) {
+							foo = ex;
+						}
+						if (manager == null) {
+							manager = (SegmentBase) managerClass.newInstance();
+							manager.readFromFile(file);
+						}
 						this.segments.add(manager);
 						if (manager instanceof SosSegment) {
 							seenSOS = true;
+							return;
 						}
 					}
 				}
@@ -244,6 +291,16 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 		if ((foundBegin == false) || (foundEnd == false)) {
 			return false;
+		}
+
+		for (SegmentBase segment : this) {
+			if ( ! segment.isValid()) {
+				return false;
+			}
+
+			if (segment instanceof JunkSegment) {
+				return false;
+			}
 		}
 
 		return true;

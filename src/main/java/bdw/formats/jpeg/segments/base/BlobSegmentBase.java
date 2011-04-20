@@ -72,6 +72,7 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	}
 
 	public long getDataLength() throws IOException {
+		//TODO Could make this faster by calculating the data length as we scan it.
 		forceContentLoading();
 
 		return byteArray.getSize();

@@ -15,14 +15,18 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
- * Comment
+ * Segment that represents a comment in a jpeg file
  */
 public class ComSegment extends SegmentBase {
 
@@ -36,6 +40,32 @@ public class ComSegment extends SegmentBase {
         writeTrailingNull = true;
     }
 
+    public ComSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		this(stream, ParseMode.STRICT);
+    }
+
+	public ComSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromStream(stream);
+    }
+
+    public ComSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		this(file, ParseMode.STRICT);
+    }
+
+	public ComSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromFile(file);
+    }
+
+	public static boolean canHandleMarker(int marker) {
+		if (marker == ComSegment.MARKER) {
+			return true;
+		}
+		return false;
+	}
+
+
     public void setComment(String comment) {
         if (comment == null) {
             throw new IllegalArgumentException("comment may not be null");
@@ -48,34 +78,6 @@ public class ComSegment extends SegmentBase {
         return comment;
     }
 
-    @Override
-    public void readData(DataInput input) throws IOException {
-        int contentLength = input.readUnsignedShort();
-
-        StringBuilder buffer = new StringBuilder(contentLength - 2);
-        int charsLeft = contentLength - 2;
-
-        if (charsLeft == 0) {
-            setComment("");
-            writeTrailingNull = false;
-        } else {
-            int aChar;
-
-            while (charsLeft > 1) {
-                aChar = input.readByte();
-                buffer.append((char) aChar);
-                charsLeft--;
-            }
-            aChar = input.readByte();
-            if (aChar != 0x00) {
-                buffer.append((char) aChar);
-                writeTrailingNull = false;
-            } else {
-                writeTrailingNull = true;
-            }
-            setComment(buffer.toString());
-        }
-    }
 
     @Override
     public void write(OutputStream stream) throws IOException {
@@ -130,4 +132,39 @@ public class ComSegment extends SegmentBase {
 		hash = 71 * hash + (this.comment != null ? this.comment.hashCode() : 0);
 		return hash;
 	}
+
+
+    @Override
+    public void readData(DataInput input) throws IOException {
+        int contentLength = input.readUnsignedShort();
+
+        StringBuilder buffer = new StringBuilder(contentLength - 2);
+        int charsLeft = contentLength - 2;
+
+        if (charsLeft == 0) {
+            setComment("");
+            writeTrailingNull = false;
+        } else {
+            int aChar;
+
+            while (charsLeft > 1) {
+                aChar = input.readByte();
+                buffer.append((char) aChar);
+                charsLeft--;
+            }
+            aChar = input.readByte();
+            if (aChar != 0x00) {
+                buffer.append((char) aChar);
+                writeTrailingNull = false;
+				System.out.println("---------- DID NOT GET A NULL");
+            } else {
+                writeTrailingNull = true;
+            }
+                buffer.append((char) aChar);
+                writeTrailingNull = false;
+
+				setComment(buffer.toString());
+        }
+    }
+
 }
