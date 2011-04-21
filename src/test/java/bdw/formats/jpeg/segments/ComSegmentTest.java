@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  *
  */
-public class ComSegmentTests {
+public class ComSegmentTest {
 
     protected ComSegment segment;
     protected TestUtils utils;
@@ -38,6 +38,7 @@ public class ComSegmentTests {
         segment = new ComSegment();
         utils = new TestUtils();
     }
+
 
     @Test
     public void constructor_SetsCorrectMarker() {
@@ -67,9 +68,9 @@ public class ComSegmentTests {
 
     @Test
     public void read_ZeroLength_OK() throws IOException, InvalidJpegFormat {
-	InputStream stream = utils.makeInputStreamFromString("00 02");
+		InputStream stream = utils.makeInputStreamFromString("00 02");
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
         assertEquals("", segment.getComment());
     }
@@ -78,18 +79,18 @@ public class ComSegmentTests {
     public void read_ZeroLengthWithNull_OK()  throws IOException, InvalidJpegFormat {
 	InputStream stream = utils.makeInputStreamFromString("00 03 00");
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
-        assertEquals("", segment.getComment());
+        assertEquals("\000", segment.getComment());
     }
 
     @Test
     public void read_NullTerminatedString_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 06 41 42 43 00");
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
-        assertEquals("ABC", segment.getComment());
+        assertEquals("ABC\000", segment.getComment());
     }
 
     @Test
@@ -97,7 +98,7 @@ public class ComSegmentTests {
 	InputStream stream = utils.makeInputStreamFromString("00 02");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
         segment.write(output);
         assertArrayEquals(utils.makeByteArrayFromString("00 02"), output.toByteArray());
@@ -110,7 +111,7 @@ public class ComSegmentTests {
         segment.setComment("");
 
         segment.write(output);
-        assertArrayEquals(utils.makeByteArrayFromString("00 03 00"), output.toByteArray());
+        assertArrayEquals(utils.makeByteArrayFromString("00 02"), output.toByteArray());
     }
 
     @Test
@@ -120,14 +121,14 @@ public class ComSegmentTests {
         segment.setComment("This is a comment");
 
         segment.write(output);
-        assertArrayEquals(utils.makeByteArrayFromString("00 14 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74 00"), output.toByteArray());
+        assertArrayEquals(utils.makeByteArrayFromString("00 13 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74"), output.toByteArray());
     }
 
     @Test
     public void equals_WithEqualCommentWithoutTrailingNull_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 13 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74");
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
         ComSegment segment2 = new ComSegment();
 
@@ -140,7 +141,7 @@ public class ComSegmentTests {
     public void equals_WithDifferentComments_False()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 13 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74");
 
-        segment.readFromStream(stream);
+        segment = new ComSegment(stream);
 
         ComSegment segment2 = new ComSegment();
 

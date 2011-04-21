@@ -32,12 +32,10 @@ public class ComSegment extends SegmentBase {
 
     public static final int MARKER = 0xFE;
     protected String comment;
-    protected boolean writeTrailingNull;
 
     public ComSegment() {
         setMarker(ComSegment.MARKER);
         comment = "";
-        writeTrailingNull = true;
     }
 
     public ComSegment(InputStream stream) throws IOException, InvalidJpegFormat {
@@ -46,7 +44,7 @@ public class ComSegment extends SegmentBase {
 
 	public ComSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this();
-		super.readFromStream(stream);
+		super.readFromStream(stream, mode);
     }
 
     public ComSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
@@ -55,7 +53,7 @@ public class ComSegment extends SegmentBase {
 
 	public ComSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this();
-		super.readFromFile(file);
+		super.readFromFile(file, mode);
     }
 
 	public static boolean canHandleMarker(int marker) {
@@ -65,13 +63,11 @@ public class ComSegment extends SegmentBase {
 		return false;
 	}
 
-
     public void setComment(String comment) {
         if (comment == null) {
             throw new IllegalArgumentException("comment may not be null");
         }
         this.comment = comment;
-        writeTrailingNull = true;
     }
 
     public String getComment() {
@@ -82,28 +78,34 @@ public class ComSegment extends SegmentBase {
     @Override
     public void write(OutputStream stream) throws IOException {
         super.write(stream);
-        DataOutputStream dataStream;
+        DataOutputStream dataStream = wrapAsDataOutputStream(stream);
+		boolean is8Bit = false;
+		boolean isUnicode = false;
 
-        if (stream instanceof DataOutputStream) {
-            dataStream = (DataOutputStream) stream;
-        } else {
-            dataStream = new DataOutputStream(stream);
-        }
+//		for (int index = 0; index < comment.length(); index++) {
+//			if (comment.charAt(index) > (char)127) {
+//				is8Bit = true;
+//			}
+//
+//			if (comment.charAt(index) > (char) 255) {
+//				isUnicode = true;
+//			}
+//		}
+//
+//		byte[] bytes = comment.getBytes(Charset.forName("UTF8")); // TODO Is this right?
+
+		// need to test null
+		// need to test chinese
+
 
         int totalLength = 2 + comment.length();
 
-        if (writeTrailingNull == true) {
-            totalLength ++;
-        }
         dataStream.writeShort(totalLength);
 
         for (int index = 0; index < comment.length(); index++) {
             dataStream.writeByte((int)comment.charAt(index));
         }
 
-        if (writeTrailingNull == true) {
-            dataStream.writeByte(0x00);
-        }
     }
 
 	/**
@@ -135,35 +137,29 @@ public class ComSegment extends SegmentBase {
 
 
     @Override
-    public void readData(DataInput input) throws IOException {
+    protected void readData(DataInput input, ParseMode mode) throws IOException {
         int contentLength = input.readUnsignedShort();
-
         StringBuilder buffer = new StringBuilder(contentLength - 2);
         int charsLeft = contentLength - 2;
+		int maxChar = 0;
 
         if (charsLeft == 0) {
             setComment("");
-            writeTrailingNull = false;
         } else {
             int aChar;
 
-            while (charsLeft > 1) {
+            while (charsLeft > 0) {
                 aChar = input.readByte();
+				maxChar = Math.max(maxChar, aChar);
                 buffer.append((char) aChar);
                 charsLeft--;
             }
-            aChar = input.readByte();
-            if (aChar != 0x00) {
-                buffer.append((char) aChar);
-                writeTrailingNull = false;
-				System.out.println("---------- DID NOT GET A NULL");
-            } else {
-                writeTrailingNull = true;
-            }
-                buffer.append((char) aChar);
-                writeTrailingNull = false;
 
-				setComment(buffer.toString());
+//			if maxChar > 255 assume unicode
+//					if it is > 127 assume windows
+//							else we're all go.
+//									'
+			setComment(buffer.toString());
         }
     }
 

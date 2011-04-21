@@ -19,6 +19,7 @@ import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.ParseMode;
 import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -95,6 +96,20 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	}
 
 	/**
+	 * @param file The file to read from (not null)
+	 * @param mode The mode to parse the file in
+	 *
+	 * @throws IOException If an error occurs while reading
+	 */
+	protected void readFromFile(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		if (file == null) {
+			throw new IllegalArgumentException("Input file may not be null");
+		}
+
+		readData(file, mode);
+	}
+
+	/**
 	 * @param stream The stream to read from (not null)
 	 * @throws IOException If an error occurs while reading
 	 */
@@ -111,6 +126,24 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	}
 
 	/**
+	 * @param stream The stream to read from (not null)
+	 * @param mode The mode to parse the file in
+	 *
+	 * @throws IOException If an error occurs while reading
+	 */
+	protected void readFromStream(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		if (stream == null) {
+			throw new IllegalArgumentException("Input stream may not be null");
+		}
+
+		if (stream instanceof DataInputStream) {
+			readData((DataInputStream) stream, mode);
+		} else {
+			readData(new DataInputStream(stream), mode);
+		}
+	}
+
+	/**
 	 * Read all the data and populate this instance.
 	 * This resets all contents of this segment.
 	 *
@@ -120,6 +153,18 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	 */
 	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
 	}
+
+	/**
+	 * Read all the data and populate this instance.
+	 * This resets all contents of this segment.
+	 *
+	 * @param dataSource The input source to read from
+	 * @param mode The mode to read the file in
+	 *
+	 * @throws IOException If something happens while reading
+	 */
+	protected void readData(DataInput dataSource, ParseMode mode) throws IOException, InvalidJpegFormat {
+	};
 
 	/**
 	 * If this segment has not read all of its content from disk, this will force it to
@@ -138,6 +183,22 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	public void write(OutputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IllegalArgumentException("Stream may not be null");
+		}
+	}
+
+	/**
+	 * Convenience routine so subclasses can get an output stream
+	 * as a DataOutputStream easily
+	 *
+	 * @param stream The stream to wrap as a DataOutputStream
+	 *
+	 * @return A DataOutputStream (either wrapping the input, or the input if it already was one)
+	 */
+	protected DataOutputStream wrapAsDataOutputStream(OutputStream stream) {
+		if (stream instanceof DataOutputStream) {
+			return (DataOutputStream) stream;
+		} else {
+			return new DataOutputStream(stream);
 		}
 	}
 }
