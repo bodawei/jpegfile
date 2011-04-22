@@ -18,44 +18,124 @@ package bdw.formats.jpeg.segments;
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
+import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 
 /**
- * Segment that represents a comment in a jpeg file
+ * Segment that represents a comment in a jpeg file.
+ * When it exists, it is usually a short string identifying the program
+ * that was used to create the program, or the camera used to take it.
  */
 public class ComSegment extends SegmentBase {
-
+	/**
+	 * Marker code that conventionally represents the com segment.
+	 */
     public static final int MARKER = 0xFE;
+
+	/**
+	 * The string that is the actual comment
+	 */
     protected String comment;
 
+	/**
+	 * Internal flag. If we read a comment that wasn't a unicode or ascii
+	 * compatible string, remember this so we can write it out as as a
+	 * windows character set.
+	 */
+	protected boolean useWindowsCharset;
+
+	/**
+	 * Cached file in case we don't want to read the whole comment in now.
+	 */
+	protected RandomAccessFile raFile;
+
+	/**
+	 * The offset into the file to the start of the comment. only has
+	 * meaning if raFile isn't null.
+	 */
+	protected long fileOffset;
+
+	/**
+	 * The mode we are supposed to parse the comment in.
+	 * Only meaningful if raFile isn't null
+	 */
+	protected ParseMode mode;
+
+	/**
+	 * Construct a plain instance with a comment of ""
+	 */
     public ComSegment() {
         setMarker(ComSegment.MARKER);
         comment = "";
+		useWindowsCharset = false;
+		raFile = null;
+		fileOffset = 0;
+		mode = ParseMode.STRICT;
     }
 
+	/**
+	 * Construct an instance from a stream, parsing it strictly.
+	 *
+	 * @param stream The stream to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
     public ComSegment(InputStream stream) throws IOException, InvalidJpegFormat {
 		this(stream, ParseMode.STRICT);
     }
 
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
 	public ComSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this();
 		super.readFromStream(stream, mode);
     }
 
+	/**
+	 * Construct an instance from a stream. Parses it strictly
+	 *
+	 * @param file The file to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
     public ComSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
 		this(file, ParseMode.STRICT);
     }
 
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
 	public ComSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this();
 		super.readFromFile(file, mode);
     }
 
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
 	public static boolean canHandleMarker(int marker) {
 		if (marker == ComSegment.MARKER) {
 			return true;
@@ -63,50 +143,86 @@ public class ComSegment extends SegmentBase {
 		return false;
 	}
 
+	/**
+	 * @param comment The new comment (may not be null)
+	 */
     public void setComment(String comment) {
         if (comment == null) {
             throw new IllegalArgumentException("comment may not be null");
         }
+
+		useWindowsCharset = false;
         this.comment = comment;
     }
 
-    public String getComment() {
+	/**
+	 * @return The current comment string.
+	 * @throws IOException If something goes wrong during a forceContentLoading
+	 */
+    public String getComment() throws IOException {
+		forceContentLoading();
         return comment;
     }
 
-
+	/**
+	 * @inheritdoc
+	 *
+	 * Writes the comment in JPEG format to the specified stream.
+	 * This will try to write the string as ASCII if possible,
+	 * otherwise UTF8.  The exception to this is that if the
+	 * read routine discovered characters with the 8th bit set, and
+	 * couldn't interpret it as a utf8 string, it assumed it was
+	 * reading a windows character set string.  In that case,
+	 * write it out as a windows string.
+	 *
+	 * @param stream The stream to write to
+	 * @throws IOException If an io problem happens.
+	 */
     @Override
     public void write(OutputStream stream) throws IOException {
         super.write(stream);
-        DataOutputStream dataStream = wrapAsDataOutputStream(stream);
-		boolean is8Bit = false;
-		boolean isUnicode = false;
 
-//		for (int index = 0; index < comment.length(); index++) {
-//			if (comment.charAt(index) > (char)127) {
-//				is8Bit = true;
-//			}
-//
-//			if (comment.charAt(index) > (char) 255) {
-//				isUnicode = true;
-//			}
-//		}
-//
-//		byte[] bytes = comment.getBytes(Charset.forName("UTF8")); // TODO Is this right?
+		DataOutputStream dataStream = wrapAsDataOutputStream(stream);
+		Charset set = Charset.forName("UTF8");
+		byte[] bytes;
 
-		// need to test null
-		// need to test chinese
+		// IF appropriate, try to get the best character set.
+		// If this jvm doesn't support Cp1252 (windows), try iso latin 1
+		// which is pretty similar. If that's not there, then
+		// we'll just use utf-8
+		if (useWindowsCharset) {
+			try {
+				set = Charset.forName("Cp1252");
+			} catch (Exception e) {
+				try {
+					set = Charset.forName("ISO8859_1");
+				} catch (Exception e2) {
+					set = Charset.forName("UTF8");
+				}
+			}
+		}
+		bytes = comment.getBytes(set);
 
+        dataStream.writeShort(2 + bytes.length);
 
-        int totalLength = 2 + comment.length();
-
-        dataStream.writeShort(totalLength);
-
-        for (int index = 0; index < comment.length(); index++) {
-            dataStream.writeByte((int)comment.charAt(index));
+        for (int index = 0; index < bytes.length; index++) {
+			dataStream.writeByte((int)bytes[index]);
         }
-
     }
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public void forceContentLoading() throws IOException {
+		if (raFile != null) {
+			long storedPosition = raFile.getFilePointer();
+			raFile.seek(fileOffset);
+			readData(raFile, mode);
+			raFile.seek(storedPosition);
+			raFile = null;
+		}
+	}
 
 	/**
 	 * Two comment segments are equal if they both have the same comment
@@ -118,7 +234,11 @@ public class ComSegment extends SegmentBase {
 		if ((other == null) || !(other instanceof ComSegment)) {
 			return false;
 		} else {
-			if ( ! getComment().equals(((ComSegment)other).getComment())) {
+			try {
+				if ( ! getComment().equals(((ComSegment)other).getComment())) {
+					return false;
+				}
+			} catch (IOException e) {
 				return false;
 			}
 		}
@@ -135,31 +255,80 @@ public class ComSegment extends SegmentBase {
 		return hash;
 	}
 
+	/**
+	 * @inheritdoc
+	 *
+	 * @param file The file to read from (not null)
+	 * @param mode The mode to parse the file in
+	 *
+	 * @throws IOException If an error occurs while reading
+	 */
+	protected void readFromFile(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+        long position = file.getFilePointer();
+		int contentLength = file.readUnsignedShort();
 
-    @Override
+		// If the comment data is too long, defer reading it in.
+		if (contentLength-2 > SegmentBase.READ_LIMIT) {
+			raFile = file;
+			fileOffset = position;
+			this.mode = mode;
+			file.seek(position);
+		} else {
+			readData(file, mode);
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
     protected void readData(DataInput input, ParseMode mode) throws IOException {
         int contentLength = input.readUnsignedShort();
-        StringBuilder buffer = new StringBuilder(contentLength - 2);
-        int charsLeft = contentLength - 2;
-		int maxChar = 0;
+		int totalBytes = contentLength - 2;
 
-        if (charsLeft == 0) {
+        if (totalBytes == 0) {
             setComment("");
         } else {
             int aChar;
+			InputStreamReader reader;
+			StringBuilder builder = new StringBuilder(contentLength - 2);
+			int index = 0;
+			byte[] buffer = new byte[totalBytes];
 
-            while (charsLeft > 0) {
-                aChar = input.readByte();
-				maxChar = Math.max(maxChar, aChar);
-                buffer.append((char) aChar);
-                charsLeft--;
+			// Read in the raw bytes
+			while (index < totalBytes) {
+                buffer[index] = input.readByte();
+                index++;
             }
 
-//			if maxChar > 255 assume unicode
-//					if it is > 127 assume windows
-//							else we're all go.
-//									'
-			setComment(buffer.toString());
+			// Try to parse them as utf8.  We get back 0xFFFD
+			// if the reader encounters something that's not a
+			// unicode character (note that since ASCII is a
+			// exact subset of utf8, this also catches a purely
+			// ASCII string.
+			reader = new InputStreamReader(new ByteArrayInputStream(buffer), "UTF8");
+			aChar = reader.read();
+			while ((aChar != -1) && (aChar != 0xFFFD)) {
+				builder.append((char)aChar);
+				aChar = reader.read();
+			}
+
+			// OK, if we encountered a non-uft8 string here, let's
+			// just assume it is a windows character set and read it
+			// in thusly.  This might be wrong, but no way to tell.
+			if (aChar == 0xFFFD) {
+				reader = new InputStreamReader(new ByteArrayInputStream(buffer), "Cp1252");
+				aChar = reader.read();
+				while (aChar != -1) {
+					builder.append((char)aChar);
+					aChar = reader.read();
+				}
+				setComment(builder.toString());
+				this.useWindowsCharset = true;
+			} else {
+				setComment(builder.toString());
+			}
+
         }
     }
 

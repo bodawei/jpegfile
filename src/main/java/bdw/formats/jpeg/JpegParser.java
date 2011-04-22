@@ -186,6 +186,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 							if (canHandle) {
 								manager = (SegmentBase) constructor.newInstance(file);
+								manager.setMarker(markerByte);
 							}
 						} catch (IllegalArgumentException ex) {
 							foo = ex;

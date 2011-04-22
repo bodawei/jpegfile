@@ -8,7 +8,6 @@
   * readFromFile/Stream methods maybe should be static also?  Certainly, they need to be able to return different classes based on the type.
 	* Maybe this should be doing the java serialization scheme?
 * Can we explain the other structures as well as Dht?
-* Comment should cope with utf8 and > 1024 bytes
 
 * In JpegParser
 ** what should isValid do?
