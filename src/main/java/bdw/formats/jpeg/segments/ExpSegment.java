@@ -15,10 +15,15 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
- * Expand reference components
+ * Expand reference component
  */
 public class ExpSegment extends SegmentBase {
 
@@ -32,6 +37,68 @@ public class ExpSegment extends SegmentBase {
 	 */
 	public ExpSegment() {
 		setMarker(ExpSegment.MARKER);
+	}
+
+	/**
+	 * Construct an instance from a stream, parsing it strictly.
+	 *
+	 * @param stream The stream to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public ExpSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		this(stream, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public ExpSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream. Parses it strictly
+	 *
+	 * @param file The file to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public ExpSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		this(file, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public ExpSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == ExpSegment.MARKER) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -52,5 +119,4 @@ public class ExpSegment extends SegmentBase {
 		int hash = 5;
 		return hash;
 	}
-
 }

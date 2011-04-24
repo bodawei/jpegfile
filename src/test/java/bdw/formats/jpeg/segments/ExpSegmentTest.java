@@ -46,9 +46,7 @@ public class ExpSegmentTest {
 	public void expSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		ExpSegment segment = new ExpSegment();
-
-		segment.readFromStream(stream);
+		ExpSegment segment = new ExpSegment(stream);
 
 		assertEquals(0xAA, stream.read());
 	}

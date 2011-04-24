@@ -24,7 +24,9 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +103,71 @@ public class SofSegment extends SegmentBase {
 	public SofSegment() {
 		setMarker(0);
 		components = new ArrayList<SofComponent>();
+	}
+
+	/**
+	 * Construct an instance from a stream, parsing it strictly.
+	 *
+	 * @param stream The stream to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public SofSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		this(stream, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SofSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream. Parses it strictly
+	 *
+	 * @param file The file to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public SofSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		this(file, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SofSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (((marker >= SofSegment.RANGE1_START) && (marker <= SofSegment.RANGE1_END)) ||
+			((marker >= SofSegment.RANGE2_START) && (marker <= SofSegment.RANGE2_END)) ||	
+			((marker >= SofSegment.RANGE3_START) && (marker <= SofSegment.RANGE3_END)) ||
+			((marker >= SofSegment.RANGE4_START) && (marker <= SofSegment.RANGE4_END))) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -217,92 +284,18 @@ public class SofSegment extends SegmentBase {
 	}
 
 	/**
-	 * Read all the data and populate this instance.
-	 * This resets all contents of this segment. This means that this is like
-	 * deleting all components and then setting all properties afresh.
-	 *
-	 * Because this will never be more than 1 kilobyte of data, we never defer
-	 * reading until later.
-	 * Note: If any errors occur while reading, this instance will not be
-	 * changed.
-	 *
-	 * @param dataSource The input source to read from
-	 *
-	 * @throws IOException If something happens while reading
-	 */
-	@Override
-	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
-		int precision;
-		int height;
-		int width;
-		List<SofComponent> comps = new ArrayList<SofComponent>();
-
-		try {
-			int contentLength = dataSource.readUnsignedShort();
-
-			if (contentLength < 7) {
-				throw new InvalidJpegFormat("Sof segment found not enough length");
-			}
-
-			precision = dataSource.readUnsignedByte();
-			height = dataSource.readUnsignedShort();
-			width = dataSource.readUnsignedShort();
-			int numComponents = dataSource.readUnsignedByte();
-
-			if (contentLength != 8 + (SofComponent.DISK_SIZE * numComponents)) {
-				throw new InvalidJpegFormat("Sof segment found not enough length");
-			}
-
-			// Note: According to one source, usually numComponents is:
-			// 1 = grey scale
-			// 3 = color YCbCr or YIQ
-			// 4 = color CMYK
-
-			if ((numComponents == 0) ||
-				(numComponents == 2) ||
-				(numComponents > 4)) {
-				if (strict == ParseMode.STRICT) {
-					throw new InvalidJpegFormat("Sof segment found with " + numComponents + " components. This should be 1, 3 or 4");
-				} else {
-					setValid(false);
-				}
-			}
-
-			for (int index = 0; index < numComponents; index++) {
-				SofComponent entry = new SofComponent();
-				entry.read(dataSource, strict);
-				comps.add(entry);
-			}
-		} catch (EOFException exception) {
-			throw new InvalidJpegFormat("EOF found before Sof segment fully read");
-		}
-
-		// If we get this far, all is good. We can now commit these values:
-		setSamplePrecision(precision);
-		setImageHeight(height);
-		setImageWidth(width);
-		components.clear();
-		components.addAll(comps);
-	}
-
-	/**
 	 * Write this segment out to the specified output stream
 	 * @param output The stream to write out to
 	 * @throws IOException If any errors occur
 	 */
 	@Override
 	public void write(OutputStream output) throws IOException {
-		DataOutput out;
+		DataOutput out = super.wrapAsDataOutputStream(output);
 
 		if ( ! isValid()) {
 			throw new IOException("The Number of components is not valid, or the components themselves are not valid");
 		}
 
-		if (output instanceof DataOutput) {
-			out = (DataOutput) output;
-		} else {
-			out = new DataOutputStream(output);
-		}
 		out.writeShort(2 + 6 + (SofComponent.DISK_SIZE * components.size()));
 		out.writeByte(getSamplePrecision());
 		out.writeShort(getImageHeight());
@@ -347,5 +340,74 @@ public class SofSegment extends SegmentBase {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Read all the data and populate this instance.
+	 * This resets all contents of this segment. This means that this is like
+	 * deleting all components and then setting all properties afresh.
+	 *
+	 * Because this will never be more than 1 kilobyte of data, we never defer
+	 * reading until later.
+	 * Note: If any errors occur while reading, this instance will not be
+	 * changed.
+	 *
+	 * @param dataSource The input source to read from
+	 *
+	 * @throws IOException If something happens while reading
+	 */
+	@Override
+	protected void readData(DataInput dataSource, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int precision;
+		int height;
+		int width;
+		List<SofComponent> comps = new ArrayList<SofComponent>();
+
+		try {
+			int contentLength = dataSource.readUnsignedShort();
+
+			if (contentLength < 7) {
+				throw new InvalidJpegFormat("Sof segment found not enough length");
+			}
+
+			precision = dataSource.readUnsignedByte();
+			height = dataSource.readUnsignedShort();
+			width = dataSource.readUnsignedShort();
+			int numComponents = dataSource.readUnsignedByte();
+
+			if (contentLength != 8 + (SofComponent.DISK_SIZE * numComponents)) {
+				throw new InvalidJpegFormat("Sof segment found not enough length");
+			}
+
+			// Note: According to one source, usually numComponents is:
+			// 1 = grey scale
+			// 3 = color YCbCr or YIQ
+			// 4 = color CMYK
+
+			if ((numComponents == 0) ||
+				(numComponents == 2) ||
+				(numComponents > 4)) {
+				if (mode == ParseMode.STRICT) {
+					throw new InvalidJpegFormat("Sof segment found with " + numComponents + " components. This should be 1, 3 or 4");
+				} else {
+					setValid(false);
+				}
+			}
+
+			for (int index = 0; index < numComponents; index++) {
+				SofComponent entry = new SofComponent();
+				entry.read(dataSource, mode);
+				comps.add(entry);
+			}
+		} catch (EOFException exception) {
+			throw new InvalidJpegFormat("EOF found before Sof segment fully read");
+		}
+
+		// If we get this far, all is good. We can now commit these values:
+		setSamplePrecision(precision);
+		setImageHeight(height);
+		setImageWidth(width);
+		components.clear();
+		components.addAll(comps);
 	}
 }

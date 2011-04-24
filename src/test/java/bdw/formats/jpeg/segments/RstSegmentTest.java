@@ -18,7 +18,6 @@ package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.RstSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
@@ -51,10 +50,8 @@ public class RstSegmentTest {
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		RstSegment segment = new RstSegment();
-
-		segment.readFromStream(stream);
-
+		RstSegment segment = new RstSegment(stream);
+		
 		assertEquals(0xAA, stream.read());
 	}
 

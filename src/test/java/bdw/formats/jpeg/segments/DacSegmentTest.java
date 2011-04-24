@@ -18,7 +18,6 @@ package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.DacSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Before;
@@ -43,9 +42,7 @@ public class DacSegmentTest {
 	public void testDacSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		DacSegment segment = new DacSegment();
-
-		segment.readFromStream(stream);
+		DacSegment segment = new DacSegment(stream);
 
 		assertEquals(0xAA, stream.read());
 	}

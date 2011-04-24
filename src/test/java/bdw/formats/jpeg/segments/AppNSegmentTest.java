@@ -39,13 +39,13 @@ public class AppNSegmentTest {
 
     @Test
     public void creationSetsMarker() {
-		assertEquals("marker", 0, segment.getMarker());
+		assertEquals("marker", AppNSegment.START_MARKER, segment.getMarker());
 	}
 
 
     @Test
     public void readFromStreamWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = new AppNSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
@@ -54,20 +54,26 @@ public class AppNSegmentTest {
 
     @Test(expected=EOFException.class)
     public void readFromStreamWithBadLength() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 10" +
+		segment = new AppNSegment(utils.makeInputStreamFromString("00 10" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 	}
 
     @Test
     public void readFromSmallFileWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile("00 0C" +
+		segment = new AppNSegment(utils.makeRandomAccessFile("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
 				segment.getBytes());
 	}
 
-    @Test
+    @Test(expected=EOFException.class)
+    public void readFromFileWithBadLength() throws IOException, InvalidJpegFormat {
+		segment = new AppNSegment(utils.makeRandomAccessFile("00 10" +
+			"01 02 03 04 05 06 07 08 09 0a"));
+	}
+
+	@Test
     public void readFromBigFileWorks() throws IOException, InvalidJpegFormat {
 		StringBuilder builder = new StringBuilder();
 
@@ -76,7 +82,7 @@ public class AppNSegmentTest {
 		for (int index = 0; index < 0x1FE0; index++) {
 			builder.append("00");
 		}
-		segment.readFromFile(utils.makeRandomAccessFile(builder.toString()));
+		segment = new AppNSegment(utils.makeRandomAccessFile(builder.toString()));
 
 		assertEquals("length", 0x1FE0, segment.getBytes().length);
 	}
@@ -94,7 +100,7 @@ public class AppNSegmentTest {
 		builder.append("77");
 		file = utils.makeRandomAccessFile(builder.toString());
 
-		segment.readFromFile(file);
+		segment = new AppNSegment(file);
 
 		assertEquals("Expected byte after reading", 0x77, file.readByte());
 	}
@@ -102,7 +108,7 @@ public class AppNSegmentTest {
 
 	@Test
     public void twoEqualSegmentsEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = new AppNSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		AppNSegment other = new AppNSegment();
@@ -112,7 +118,7 @@ public class AppNSegmentTest {
 
     @Test
     public void unequalSegmentsAreNotEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = new AppNSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		AppNSegment other = new AppNSegment();

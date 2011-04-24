@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments.base;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.util.ByteArrayBuilder;
 import java.io.EOFException;
 import java.io.IOException;
@@ -99,7 +100,7 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	}
 
 	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+	protected void readFromFile(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
 		ByteArrayBuilder builder = new ByteArrayBuilder();
 		long offset = file.getFilePointer();
 		int byteCount = 0;
@@ -150,7 +151,7 @@ public abstract class BlobSegmentBase extends SegmentBase {
 	}
 
 	@Override
-	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
+	protected void readFromStream(InputStream stream, ParseMode strict) throws IOException, InvalidJpegFormat {
 		int aByte;
 		boolean keepGoing = true;
 		ByteArrayBuilder builder = new ByteArrayBuilder();

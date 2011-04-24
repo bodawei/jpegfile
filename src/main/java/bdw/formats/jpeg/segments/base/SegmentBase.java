@@ -48,15 +48,8 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 
 	public SegmentBase() {
 		valid = true;
-		strict = ParseMode.STRICT;
 	}
 
-
-	protected ParseMode strict;
-
-	public void setStrictness(ParseMode strictness) {
-		strict = strictness;
-	}
 
 	/**
 	 * @return true if the segment is strictly valid
@@ -83,17 +76,6 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 		marker = newMarker;
 	}
 
-	/**
-	 * @param file The file to read from (not null)
-	 * @throws IOException If an error occurs while reading
-	 */
-	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		if (file == null) {
-			throw new IllegalArgumentException("Input file may not be null");
-		}
-
-		readData(file);
-	}
 
 	/**
 	 * @param file The file to read from (not null)
@@ -107,22 +89,6 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 		}
 
 		readData(file, mode);
-	}
-
-	/**
-	 * @param stream The stream to read from (not null)
-	 * @throws IOException If an error occurs while reading
-	 */
-	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
-		if (stream == null) {
-			throw new IllegalArgumentException("Input stream may not be null");
-		}
-
-		if (stream instanceof DataInputStream) {
-			readData((DataInputStream) stream);
-		} else {
-			readData(new DataInputStream(stream));
-		}
 	}
 
 	/**

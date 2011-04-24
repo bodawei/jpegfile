@@ -91,7 +91,6 @@ public class ComSegment extends SegmentBase {
 		this(stream, ParseMode.STRICT);
     }
 
-
 	/**
 	 * Construct an instance from a stream.
 	 *
@@ -181,6 +180,8 @@ public class ComSegment extends SegmentBase {
     @Override
     public void write(OutputStream stream) throws IOException {
         super.write(stream);
+
+		forceContentLoading();
 
 		DataOutputStream dataStream = wrapAsDataOutputStream(stream);
 		Charset set = Charset.forName("UTF8");

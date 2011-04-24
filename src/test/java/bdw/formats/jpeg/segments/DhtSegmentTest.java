@@ -86,10 +86,9 @@ public class DhtSegmentTest {
 				output.toByteArray());
 	}
 
-
 	@Test
 	public void canReadSegmentWithTwoTables() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 26" +
+		segment = new DhtSegment(utils.makeInputStreamFromString("00 26" +
 				sampleTable1String +
 				sampleTable2String));
 
@@ -102,9 +101,8 @@ public class DhtSegmentTest {
 
 	@Test(expected=EOFException.class)
 	public void incompleteDataGivesExeption() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 26" +
+		segment = new DhtSegment(utils.makeInputStreamFromString("00 26" +
 				sampleTable1String +
 				"00 01"));
-
 	}
 }

@@ -20,7 +20,6 @@ import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
 import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
-import bdw.formats.jpeg.segments.DqtSegment;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,8 +72,7 @@ public class DqtSegmentTest {
 
 	@Test
 	public void read_OneTable_PopulatesAllAsExpected() throws IOException, InvalidJpegFormat {
-		DqtSegment segment = new DqtSegment();
-		segment.readFromStream(utils.makeInputStreamFromString("00 43" +
+		DqtSegment segment = new DqtSegment(utils.makeInputStreamFromString("00 43" +
 				"05" +
 				" 00 01 02 03 04 05 06 07 08 09" +
 				" 0A 0B 0C 0D 0E 0f 10 11 12 13" +
@@ -96,9 +94,8 @@ public class DqtSegmentTest {
 
 	@Test
 	public void read_BadLength_ThrowsException() throws IOException, InvalidJpegFormat  {
-		DqtSegment segment = new DqtSegment();
 		try {
-			segment.readFromStream(utils.makeInputStreamFromString("00 33" +
+			DqtSegment segment = new DqtSegment(utils.makeInputStreamFromString("00 33" +
 					"05" +
 					" 00 01 02 03 04 05 06 07 08 09" +
 					" 0A 0B 0C 0D 0E 0f 10 11 12 13" +

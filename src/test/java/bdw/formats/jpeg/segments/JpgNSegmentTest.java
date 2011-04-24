@@ -18,8 +18,6 @@ package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.JpgNSegment;
-import bdw.formats.jpeg.segments.JpgSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Before;
@@ -44,9 +42,7 @@ public class JpgNSegmentTest {
 	public void testJpgNSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		JpgNSegment segment = new JpgNSegment();
-
-		segment.readFromStream(stream);
+		JpgNSegment segment = new JpgNSegment(stream);
 
 		assertEquals(0xAA, stream.read());
 	}

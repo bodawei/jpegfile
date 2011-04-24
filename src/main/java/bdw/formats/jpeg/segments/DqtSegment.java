@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
 import bdw.io.LimitExceeded;
@@ -24,7 +25,9 @@ import bdw.io.LimitingDataInput;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +51,68 @@ public class DqtSegment extends SegmentBase {
 	public DqtSegment() {
 		setMarker(DqtSegment.MARKER);
 		tables = new ArrayList<DqtQuantizationTable>();
+	}
+
+	/**
+	 * Construct an instance from a stream, parsing it strictly.
+	 *
+	 * @param stream The stream to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public DqtSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		this(stream, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DqtSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream. Parses it strictly
+	 *
+	 * @param file The file to read from
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+    public DqtSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		this(file, ParseMode.STRICT);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. 
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DqtSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this();
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == DqtSegment.MARKER) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -77,39 +142,10 @@ public class DqtSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	protected void readData(DataInput input) throws IOException, InvalidJpegFormat {
-		int contentLength = input.readUnsignedShort();
-		LimitingDataInput limited = new LimitingDataInput(input, contentLength -2);
-		int index = 0;
-		
-		while (limited.getRemainingLimit() != 0) {
-			DqtQuantizationTable table = new DqtQuantizationTable();
-
-			try {
-				table.read(limited);
-			} catch (LimitExceeded e) {
-				throw new InvalidJpegFormat("Dqt segment length doesn't match actual data");
-			}
-			insertTable(index, table);
-			index++;
-		}
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
-		DataOutputStream dataStream;
+		DataOutputStream dataStream = super.wrapAsDataOutputStream(stream);
 		int length = 0;
-
-		if (stream instanceof DataOutputStream) {
-			dataStream = (DataOutputStream) stream;
-		} else {
-			dataStream = new DataOutputStream(stream);
-		}
 
 		for (int index = 0; index < getTableCount(); index++) {
 			length += getTable(index).getSizeOnDisk();
@@ -155,5 +191,28 @@ public class DqtSegment extends SegmentBase {
 		int hash = 7;
 		hash = 61 * hash + (this.tables != null ? this.tables.hashCode() : 0);
 		return hash;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readData(DataInput input, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int contentLength = input.readUnsignedShort();
+		LimitingDataInput limited = new LimitingDataInput(input, contentLength -2);
+		int index = 0;
+		
+		while (limited.getRemainingLimit() != 0) {
+			DqtQuantizationTable table = new DqtQuantizationTable();
+
+			try {
+				table.read(limited);
+			} catch (LimitExceeded e) {
+				throw new InvalidJpegFormat("Dqt segment length doesn't match actual data");
+			}
+			insertTable(index, table);
+			index++;
+		}
+
 	}
 }

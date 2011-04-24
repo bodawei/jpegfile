@@ -79,9 +79,8 @@ public class DriSegmentTest {
 	public void canReadGoodData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 04 FF FF");
 
-		DriSegment segment = new DriSegment();
+		DriSegment segment = new DriSegment(stream);
 
-		segment.readFromStream(stream);
 
 		assertEquals("Restart Interval", 0xFFFF, segment.getRestartInterval());
 	}
@@ -90,9 +89,9 @@ public class DriSegmentTest {
 	public void throwsOnBadInput() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 06 FF FF");
 
-		DriSegment segment = new DriSegment();
+		DriSegment segment;
 		try {
-			segment.readFromStream(stream);
+			segment = new DriSegment(stream);
 			fail("Reading should have failed");
 		} catch (Exception e) {
 			assertTrue(e instanceof InvalidJpegFormat);

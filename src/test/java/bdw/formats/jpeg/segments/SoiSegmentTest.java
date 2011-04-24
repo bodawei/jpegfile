@@ -20,7 +20,6 @@ import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
-import bdw.formats.jpeg.segments.SoiSegment;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -43,9 +42,7 @@ public class SoiSegmentTest {
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		SoiSegment segment = new SoiSegment();
-
-		segment.readFromStream(stream);
+		SoiSegment segment = new SoiSegment(stream);
 
 		assertEquals(0xAA, stream.read());
 	}
