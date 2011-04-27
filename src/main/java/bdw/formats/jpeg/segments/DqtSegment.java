@@ -38,7 +38,7 @@ public class DqtSegment extends SegmentBase {
 	/**
 	 * Standard marker for this type
 	 */
-	public static final int MARKER = 0xDB;
+	public static final int SUBTYPE = 0xDB;
 
 	/**
 	 * list of quantization tables
@@ -49,20 +49,21 @@ public class DqtSegment extends SegmentBase {
 	 * Constructor
 	 */
 	public DqtSegment() {
-		setMarker(DqtSegment.MARKER);
+		setMarker(DqtSegment.SUBTYPE);
 		tables = new ArrayList<DqtQuantizationTable>();
 	}
 
 	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 * Constructs an instance with all properties empty
 	 */
-    public DqtSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
+	public DqtSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (DqtSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Construct an instance from a stream.
@@ -72,20 +73,9 @@ public class DqtSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DqtSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public DqtSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
-    }
-
-	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public DqtSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
     }
 
 	/**
@@ -96,8 +86,8 @@ public class DqtSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DqtSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public DqtSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -109,7 +99,7 @@ public class DqtSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == DqtSegment.MARKER) {
+		if (marker == DqtSegment.SUBTYPE) {
 			return true;
 		}
 		return false;

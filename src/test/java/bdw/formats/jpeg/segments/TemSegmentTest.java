@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,14 +41,14 @@ public class TemSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(TemSegment.MARKER, new TemSegment().getMarker());
+		assertEquals(TemSegment.SUBTYPE, new TemSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		TemSegment segment = new TemSegment(stream);
+		TemSegment segment = new TemSegment(TemSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

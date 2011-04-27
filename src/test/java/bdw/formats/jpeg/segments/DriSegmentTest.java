@@ -16,6 +16,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +41,7 @@ public class DriSegmentTest {
 
 	@Test
 	public void newInstanceHasTheRightMarker() {
-		assertEquals(DriSegment.MARKER, new DriSegment().getMarker());
+		assertEquals(DriSegment.SUBTYPE, new DriSegment().getMarker());
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class DriSegmentTest {
 	public void canReadGoodData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 04 FF FF");
 
-		DriSegment segment = new DriSegment(stream);
+		DriSegment segment = new DriSegment(DriSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 
 		assertEquals("Restart Interval", 0xFFFF, segment.getRestartInterval());
@@ -91,7 +92,7 @@ public class DriSegmentTest {
 
 		DriSegment segment;
 		try {
-			segment = new DriSegment(stream);
+			segment = new DriSegment(DriSegment.SUBTYPE, stream, ParseMode.STRICT);
 			fail("Reading should have failed");
 		} catch (Exception e) {
 			assertTrue(e instanceof InvalidJpegFormat);

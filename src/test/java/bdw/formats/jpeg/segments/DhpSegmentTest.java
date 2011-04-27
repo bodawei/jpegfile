@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,14 +36,14 @@ public class DhpSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(DhpSegment.MARKER, new DhpSegment().getMarker());
+		assertEquals(DhpSegment.SUBTYPE, new DhpSegment().getMarker());
 	}
 
 	@Test
 	public void testDhpSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		DhpSegment segment = new DhpSegment(stream);
+		DhpSegment segment = new DhpSegment(DhpSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

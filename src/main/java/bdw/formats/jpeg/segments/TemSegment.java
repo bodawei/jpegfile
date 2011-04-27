@@ -31,22 +31,19 @@ public class TemSegment extends SegmentBase {
 	/**
 	 * Marker for this type of segment
 	 */
-	public static final int MARKER = 0x01;
+	public static final int SUBTYPE = 0x01;
 
 	public TemSegment() {
-		setMarker(TemSegment.MARKER);
+		setMarker(TemSegment.SUBTYPE);		
 	}
 
-	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public TemSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
+	public TemSegment(int subType) throws InvalidJpegFormat {
+		if (TemSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Construct an instance from a stream.
@@ -56,23 +53,12 @@ public class TemSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public TemSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public TemSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public TemSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -80,8 +66,8 @@ public class TemSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public TemSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public TemSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -93,7 +79,7 @@ public class TemSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == TemSegment.MARKER) {
+		if (marker == TemSegment.SUBTYPE) {
 			return true;
 		}
 		return false;

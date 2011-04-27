@@ -30,25 +30,26 @@ public class DnlSegment extends SegmentBase {
 	/**
 	 * Marker for this segment type
 	 */
-	public static final int MARKER = 0xDC;
+	public static final int SUBTYPE = 0xDC;
 
 	/**
 	 * Construct
 	 */
 	public DnlSegment() {
-		setMarker(DnlSegment.MARKER);
+		setMarker(DnlSegment.SUBTYPE);
 	}
 
 	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 * Constructs an instance with all properties empty
 	 */
-    public DnlSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
+	public DnlSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (DnlSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Construct an instance from a stream.
@@ -58,23 +59,12 @@ public class DnlSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DnlSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public DnlSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public DnlSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -82,8 +72,8 @@ public class DnlSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DnlSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public DnlSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -95,7 +85,7 @@ public class DnlSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == DnlSegment.MARKER) {
+		if (marker == DnlSegment.SUBTYPE) {
 			return true;
 		}
 		return false;

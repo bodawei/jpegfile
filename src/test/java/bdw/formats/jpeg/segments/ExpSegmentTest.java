@@ -16,6 +16,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,14 +40,14 @@ public class ExpSegmentTest {
 
 	@Test
 	public void instanceHasProperMarker() {
-		assertEquals(ExpSegment.MARKER, new ExpSegment().getMarker());
+		assertEquals(ExpSegment.SUBTYPE, new ExpSegment().getMarker());
 	}
 
 	@Test
 	public void expSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		ExpSegment segment = new ExpSegment(stream);
+		ExpSegment segment = new ExpSegment(ExpSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

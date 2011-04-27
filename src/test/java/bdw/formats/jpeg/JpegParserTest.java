@@ -68,8 +68,8 @@ public class JpegParserTest {
 		file.readFromFile(new File(uri));
 
 		assertEquals(2, file.getSegments().size());
-		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(1).getMarker());
+		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
+		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(1).getMarker());
 	}
 
     @Test
@@ -82,8 +82,8 @@ public class JpegParserTest {
 		file.readFromFile(new File(uri));
 
 		assertEquals(9, file.getSegments().size());
-		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(8).getMarker());
+		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
+		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(8).getMarker());
 	}
 
     @Test

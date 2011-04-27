@@ -30,25 +30,25 @@ public class JpgSegment extends SegmentBase {
 	/**
 	 * Marker for this kind of segment
 	 */
-    public static final int MARKER = 0xC8;
+    public static final int SUBTYPE = 0xC8;
 
 	/**
 	 * Constructor
 	 */
     public JpgSegment() {
-		setMarker(JpgSegment.MARKER);
+		setMarker(JpgSegment.SUBTYPE);
     }
 
 	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 * Constructs an instance with all properties empty
 	 */
-    public JpgSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
+	public JpgSegment(int subType) throws InvalidJpegFormat {
+		if (JpgSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Construct an instance from a stream.
@@ -58,23 +58,12 @@ public class JpgSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public JpgSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public JpgSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public JpgSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -82,8 +71,8 @@ public class JpgSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public JpgSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public JpgSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -95,7 +84,7 @@ public class JpgSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == JpgSegment.MARKER) {
+		if (marker == JpgSegment.SUBTYPE) {
 			return true;
 		}
 		return false;

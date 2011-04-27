@@ -31,25 +31,25 @@ public class EoiSegment extends SegmentBase {
 	/**
 	 * The marker code corresponding to this type of segment
 	 */
-	public static final int MARKER = 0xD9;
+	public static final int SUBTYPE = 0xD9;
 
 	/**
 	 * Construct
 	 */
 	public EoiSegment() {
-		setMarker(EoiSegment.MARKER);
+		setMarker(EoiSegment.SUBTYPE);
 	}
 
 	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 * Constructs an instance with all properties empty
 	 */
-    public EoiSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
+	public EoiSegment(int subType) throws InvalidJpegFormat {
+		if (EoiSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Construct an instance from a stream.
@@ -59,23 +59,12 @@ public class EoiSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public EoiSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public EoiSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public EoiSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -83,8 +72,8 @@ public class EoiSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public EoiSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public EoiSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -96,7 +85,7 @@ public class EoiSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == EoiSegment.MARKER) {
+		if (marker == EoiSegment.SUBTYPE) {
 			return true;
 		}
 		return false;

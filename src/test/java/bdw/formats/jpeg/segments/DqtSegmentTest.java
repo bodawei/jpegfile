@@ -16,6 +16,9 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.ParseMode;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
@@ -34,9 +37,17 @@ public class DqtSegmentTest {
 		utils = new TestUtils();
 	}
 
+	public DqtSegment createSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		return new DqtSegment(DqtSegment.SUBTYPE, stream, ParseMode.STRICT);
+	}
+
+	public DqtSegment createSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		return new DqtSegment(DqtSegment.SUBTYPE, file, ParseMode.STRICT);
+	}
+
 	@Test
 	public void getMarker_returnsRightDefault() {
-		assertEquals(DqtSegment.MARKER, new DqtSegment().getMarker());
+		assertEquals(DqtSegment.SUBTYPE, new DqtSegment().getMarker());
 	}
 
 	@Test
@@ -72,7 +83,7 @@ public class DqtSegmentTest {
 
 	@Test
 	public void read_OneTable_PopulatesAllAsExpected() throws IOException, InvalidJpegFormat {
-		DqtSegment segment = new DqtSegment(utils.makeInputStreamFromString("00 43" +
+		DqtSegment segment = createSegment(utils.makeInputStreamFromString("00 43" +
 				"05" +
 				" 00 01 02 03 04 05 06 07 08 09" +
 				" 0A 0B 0C 0D 0E 0f 10 11 12 13" +
@@ -95,7 +106,7 @@ public class DqtSegmentTest {
 	@Test
 	public void read_BadLength_ThrowsException() throws IOException, InvalidJpegFormat  {
 		try {
-			DqtSegment segment = new DqtSegment(utils.makeInputStreamFromString("00 33" +
+			DqtSegment segment = createSegment(utils.makeInputStreamFromString("00 33" +
 					"05" +
 					" 00 01 02 03 04 05 06 07 08 09" +
 					" 0A 0B 0C 0D 0E 0f 10 11 12 13" +

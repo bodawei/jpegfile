@@ -72,7 +72,7 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 		return marker;
 	}
 
-	public void setMarker(int newMarker) {
+	protected void setMarker(int newMarker) {
 		marker = newMarker;
 	}
 

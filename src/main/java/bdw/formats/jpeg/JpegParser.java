@@ -116,10 +116,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 			if (aByte != 0xFF) {
 				file.seek(pos);
 				if (seenSOS) {
-					DataSegment data = new DataSegment(file);
+					DataSegment data = new DataSegment(DataSegment.SUBTYPE, file, ParseMode.STRICT);
 					this.segments.add(data);
 				} else {
-					UnknownSegment data = new UnknownSegment(file);
+					UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 					this.segments.add(data);
 				}
 			} else {
@@ -130,10 +130,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 				if (markerByte == 0) {
 					file.seek(pos);
 					if (seenSOS) {
-						DataSegment data = new DataSegment(file);
+						DataSegment data = new DataSegment(DataSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
 					} else {
-						UnknownSegment data = new UnknownSegment(file);
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
 					}
 				} else {
@@ -152,10 +152,9 @@ public class JpegParser implements Iterable<SegmentBase> {
 								canHandle = (Boolean) handler.invoke(managerClass, markerByte);
 							}
 							if (canHandle) {
-								constructor = managerClass.getDeclaredConstructor(RandomAccessFile.class);
+								constructor = managerClass.getDeclaredConstructor(int.class, RandomAccessFile.class, ParseMode.class);
 								try {
-									manager = (SegmentBase) constructor.newInstance(file);
-									manager.setMarker(markerByte);
+									manager = (SegmentBase) constructor.newInstance(markerByte, file, ParseMode.STRICT);
 									this.segments.add(manager);
 									break;
 								} catch (Exception e) {
@@ -175,11 +174,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 					
 					}
 					if (manager == null) {
-						UnknownSegment data = new UnknownSegment(file);
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
 					}  else if (manager instanceof SosSegment) {
 						seenSOS = true;
-						return;
 					}
 				}
 			}
@@ -193,32 +191,76 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 		try {
 			while (true) {
+				boolean seenSOS = false;
+				dataStream.mark(2);
 				aByte = dataStream.readUnsignedByte();
 
 				if (aByte != 0xFF) {
-					// do nothing.  we must be encountering raw data.
-					// the last marker should have been sos.
-					// and isn't this just a strange file format?  all this structured data, and then suddenly a raw spew of data with no sense of size,
-					// escapes (0xff00), etc.
-				} else {
-					markerByte = dataStream.readUnsignedByte();
-					if (markerByte == 0x00) {
-						// last segment should have been SOS
-						// skip it, and keep going
-						// this apparently is a way to escape 0xff in the data, and the 00 isn't real data
-					} else if (markerByte == 0xFF) {
-						// evidently we should just ignore spare ff's.
-						// the question is is this the start of a new segment?
+					if (seenSOS) {
+						DataSegment data = new DataSegment(DataSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+						this.segments.add(data);
 					} else {
-//						Class<? extends SegmentBase> managerClass = this.segmentManagers[markerByte];
-//						SegmentBase manager = (SegmentBase) managerClass.newInstance();
-//						manager.readFromStream(dataStream);
-//						this.segments.add(manager);
-//						if (manager instanceof SosSegment) {
-////							expectData = true;
-//						}
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+						this.segments.add(data);
+					}
+				} else {
+					markerByte = 0;
+					markerByte = dataStream.readUnsignedByte();
+					if (markerByte == 0) {
+						dataStream.reset();
+						if (seenSOS) {
+							DataSegment data = new DataSegment(DataSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						} else {
+							UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						}
+					} else {
+						Class<? extends SegmentBase> managerClass;
+						Boolean canHandle = Boolean.FALSE;
+						Method handler;
+						Exception foo;
+						Constructor constructor;
+						SegmentBase manager = null;
+
+						for (int index = 0; index < this.segmentManagers.size(); index++) {
+							managerClass = this.segmentManagers.get(index);
+							try {
+								handler = managerClass.getDeclaredMethod("canHandleMarker", int.class);
+								if (handler != null) {
+									canHandle = (Boolean) handler.invoke(managerClass, markerByte);
+								}
+								if (canHandle) {
+									constructor = managerClass.getDeclaredConstructor(int.class, InputStream.class, ParseMode.class);
+									try {
+										manager = (SegmentBase) constructor.newInstance(markerByte, dataStream, ParseMode.STRICT);
+										this.segments.add(manager);
+										break;
+									} catch (Exception e) {
+										canHandle = Boolean.FALSE;
+									}
+								}
+							} catch (IllegalArgumentException ex) {
+								foo = ex;
+								ex.printStackTrace();
+							} catch (InvocationTargetException ex) {
+								foo = ex;
+							} catch (NoSuchMethodException ex) {
+								foo = ex;
+							} catch (SecurityException ex) {
+								foo = ex;
+							}
+
+						}
+						if (manager == null) {
+							UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						}  else if (manager instanceof SosSegment) {
+							seenSOS = true;
+						}
 					}
 				}
+
 			}
 		} catch (EOFException exception) {
 			// we're done.  so gracefully quit.

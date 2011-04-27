@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
@@ -35,14 +36,14 @@ public class SoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(SoiSegment.MARKER, new SoiSegment().getMarker());
+		assertEquals(SoiSegment.SUBTYPE, new SoiSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		SoiSegment segment = new SoiSegment(stream);
+		SoiSegment segment = new SoiSegment(SoiSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

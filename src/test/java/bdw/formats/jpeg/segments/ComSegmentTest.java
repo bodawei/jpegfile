@@ -16,7 +16,9 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.RandomAccessFile;
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,11 +40,18 @@ public class ComSegmentTest {
         segment = new ComSegment();
         utils = new TestUtils();
     }
+	
+	public ComSegment createSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		return new ComSegment(ComSegment.SUBTYPE, stream, ParseMode.STRICT);
+	}
 
+	public ComSegment createSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		return new ComSegment(ComSegment.SUBTYPE, file, ParseMode.STRICT);
+	}
 
     @Test
     public void constructor_SetsCorrectMarker() {
-        assertEquals(ComSegment.MARKER, segment.getMarker());
+        assertEquals(ComSegment.SUBTYPE, segment.getMarker());
     }
 
     @Test
@@ -70,7 +79,7 @@ public class ComSegmentTest {
     public void read_ZeroLength_OK() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 02");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         assertEquals("", segment.getComment());
     }
@@ -79,7 +88,7 @@ public class ComSegmentTest {
     public void read_ZeroLengthWithNull_OK()  throws IOException, InvalidJpegFormat {
 	InputStream stream = utils.makeInputStreamFromString("00 03 00");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         assertEquals("\000", segment.getComment());
     }
@@ -88,7 +97,7 @@ public class ComSegmentTest {
     public void read_NullTerminatedString_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 06 41 42 43 00");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         assertEquals("ABC\000", segment.getComment());
     }
@@ -97,7 +106,7 @@ public class ComSegmentTest {
     public void read_UnicodeString_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 16 e9 80 99 e6 98 af e4 b8 80 e5 80 8b 00  63 6f 6d 6d 65 6e 74");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         assertEquals("這是一個\000comment", segment.getComment());
     }
@@ -106,7 +115,7 @@ public class ComSegmentTest {
     public void read_WindowsString_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 07 93 20 85 20 94");	// “ … ”
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         assertEquals("“ … ”", segment.getComment());
     }
@@ -120,7 +129,7 @@ public class ComSegmentTest {
 			builder.append('4');
 			builder.append((char)('0'+(index % 10)));
 		}
-        segment = new ComSegment(utils.makeRandomAccessFile(builder.toString()));
+        segment = createSegment(utils.makeRandomAccessFile(builder.toString()));
 
 		assertEquals("byteCount", 1025, segment.getComment().length());
 		assertEquals("lastByte", 'D', segment.getComment().charAt(1024));
@@ -132,7 +141,7 @@ public class ComSegmentTest {
 	InputStream stream = utils.makeInputStreamFromString("00 02");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         segment.write(output);
         assertArrayEquals(utils.makeByteArrayFromString("00 02"), output.toByteArray());
@@ -183,7 +192,7 @@ public class ComSegmentTest {
 		InputStream stream = utils.makeInputStreamFromString("00 05 93 85 94");	// “…”
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
         segment.write(output);
 
         assertArrayEquals(utils.makeByteArrayFromString("00 05 93 85 94"), output.toByteArray());
@@ -194,7 +203,7 @@ public class ComSegmentTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		// set up with windows string
-        segment = new ComSegment(utils.makeInputStreamFromString("00 07 93 20 85 20 94"));
+        segment = createSegment(utils.makeInputStreamFromString("00 07 93 20 85 20 94"));
 
 		segment.setComment("這是一個\000comment");
 
@@ -207,7 +216,7 @@ public class ComSegmentTest {
     public void equals_WithEqualCommentWithoutTrailingNull_OK()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 13 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         ComSegment segment2 = new ComSegment();
 
@@ -220,7 +229,7 @@ public class ComSegmentTest {
     public void equals_WithDifferentComments_False()  throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("00 13 54 68 69 73 20 69 73 20 61 20 63 6f 6d 6d 65 6e 74");
 
-        segment = new ComSegment(stream);
+        segment = createSegment(stream);
 
         ComSegment segment2 = new ComSegment();
 

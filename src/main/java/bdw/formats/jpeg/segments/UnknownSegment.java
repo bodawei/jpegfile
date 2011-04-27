@@ -38,25 +38,22 @@ public class UnknownSegment extends BlobSegmentBase {
 	/**
 	 * Marker for this type.
 	 */
-	public static int MARKER = 0xFFFF;
+	public static int SUBTYPE = -1;
 
+	public UnknownSegment() {
+		setMarker(UnknownSegment.SUBTYPE);
+	}
+	
 	/**
 	 * Construct
 	 */
-	public UnknownSegment() {
-		super();
+	public UnknownSegment(int subType) throws InvalidJpegFormat {
+		if (UnknownSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
 	}
-
-	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public UnknownSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
 
 	/**
 	 * Construct an instance from a stream.
@@ -66,23 +63,12 @@ public class UnknownSegment extends BlobSegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public UnknownSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public UnknownSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public UnknownSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -90,8 +76,8 @@ public class UnknownSegment extends BlobSegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public UnknownSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public UnknownSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -103,7 +89,7 @@ public class UnknownSegment extends BlobSegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == UnknownSegment.MARKER) {
+		if (marker == UnknownSegment.SUBTYPE) {
 			return true;
 		}
 		return false;
@@ -116,7 +102,7 @@ public class UnknownSegment extends BlobSegmentBase {
 	 */
 	@Override
 	public int getMarker() {
-		return UnknownSegment.MARKER;
+		return UnknownSegment.SUBTYPE;
 	}
 	
 

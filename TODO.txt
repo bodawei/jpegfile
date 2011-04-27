@@ -1,17 +1,16 @@
-* Architecture changes
-  * Deal with imperfect data better
-	* EOF or length too long: ?
-	* length too short  (can't happen)
-	* length and internal data say different things
-	* internal data has invalid values (we could allow)
+* Cleanup segments and their supports and tests
+  * General code cleanup
+  * Look over error conditions
+    * EOF
+    * Format errors
+    * Format warnings (lax)
+* Are you really happy with passing the subtype in to all the constructors?
 * Can we explain the other structures as well as Dht?
 
-* In JpegParser
-** what should isValid do?
-** Create a subtype of DataInput which keeps track of what byte one is at (so can be put in error, and perhaps reported usefully in jpeg file?
-* Exif or other metadata added
-* Finish JpegParser
-* Do a jpeg scanner? (e.g. find me this one segment without reading everything in so much)
+* Clean up JpegParser
+* Do counting InputStream to be able to report byte counts?
+* Jpeg Differ
+* Jpeg scanner
 
-----
-http://www.drewnoakes.com/code/exif/
+* Exif and other AppN things
+	http://www.drewnoakes.com/code/exif/

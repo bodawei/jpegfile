@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,14 +36,14 @@ public class DnlSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(DnlSegment.MARKER, new DnlSegment().getMarker());
+		assertEquals(DnlSegment.SUBTYPE, new DnlSegment().getMarker());
 	}
 
 	@Test
 	public void testDnlSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		DnlSegment segment = new DnlSegment(stream);
+		DnlSegment segment = new DnlSegment(DnlSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

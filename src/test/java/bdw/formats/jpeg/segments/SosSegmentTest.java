@@ -17,9 +17,12 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +49,18 @@ public class SosSegmentTest {
 		utils = new TestUtils();
 	}
 
+	public SosSegment createSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		return new SosSegment(SosSegment.SUBTYPE, stream, ParseMode.STRICT);
+	}
+
+	public SosSegment createSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		return new SosSegment(SosSegment.SUBTYPE, file, ParseMode.STRICT);
+	}
+
 	@Test
 	public void testMarkerIsRight() throws IOException {
 		SosSegment segment = new SosSegment();
-		Assert.assertEquals("Marker ID", SosSegment.MARKER, segment.getMarker());
+		Assert.assertEquals("Marker ID", SosSegment.SUBTYPE, segment.getMarker());
 	}
 
 	@Test
@@ -123,7 +134,7 @@ public class SosSegmentTest {
 
 	@Test
 	public void testReadSegmentFromStream() throws IOException, InvalidJpegFormat {
-		SosSegment segment = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		SosSegment segment = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		Assert.assertEquals("Spectral Selection Start", 1, segment.getSpectralSelectionStart());
 		Assert.assertEquals("Spectral Selection End", 2, segment.getSpectralSelectionEnd());
@@ -134,13 +145,13 @@ public class SosSegmentTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testReadInvalidComponentCountErrors() throws IOException, InvalidJpegFormat {
-		SosSegment segment = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_BAD_COMPONENT_COUNT));
+		SosSegment segment = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_BAD_COMPONENT_COUNT));
 	}
 
 	@Test
 	public void testEquals() throws IOException, InvalidJpegFormat {
-		SosSegment one = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
-		SosSegment two = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		SosSegment one = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		SosSegment two = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		Assert.assertTrue("one equals two", one.equals(two));
 		Assert.assertTrue("two equals one", two.equals(one));
@@ -148,8 +159,8 @@ public class SosSegmentTest {
 
 	@Test
 	public void testEqualsFailsForUnequalSegments() throws IOException, InvalidJpegFormat {
-		SosSegment one = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
-		SosSegment two = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_2));
+		SosSegment one = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		SosSegment two = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_2));
 
 		Assert.assertFalse("one doesn't equal two", one.equals(two));
 		Assert.assertFalse("two doesn't equal one", two.equals(one));
@@ -157,7 +168,7 @@ public class SosSegmentTest {
 
 	@Test
 	public void testWrite() throws IOException, InvalidJpegFormat {
-		SosSegment one = new SosSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
+		SosSegment one = createSegment(utils.makeInputStreamFromString(SOSSEGMENT_1));
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		one.write(out);

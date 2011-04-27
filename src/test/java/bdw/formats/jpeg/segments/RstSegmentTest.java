@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,26 +43,26 @@ public class RstSegmentTest {
 	}
 
 	@Test
-	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(0, new RstSegment().getMarker());
+	public void testThatHasTheRightMarkerByDefault() throws InvalidJpegFormat {
+		assertEquals(RstSegment.FIRST_SUBTYPE, new RstSegment(RstSegment.FIRST_SUBTYPE).getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		RstSegment segment = new RstSegment(stream);
+		RstSegment segment = new RstSegment(RstSegment.FIRST_SUBTYPE, stream, ParseMode.STRICT);
 		
 		assertEquals(0xAA, stream.read());
 	}
 
 	@Test
-	public void rstSegmentsEqual() throws IOException {
-		assertTrue(new RstSegment().equals(new RstSegment()));
+	public void rstSegmentsEqual() throws IOException, InvalidJpegFormat {
+		assertTrue(new RstSegment(RstSegment.FIRST_SUBTYPE).equals(new RstSegment(RstSegment.FIRST_SUBTYPE)));
 	}
 
 	@Test
-	public void rstSegmentNotEqualToOther() throws IOException {
-		assertFalse(new RstSegment().equals(new Object()));
+	public void rstSegmentNotEqualToOther() throws IOException, InvalidJpegFormat {
+		assertFalse(new RstSegment(RstSegment.FIRST_SUBTYPE).equals(new Object()));
 	}
 }

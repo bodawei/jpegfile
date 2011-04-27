@@ -21,7 +21,6 @@ import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.support.SofComponent;
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,43 +42,36 @@ public class SofSegment extends SegmentBase {
 	/**
 	 * Start of the first range of possible markers
 	 */
-	public static final int RANGE1_START = 0xc0;
+	public static final int FIRST1_SUBTYPE = 0xc0;
 	/**
 	 * End of the first range of possible markers
 	 */
-	public static final int RANGE1_END = 0xc3;
+	public static final int LAST1_SUBTYPE = 0xc3;
 	/**
 	 * Start of the second range of possible markers
 	 */
-	public static final int RANGE2_START = 0xc5;
+	public static final int FIRST2_SUBTYPE = 0xc5;
 	/**
 	 * End of the second range of possible markers
 	 */
-	public static final int RANGE2_END = 0xc7;
+	public static final int LAST2_SUBTYPE = 0xc7;
 	/**
 	 * Start of the third range of possible markers
 	 */
-	public static final int RANGE3_START = 0xc9;
+	public static final int FIRST3_SUBTYPE = 0xc9;
 	/**
 	 * End of the third range of possible markers
 	 */
-	public static final int RANGE3_END = 0xcb;
+	public static final int LAST3_SUBTYPE = 0xcb;
 	/**
 	 * Start of the fourth range of possible markers
 	 */
-	public static final int RANGE4_START = 0xcd;
+	public static final int FIRST4_SUBTYPE = 0xcd;
 	/**
 	 * End of the fourth range of possible markers
 	 */
-	public static final int RANGE4_END = 0xcf;
-	/**
-	 * Max size for the precision and number of components
-	 */
-	protected static final int UINT1_MAX_VALUE = 255;
-	/**
-	 * Max size for the width and height
-	 */
-	protected static final int UINT2_MAX_VALUE = 65535;
+	public static final int LAST4_SUBTYPE = 0xcf;
+
 	/**
 	 * Precision (?)
 	 */
@@ -98,23 +90,16 @@ public class SofSegment extends SegmentBase {
 	protected List<SofComponent> components;
 
 	/**
-	 * Construct
+	 * Constructs an instance with all properties empty
 	 */
-	public SofSegment() {
-		setMarker(0);
+	public SofSegment(int subType) throws InvalidJpegFormat {
 		components = new ArrayList<SofComponent>();
+		if (SofSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
 	}
-
-	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public SofSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
-    }
 
 	/**
 	 * Construct an instance from a stream.
@@ -124,23 +109,12 @@ public class SofSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public SofSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public SofSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public SofSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -148,8 +122,8 @@ public class SofSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public SofSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public SofSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -161,10 +135,10 @@ public class SofSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (((marker >= SofSegment.RANGE1_START) && (marker <= SofSegment.RANGE1_END)) ||
-			((marker >= SofSegment.RANGE2_START) && (marker <= SofSegment.RANGE2_END)) ||	
-			((marker >= SofSegment.RANGE3_START) && (marker <= SofSegment.RANGE3_END)) ||
-			((marker >= SofSegment.RANGE4_START) && (marker <= SofSegment.RANGE4_END))) {
+		if (((marker >= SofSegment.FIRST1_SUBTYPE) && (marker <= SofSegment.LAST1_SUBTYPE)) ||
+			((marker >= SofSegment.FIRST2_SUBTYPE) && (marker <= SofSegment.LAST2_SUBTYPE)) ||	
+			((marker >= SofSegment.FIRST3_SUBTYPE) && (marker <= SofSegment.LAST3_SUBTYPE)) ||
+			((marker >= SofSegment.FIRST4_SUBTYPE) && (marker <= SofSegment.LAST4_SUBTYPE))) {
 			return true;
 		}
 		return false;

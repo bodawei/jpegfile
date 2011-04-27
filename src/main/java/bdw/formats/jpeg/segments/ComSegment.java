@@ -37,7 +37,7 @@ public class ComSegment extends SegmentBase {
 	/**
 	 * Marker code that conventionally represents the com segment.
 	 */
-    public static final int MARKER = 0xFE;
+    public static final int SUBTYPE = 0xFE;
 
 	/**
 	 * The string that is the actual comment
@@ -71,24 +71,27 @@ public class ComSegment extends SegmentBase {
 	/**
 	 * Construct a plain instance with a comment of ""
 	 */
-    public ComSegment() {
-        setMarker(ComSegment.MARKER);
-        comment = "";
+    public ComSegment()  {
+		comment = "";
 		useWindowsCharset = false;
 		raFile = null;
 		fileOffset = 0;
-		mode = ParseMode.STRICT;
-    }
-
+		setMarker(ComSegment.SUBTYPE);
+	}
+		
 	/**
-	 * Construct an instance from a stream, parsing it strictly.
-	 *
-	 * @param stream The stream to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 *  Constructs an instance with the specified subType
+	 * 
+	 * @param subType the subType for the instance.
+	 * @throws InvalidType If the subtype is other than ComSegment.SUBTYPE
 	 */
-    public ComSegment(InputStream stream) throws IOException, InvalidJpegFormat {
-		this(stream, ParseMode.STRICT);
+	public ComSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (ComSegment.canHandleMarker(subType)) {
+			setMarker(subType);
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
     }
 
 	/**
@@ -99,23 +102,12 @@ public class ComSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public ComSegment(InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public ComSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat  {
+		this(subType);
 		super.readFromStream(stream, mode);
     }
 
 	/**
-	 * Construct an instance from a stream. Parses it strictly
-	 *
-	 * @param file The file to read from
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-    public ComSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		this(file, ParseMode.STRICT);
-    }
-
-	/**
 	 * Construct an instance from a stream.
 	 *
 	 * @param file The file to read from
@@ -123,8 +115,8 @@ public class ComSegment extends SegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public ComSegment(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this();
+	public ComSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
 		super.readFromFile(file, mode);
     }
 
@@ -136,7 +128,7 @@ public class ComSegment extends SegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == ComSegment.MARKER) {
+		if (marker == ComSegment.SUBTYPE) {
 			return true;
 		}
 		return false;
@@ -264,6 +256,7 @@ public class ComSegment extends SegmentBase {
 	 *
 	 * @throws IOException If an error occurs while reading
 	 */
+	@Override
 	protected void readFromFile(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
         long position = file.getFilePointer();
 		int contentLength = file.readUnsignedShort();
