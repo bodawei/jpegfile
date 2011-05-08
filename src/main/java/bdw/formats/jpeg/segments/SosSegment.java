@@ -167,7 +167,7 @@ public class SosSegment extends SegmentBase {
 		int componentCount = input.readUnsignedByte();
 
 		if ((2 + 1 + (componentCount * 2) + 3) != contentLength) {
-			throw new IllegalArgumentException("Need to report the error, and store the byte offset too.");
+			throw new IllegalArgumentException("Sos Got " + (2 + 1 + (componentCount * 2) + 3) + " bytes, but expected " + contentLength);
 		}
 
 		for (int index = 0; index < componentCount; index++) {
