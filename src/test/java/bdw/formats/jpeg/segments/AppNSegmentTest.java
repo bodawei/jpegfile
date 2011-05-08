@@ -16,10 +16,12 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import org.junit.Before;
@@ -32,20 +34,27 @@ public class AppNSegmentTest {
 	protected AppNSegment segment;
 
 	@Before
-    public void setUp() {
-		segment = new AppNSegment();
+    public void setUp() throws InvalidJpegFormat {
+		segment = new AppNSegment(AppNSegment.START_MARKER);
 		utils = new TestUtils();
     }
+	
+	private AppNSegment createSegment(RandomAccessFile file) throws InvalidJpegFormat, IOException {
+		return new AppNSegment(AppNSegment.START_MARKER, file, ParseMode.STRICT);
+	}
 
+	private AppNSegment createSegment(InputStream stream) throws InvalidJpegFormat, IOException {
+		return new AppNSegment(AppNSegment.START_MARKER, stream, ParseMode.STRICT);
+	}
     @Test
     public void creationSetsMarker() {
-		assertEquals("marker", 0, segment.getMarker());
+		assertEquals("marker", AppNSegment.START_MARKER, segment.getMarker());
 	}
 
 
     @Test
     public void readFromStreamWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = createSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
@@ -54,20 +63,26 @@ public class AppNSegmentTest {
 
     @Test(expected=EOFException.class)
     public void readFromStreamWithBadLength() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 10" +
+		segment = createSegment(utils.makeInputStreamFromString("00 10" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 	}
 
     @Test
     public void readFromSmallFileWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile("00 0C" +
+		segment = createSegment(utils.makeRandomAccessFile("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
 		assertArrayEquals("bytes", utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"),
 				segment.getBytes());
 	}
 
-    @Test
+    @Test(expected=EOFException.class)
+    public void readFromFileWithBadLength() throws IOException, InvalidJpegFormat {
+		segment = createSegment(utils.makeRandomAccessFile("00 10" +
+			"01 02 03 04 05 06 07 08 09 0a"));
+	}
+
+	@Test
     public void readFromBigFileWorks() throws IOException, InvalidJpegFormat {
 		StringBuilder builder = new StringBuilder();
 
@@ -76,7 +91,7 @@ public class AppNSegmentTest {
 		for (int index = 0; index < 0x1FE0; index++) {
 			builder.append("00");
 		}
-		segment.readFromFile(utils.makeRandomAccessFile(builder.toString()));
+		segment = createSegment(utils.makeRandomAccessFile(builder.toString()));
 
 		assertEquals("length", 0x1FE0, segment.getBytes().length);
 	}
@@ -94,7 +109,7 @@ public class AppNSegmentTest {
 		builder.append("77");
 		file = utils.makeRandomAccessFile(builder.toString());
 
-		segment.readFromFile(file);
+		segment = createSegment(file);
 
 		assertEquals("Expected byte after reading", 0x77, file.readByte());
 	}
@@ -102,20 +117,20 @@ public class AppNSegmentTest {
 
 	@Test
     public void twoEqualSegmentsEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = createSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
-		AppNSegment other = new AppNSegment();
+		AppNSegment other = new AppNSegment(AppNSegment.START_MARKER);
 		other.setBytes(utils.makeByteArrayFromString("01 02 03 04 05 06 07 08 09 0a"));
 		assertEquals("segment", other, segment);
 	}
 
     @Test
     public void unequalSegmentsAreNotEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 0C" +
+		segment = createSegment(utils.makeInputStreamFromString("00 0C" +
 			"01 02 03 04 05 06 07 08 09 0a"));
 
-		AppNSegment other = new AppNSegment();
+		AppNSegment other = new AppNSegment(AppNSegment.START_MARKER);
 		other.setBytes(utils.makeByteArrayFromString("FF FE FD 04 05 06 07 08 09 0a"));
 
 		assertFalse("segment", other.equals(segment));

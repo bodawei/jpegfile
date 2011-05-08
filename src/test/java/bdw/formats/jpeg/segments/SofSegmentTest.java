@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import java.io.RandomAccessFile;
 import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
@@ -43,14 +44,22 @@ public class SofSegmentTest {
 	public void tearDown() {
 	}
 
-	@Test
-	public void newInstanceHasZeroMarkerByDefault() {
-		assertEquals(0, new SofSegment().getMarker());
+	public SofSegment createSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		return new SofSegment(SofSegment.FIRST1_SUBTYPE, stream, ParseMode.STRICT);
+	}
+
+	public SofSegment createSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		return new SofSegment(SofSegment.FIRST1_SUBTYPE, file, ParseMode.STRICT);
 	}
 
 	@Test
-	public void canAssignPrecisionValue() {
-		SofSegment segment = new SofSegment();
+	public void newInstanceHasZeroMarkerByDefault() throws InvalidJpegFormat {
+		assertEquals(SofSegment.FIRST1_SUBTYPE, new SofSegment(SofSegment.FIRST1_SUBTYPE).getMarker());
+	}
+
+	@Test
+	public void canAssignPrecisionValue() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		segment.setSamplePrecision(10);
 
@@ -58,8 +67,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canNotAssignNegativePrecisionValue() {
-		SofSegment segment = new SofSegment();
+	public void canNotAssignNegativePrecisionValue() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		try {
 			segment.setSamplePrecision(-10);
@@ -70,8 +79,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canNotAssignOutOfRangePrecisionValue() {
-		SofSegment segment = new SofSegment();
+	public void canNotAssignOutOfRangePrecisionValue() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		try {
 			segment.setSamplePrecision(256);
@@ -83,8 +92,8 @@ public class SofSegmentTest {
 
 
 	@Test
-	public void canAssignWidthValue() {
-		SofSegment segment = new SofSegment();
+	public void canAssignWidthValue() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		segment.setImageWidth(10);
 
@@ -92,8 +101,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canNotAssignNegativeWidth() {
-		SofSegment segment = new SofSegment();
+	public void canNotAssignNegativeWidth() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		try {
 			segment.setSamplePrecision(-10);
@@ -104,8 +113,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canNotAssignOutOfRangeWidthValue() {
-		SofSegment segment = new SofSegment();
+	public void canNotAssignOutOfRangeWidthValue() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		try {
 			segment.setImageWidth(65536);
@@ -116,15 +125,15 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void newInstanceHasZeroComponents() {
-		SofSegment segment = new SofSegment();
+	public void newInstanceHasZeroComponents() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		assertEquals(0, segment.getComponentCount());
 	}
 
 	@Test
-	public void canInsertAComponent() {
-		SofSegment segment = new SofSegment();
+	public void canInsertAComponent() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent comp = new SofComponent();
 
 		segment.addComponent(0, comp);
@@ -134,8 +143,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void insertAComponentOutOfRangeErrors() {
-		SofSegment segment = new SofSegment();
+	public void insertAComponentOutOfRangeErrors() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent comp = new SofComponent();
 
 		segment.addComponent(0, new SofComponent());
@@ -148,8 +157,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void insertAComponentAtBeginningMovesOthersDown() {
-		SofSegment segment = new SofSegment();
+	public void insertAComponentAtBeginningMovesOthersDown() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent comp = new SofComponent();
 
 		segment.addComponent(0, new SofComponent());
@@ -160,8 +169,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void caNotDeleteComponentThatDoesntExist() {
-		SofSegment segment = new SofSegment();
+	public void caNotDeleteComponentThatDoesntExist() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent comp1 = new SofComponent();
 
 		segment.addComponent(0, comp1);
@@ -177,8 +186,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canDeleteComponent() {
-		SofSegment segment = new SofSegment();
+	public void canDeleteComponent() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent comp1 = new SofComponent();
 
 		segment.addComponent(0, comp1);
@@ -189,8 +198,8 @@ public class SofSegmentTest {
 	}
 
 	@Test
-	public void canNotInsertMoreThan256Components() {
-		SofSegment segment = new SofSegment();
+	public void canNotInsertMoreThan256Components() throws InvalidJpegFormat {
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 
 		for (int index = 0; index < 256; index++) {
 			segment.addComponent(index, new SofComponent());
@@ -207,9 +216,8 @@ public class SofSegmentTest {
 
 	@Test
 	public void basicSofReadOK() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		InputStream stream = utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12");
-		SofSegment answerFormat = new SofSegment();
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12"));
+		SofSegment answerFormat = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent entry = new SofComponent();
 
 		answerFormat.setSamplePrecision(0x44);
@@ -221,29 +229,24 @@ public class SofSegmentTest {
 		entry.setQuantizationId(0x12);
 		answerFormat.addComponent(0, entry);
 
-		segment.readFromStream(stream);
-
 		assertEquals("SofSegment", answerFormat, segment);
 	}
 
 	@Test(expected=InvalidJpegFormat.class)
 	public void strictReadWithTwoComponentsThrowsException() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-
-		segment.readFromStream(twoComponentStream);
+		SofSegment segment = createSegment(twoComponentStream);
 	}
 
 	@Test(expected=InvalidJpegFormat.class)
 	public void strictReadWithComponentIdOutOfRange() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-
-		segment.readFromStream(utils.makeInputStreamFromString("00 0E 44 0033 1045 01 06 11 11 "));
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 0E 44 0033 1045 01 06 11 11 "));
 	}
 
 	@Test
 	public void laxReadWithComponentIdOutOfRange() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		SofSegment answerFormat = new SofSegment();
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE, 
+				utils.makeInputStreamFromString("00 0B 44 0033 1045 01 06 11 11 "), ParseMode.LAX);
+		SofSegment answerFormat = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent entry = new SofComponent();
 
 		answerFormat.setSamplePrecision(0x44);
@@ -255,17 +258,15 @@ public class SofSegmentTest {
 		entry.setQuantizationId(0x11);
 		answerFormat.addComponent(0, entry);
 
-		segment.setStrictness(ParseMode.LAX);
-		segment.readFromStream(utils.makeInputStreamFromString("00 0B 44 0033 1045 01 06 11 11 "));
-
 		assertEquals(answerFormat, segment);
 		assertFalse(segment.isValid());
 	}
 
 	@Test
 	public void laxReadWithTwoComponentsOK() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		SofSegment answerFormat = new SofSegment();
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE, 
+				twoComponentStream, ParseMode.LAX);
+		SofSegment answerFormat = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent entry = new SofComponent();
 
 		answerFormat.setSamplePrecision(0x44);
@@ -283,9 +284,6 @@ public class SofSegmentTest {
 		entry.setQuantizationId(0x22);
 		answerFormat.addComponent(1, entry);
 
-		segment.setStrictness(ParseMode.LAX);
-		segment.readFromStream(twoComponentStream);
-
 		assertEquals(answerFormat, segment);
 		assertFalse(segment.isValid());
 	}
@@ -293,9 +291,8 @@ public class SofSegmentTest {
 
 	@Test
 	public void unequalSegmentsAreNotEqual() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		InputStream stream = utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12");
-		SofSegment answerFormat = new SofSegment();
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 0B 44 0033 1045 01 02 EB 12"));
+		SofSegment answerFormat = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		SofComponent entry = new SofComponent();
 
 		answerFormat.setSamplePrecision(0x44);
@@ -307,53 +304,27 @@ public class SofSegmentTest {
 		entry.setQuantizationId(0x12);
 		answerFormat.addComponent(0, entry);
 
-		segment.readFromStream(stream);
-
 		assertFalse(answerFormat.equals(segment));
 	}
 
-	@Test
+	@Test(expected=InvalidJpegFormat.class)
 	public void invalidLengthThrowsException() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		InputStream stream = utils.makeInputStreamFromString("00 03 44 0033 1045 01 02 EB 12");
-
-		try {
-			segment.readFromStream(stream);
-			fail("Didn't throw an exception when it should have");
-		} catch (Exception e) {
-			assertTrue(e instanceof InvalidJpegFormat);
-		}
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 03 44 0033 1045 01 02 EB 12"));
 	}
 
-	@Test
+	@Test(expected=InvalidJpegFormat.class)
 	public void lengthAndComponentCountDontAgree() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		InputStream stream = utils.makeInputStreamFromString("00 0B 44 0033 1045 02 02 EB 12 03 EB 12");
-
-		try {
-			segment.readFromStream(stream);
-			fail("Didn't throw an exception when it should have");
-		} catch (Exception e) {
-			assertTrue(e instanceof InvalidJpegFormat);
-		}
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 0B 44 0033 1045 02 02 EB 12 03 EB 12"));
 	}
 
-	@Test
+	@Test(expected=InvalidJpegFormat.class)
 	public void eofInMiddleThrowsException() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
-		InputStream stream = utils.makeInputStreamFromString("00 0E 44 0033 1045 02 02 EB");
-
-		try {
-			segment.readFromStream(stream);
-			fail("Didn't throw an exception when it should have");
-		} catch (Exception e) {
-			assertTrue(e instanceof InvalidJpegFormat);
-		}
+		SofSegment segment = createSegment(utils.makeInputStreamFromString("00 0E 44 0033 1045 02 02 EB"));
 	}
 
 	@Test(expected=IOException.class)
 	public void writeSegmentWithNoComponentsShouldFail() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		byte[] rawData = utils.makeByteArrayFromString("00 08 44 0033 1045 00");
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -368,7 +339,7 @@ public class SofSegmentTest {
 
 	@Test
 	public void writeSegmentWithThreeComponents() throws IOException, InvalidJpegFormat {
-		SofSegment segment = new SofSegment();
+		SofSegment segment = new SofSegment(SofSegment.FIRST1_SUBTYPE);
 		byte[] rawData = utils.makeByteArrayFromString("00 11 44 0033 1045 03 01 12 03 04 75 06 05 E8 09");
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		SofComponent entry;

@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.ParseMode;
 import java.io.RandomAccessFile;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -26,16 +27,24 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class JunkSegmentTest {
+public class UnknownSegmentTest {
 
 	protected TestUtils utils;
-	protected JunkSegment segment;
+	protected UnknownSegment segment;
 
 	@Before
     public void setUp() {
-		segment = new JunkSegment();
+		segment = new UnknownSegment();
 		utils = new TestUtils();
     }
+
+	public UnknownSegment createSegment(InputStream stream) throws IOException, InvalidJpegFormat {
+		return new UnknownSegment(UnknownSegment.SUBTYPE, stream, ParseMode.STRICT);
+	}
+
+	public UnknownSegment createSegment(RandomAccessFile file) throws IOException, InvalidJpegFormat {
+		return new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
+	}
 
     @Test
     public void setByte1KIn() throws IOException {
@@ -47,7 +56,7 @@ public class JunkSegmentTest {
 
     @Test
     public void streamRead() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("01 02 03 04 05 06 07 08 09 0a"));
+		segment = createSegment(utils.makeInputStreamFromString("01 02 03 04 05 06 07 08 09 0a"));
 
 		assertEquals("bytes", 10, segment.getDataLength());
 		assertEquals("Last Byte", (byte)0x0A, segment.getDataAt(9));
@@ -55,21 +64,21 @@ public class JunkSegmentTest {
 
     @Test
     public void streamWithFF00ReadAsFF00() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("01 FF 00 04 05 06 07 08 09 0a"));
+		segment = createSegment(utils.makeInputStreamFromString("01 FF 00 04 05 06 07 08 09 0a"));
 
 		assertEquals("bytes", 10, segment.getDataLength());
 	}
 
     @Test
     public void streamWithNoDataCreatesZeroDataBytes() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString(""));
+		segment = createSegment(utils.makeInputStreamFromString(""));
 
 		assertEquals("bytes", 0, segment.getDataLength());
 	}
 
     @Test
     public void streamWithTrailingFFWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("02 FF"));
+		segment = createSegment(utils.makeInputStreamFromString("02 FF"));
 
 		assertEquals("bytes", 2, segment.getDataLength());
 		assertEquals("Last Byte", (byte)0xFF, segment.getDataAt(1));
@@ -78,7 +87,7 @@ public class JunkSegmentTest {
 	@Test
     public void sreamStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("01 FF 00 04 05 FF D8 08 09 0a");
-		segment.readFromStream(stream);
+		segment = createSegment(stream);
 
 		assertEquals("bytes", 5, segment.getDataLength());
 		assertEquals("nextByte", 0xFF, stream.read());
@@ -87,7 +96,7 @@ public class JunkSegmentTest {
     @Test
     public void streamDoesNotStopAtOtherSegmentIfItIsAtTheFirstByte() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("FF D8 08 09 0a");
-		segment.readFromStream(stream);
+		segment = createSegment(stream);
 
 		assertEquals("bytes", 5, segment.getDataLength());
 	}
@@ -99,28 +108,28 @@ public class JunkSegmentTest {
 		for (int index = 0; index < 0x1FE0; index++) {
 			builder.append("00");
 		}
-		segment.readFromFile(utils.makeRandomAccessFile(builder.toString()));
+		segment = createSegment(utils.makeRandomAccessFile(builder.toString()));
 
 		assertEquals("byteCount", 0x1FE0, segment.getDataLength());
 	}
 
     @Test
     public void fileWithFF00ReadAsFF00() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile("01 FF 00 04 05 06 07 08 09 0a"));
+		segment = createSegment(utils.makeRandomAccessFile("01 FF 00 04 05 06 07 08 09 0a"));
 
 		assertEquals("byteCount", 10, segment.getDataLength());
 	}
 
     @Test
     public void fileWithNoDataCreatesZeroDataBytes() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile(""));
+		segment = createSegment(utils.makeRandomAccessFile(""));
 
 		assertEquals("byteCount", 0, segment.getDataLength());
 	}
 
     @Test
     public void fileWithTrailingFFWorks() throws IOException, InvalidJpegFormat {
-		segment.readFromFile(utils.makeRandomAccessFile("02 FF"));
+		segment = createSegment(utils.makeRandomAccessFile("02 FF"));
 
 		assertEquals("byteCount", 2, segment.getDataLength());
 		assertEquals("Last Byte", (byte)0xFF, segment.getDataAt(1));
@@ -130,7 +139,7 @@ public class JunkSegmentTest {
 	@Test
     public void fileStopsAtOtherSegmentStart() throws IOException, InvalidJpegFormat {
 		RandomAccessFile file = utils.makeRandomAccessFile("01 FF 00 04 05 FF D8 08 09 0a");
-		segment.readFromFile(file);
+		segment = createSegment(file);
 
 		assertEquals("byteCount", 5, segment.getDataLength());
 		assertEquals("nextByte", 0xFF, file.read());
@@ -139,7 +148,7 @@ public class JunkSegmentTest {
     @Test
     public void fileDoesNotStopAtOtherSegmentStartWhenAtFirstByte() throws IOException, InvalidJpegFormat {
 		RandomAccessFile file = utils.makeRandomAccessFile("FF D8 08 09 0a");
-		segment.readFromFile(file);
+		segment = createSegment(file);
 
 		assertEquals("byteCount", 5, segment.getDataLength());
 	}
@@ -176,9 +185,9 @@ public class JunkSegmentTest {
 
 	@Test
     public void equalSegmentsEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 01 02 03 04 05 06 07 08 09"));
+		segment = createSegment(utils.makeInputStreamFromString("00 01 02 03 04 05 06 07 08 09"));
 
-		JunkSegment other = new JunkSegment();
+		UnknownSegment other = new UnknownSegment();
 		for (int index = 0; index < 10; index++) {
 			other.setDataAt(index, (byte)index);
 		}
@@ -188,9 +197,9 @@ public class JunkSegmentTest {
 
 	@Test
     public void unequalSegmentsNotEqual() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("01 03 03 04 05 06 07 08 09 0a"));
+		segment = createSegment(utils.makeInputStreamFromString("01 03 03 04 05 06 07 08 09 0a"));
 
-		JunkSegment other = new JunkSegment();
+		UnknownSegment other = new UnknownSegment();
 		for (int index = 0; index < 10; index++) {
 			other.setDataAt(index, (byte)index);
 		}

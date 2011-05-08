@@ -17,10 +17,13 @@ package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * Define Restart Interval
@@ -36,7 +39,7 @@ public class DriSegment extends SegmentBase {
 	/**
 	 * The only allowable marker for this segment type
 	 */
-	public static final int MARKER = 0xDD;
+	public static final int SUBTYPE = 0xDD;
 
 	/**
 	 * The restart interval this segment is managing
@@ -48,7 +51,59 @@ public class DriSegment extends SegmentBase {
 	 */
 	public DriSegment() {
 		restartInterval = 0;
-		setMarker(DriSegment.MARKER);
+		setMarker(DriSegment.SUBTYPE);
+	}
+
+	/**
+	 * Constructs an instance with all properties empty
+	 */
+	public DriSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (DriSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DriSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DriSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == DriSegment.SUBTYPE) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -71,28 +126,9 @@ public class DriSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	protected void readData(DataInput input) throws IOException, InvalidJpegFormat {
-		int contentLength = input.readUnsignedShort();
-		if (contentLength != 4) {
-			throw new InvalidJpegFormat("got the wrong length in a DRI segment");
-		}
-
-		setRestartInterval(input.readUnsignedShort());
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
-		DataOutputStream dataStream;
-
-		if (stream instanceof DataOutputStream) {
-			dataStream = (DataOutputStream) stream;
-		} else {
-			dataStream = new DataOutputStream(stream);
-		}
+		DataOutputStream dataStream = super.wrapAsDataOutputStream(stream);
 
 		dataStream.writeShort(4);
 
@@ -128,4 +164,19 @@ public class DriSegment extends SegmentBase {
 		hash = 17 * hash + this.restartInterval;
 		return hash;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readData(DataInput input, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int contentLength = input.readUnsignedShort();
+		if (contentLength != 4) {
+			throw new InvalidJpegFormat("got the wrong length in a DRI segment");
+		}
+
+		setRestartInterval(input.readUnsignedShort());
+		// VALID CHECK: Don't know if there's a valid range of values here.
+	}
+
 }

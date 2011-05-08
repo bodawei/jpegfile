@@ -28,7 +28,7 @@ import bdw.formats.jpeg.segments.EoiSegment;
 import bdw.formats.jpeg.segments.ExpSegment;
 import bdw.formats.jpeg.segments.JpgNSegment;
 import bdw.formats.jpeg.segments.JpgSegment;
-import bdw.formats.jpeg.segments.JunkSegment;
+import bdw.formats.jpeg.segments.UnknownSegment;
 import bdw.formats.jpeg.segments.RstSegment;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.SofSegment;
@@ -46,7 +46,6 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +55,7 @@ import java.util.List;
  */
 public class JpegParser implements Iterable<SegmentBase> {
 
-	protected Class<? extends SegmentBase>[] segmentManagers;
+	protected List<Class<? extends SegmentBase>> segmentManagers;
 	protected List<SegmentBase> segments;
 	protected File diskVersion;
 
@@ -65,7 +64,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 */
 	public JpegParser() {
 		segments = new ArrayList<SegmentBase>();
-		segmentManagers =  new Class[256];
+		segmentManagers = new ArrayList();
 	}
 
 	public JpegParser(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException {
@@ -76,41 +75,32 @@ public class JpegParser implements Iterable<SegmentBase> {
 	 * Adds all standard Jpeg segments to this instance.
 	 * */
 	public void addStandardSegments() {
-		addSegmentHandler(SoiSegment.MARKER, SoiSegment.class);
-		addSegmentHandler(EoiSegment.MARKER, EoiSegment.class);
-		addSegmentHandler(DqtSegment.MARKER, DqtSegment.class);
-		addSegmentHandler(SofSegment.RANGE1_START, SofSegment.RANGE1_END, SofSegment.class);
-		addSegmentHandler(SofSegment.RANGE2_START, SofSegment.RANGE2_END, SofSegment.class);
-		addSegmentHandler(SofSegment.RANGE3_START, SofSegment.RANGE3_END, SofSegment.class);
-		addSegmentHandler(SofSegment.RANGE4_START, SofSegment.RANGE4_END, SofSegment.class);
-		addSegmentHandler(DhtSegment.MARKER, DhtSegment.class);
-		addSegmentHandler(SosSegment.MARKER, SosSegment.class);
+		addSegmentHandler(SoiSegment.class);
+		addSegmentHandler(EoiSegment.class);
+		addSegmentHandler(DqtSegment.class);
+		addSegmentHandler(SofSegment.class);
+		addSegmentHandler(DhtSegment.class);
+		addSegmentHandler(SosSegment.class);
 
 		// test
-		addSegmentHandler(TemSegment.MARKER, TemSegment.class);
-		addSegmentHandler(DacSegment.MARKER, DacSegment.class);
-		addSegmentHandler(DnlSegment.MARKER, DnlSegment.class);
-		addSegmentHandler(JpgSegment.MARKER, JpgSegment.class);
-		addSegmentHandler(RstSegment.START_MARKER, RstSegment.END_MARKER, RstSegment.class);
-		addSegmentHandler(DriSegment.MARKER, DriSegment.class);
-		addSegmentHandler(DhpSegment.MARKER, DhpSegment.class);
-		addSegmentHandler(ExpSegment.MARKER, ExpSegment.class);
-		addSegmentHandler(ComSegment.MARKER, ComSegment.class);
-		addSegmentHandler(JpgNSegment.START_MARKER, JpgNSegment.END_MARKER, JpgNSegment.class);
+		addSegmentHandler(TemSegment.class);
+		addSegmentHandler(DacSegment.class);
+		addSegmentHandler(DnlSegment.class);
+		addSegmentHandler(JpgSegment.class);
+		addSegmentHandler(RstSegment.class);
+		addSegmentHandler(DriSegment.class);
+		addSegmentHandler(DhpSegment.class);
+		addSegmentHandler(ExpSegment.class);
+		addSegmentHandler(ComSegment.class);
+		addSegmentHandler(JpgNSegment.class);
 
-		addSegmentHandler(AppNSegment.START_MARKER, AppNSegment.END_MARKER, AppNSegment.class);
+		addSegmentHandler(AppNSegment.class);
 
 		// reserved between 0x02 and BF
 	}
 
-	public void addSegmentHandler(int marker, Class<? extends SegmentBase> aClass) {
-		segmentManagers[marker] = aClass;
-	}
-
-	public void addSegmentHandler(int startMarker, int endMarker, Class<? extends SegmentBase> aClass) {
-		for (int index = startMarker; index <= endMarker; index++) {
-			segmentManagers[index] = aClass;
-		}
+	public void addSegmentHandler(Class<? extends SegmentBase> aClass) {
+		segmentManagers.add(aClass);
 	}
 
 	public void readFromFile(File jpegFile) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException, InvalidJpegFormat {
@@ -126,12 +116,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 			if (aByte != 0xFF) {
 				file.seek(pos);
 				if (seenSOS) {
-					DataSegment data = new DataSegment();
-					data.readFromFile(file);
+					DataSegment data = new DataSegment(DataSegment.SUBTYPE, file, ParseMode.STRICT);
 					this.segments.add(data);
 				} else {
-					JunkSegment data = new JunkSegment();
-					data.readFromFile(file);
+					UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 					this.segments.add(data);
 				}
 			} else {
@@ -140,53 +128,38 @@ public class JpegParser implements Iterable<SegmentBase> {
 					markerByte = file.readUnsignedByte();
 				}
 				if (markerByte == 0) {
-				file.seek(pos);
+					file.seek(pos);
 					if (seenSOS) {
-						DataSegment data = new DataSegment();
-						data.readFromFile(file);
+						DataSegment data = new DataSegment(DataSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
 					} else {
-						JunkSegment data = new JunkSegment();
-						data.readFromFile(file);
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
 					}
 				} else {
-					Class<? extends SegmentBase> managerClass = this.segmentManagers[markerByte];
-					if (managerClass == null) {
-						JunkSegment data = new JunkSegment();
-						data.readFromFile(file);
-						this.segments.add(data);
-					} else {
-						Method handler;
-						Constructor constructor;
-						SegmentBase manager = null;
-						Exception foo;
+					Class<? extends SegmentBase> managerClass;
+					Boolean canHandle = Boolean.FALSE;
+					Method handler;
+					Exception foo;
+					Constructor constructor;
+					SegmentBase manager = null;
+
+					for (int index = 0; index < this.segmentManagers.size(); index++) {
+						managerClass = this.segmentManagers.get(index);
 						try {
-							Boolean canHandle = Boolean.FALSE;
-
-//	    Method[] allMethods = managerClass.getDeclaredMethods();
-//	    for (Method m : allMethods) {
-//			String mname = m.getName();
-//			if (!mname.startsWith("canHandleMarker")
-//				|| (m.getGenericReturnType() != boolean.class)) {
-//				continue;
-//			}
-//			Type[] pType = m.getGenericParameterTypes();
-//			if ((pType.length != 1)) {
-//				continue;
-//			}
-//		}
-
 							handler = managerClass.getDeclaredMethod("canHandleMarker", int.class);
 							if (handler != null) {
 								canHandle = (Boolean) handler.invoke(managerClass, markerByte);
 							}
-
-							constructor = managerClass.getDeclaredConstructor(RandomAccessFile.class);
-
 							if (canHandle) {
-								manager = (SegmentBase) constructor.newInstance(file);
-								manager.setMarker(markerByte);
+								constructor = managerClass.getDeclaredConstructor(int.class, RandomAccessFile.class, ParseMode.class);
+								try {
+									manager = (SegmentBase) constructor.newInstance(markerByte, file, ParseMode.STRICT);
+									this.segments.add(manager);
+									break;
+								} catch (Exception e) {
+									canHandle = Boolean.FALSE;
+								}
 							}
 						} catch (IllegalArgumentException ex) {
 							foo = ex;
@@ -198,15 +171,13 @@ public class JpegParser implements Iterable<SegmentBase> {
 						} catch (SecurityException ex) {
 							foo = ex;
 						}
-						if (manager == null) {
-							manager = (SegmentBase) managerClass.newInstance();
-							manager.readFromFile(file);
-						}
-						this.segments.add(manager);
-						if (manager instanceof SosSegment) {
-							seenSOS = true;
-							return;
-						}
+					
+					}
+					if (manager == null) {
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
+						this.segments.add(data);
+					}  else if (manager instanceof SosSegment) {
+						seenSOS = true;
 					}
 				}
 			}
@@ -220,32 +191,76 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 		try {
 			while (true) {
+				boolean seenSOS = false;
+				dataStream.mark(2);
 				aByte = dataStream.readUnsignedByte();
 
 				if (aByte != 0xFF) {
-					// do nothing.  we must be encountering raw data.
-					// the last marker should have been sos.
-					// and isn't this just a strange file format?  all this structured data, and then suddenly a raw spew of data with no sense of size,
-					// escapes (0xff00), etc.
-				} else {
-					markerByte = dataStream.readUnsignedByte();
-					if (markerByte == 0x00) {
-						// last segment should have been SOS
-						// skip it, and keep going
-						// this apparently is a way to escape 0xff in the data, and the 00 isn't real data
-					} else if (markerByte == 0xFF) {
-						// evidently we should just ignore spare ff's.
-						// the question is is this the start of a new segment?
+					if (seenSOS) {
+						DataSegment data = new DataSegment(DataSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+						this.segments.add(data);
 					} else {
-						Class<? extends SegmentBase> managerClass = this.segmentManagers[markerByte];
-						SegmentBase manager = (SegmentBase) managerClass.newInstance();
-						manager.readFromStream(dataStream);
-						this.segments.add(manager);
-						if (manager instanceof SosSegment) {
-//							expectData = true;
+						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+						this.segments.add(data);
+					}
+				} else {
+					markerByte = 0;
+					markerByte = dataStream.readUnsignedByte();
+					if (markerByte == 0) {
+						dataStream.reset();
+						if (seenSOS) {
+							DataSegment data = new DataSegment(DataSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						} else {
+							UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						}
+					} else {
+						Class<? extends SegmentBase> managerClass;
+						Boolean canHandle = Boolean.FALSE;
+						Method handler;
+						Exception foo;
+						Constructor constructor;
+						SegmentBase manager = null;
+
+						for (int index = 0; index < this.segmentManagers.size(); index++) {
+							managerClass = this.segmentManagers.get(index);
+							try {
+								handler = managerClass.getDeclaredMethod("canHandleMarker", int.class);
+								if (handler != null) {
+									canHandle = (Boolean) handler.invoke(managerClass, markerByte);
+								}
+								if (canHandle) {
+									constructor = managerClass.getDeclaredConstructor(int.class, InputStream.class, ParseMode.class);
+									try {
+										manager = (SegmentBase) constructor.newInstance(markerByte, dataStream, ParseMode.STRICT);
+										this.segments.add(manager);
+										break;
+									} catch (Exception e) {
+										canHandle = Boolean.FALSE;
+									}
+								}
+							} catch (IllegalArgumentException ex) {
+								foo = ex;
+								ex.printStackTrace();
+							} catch (InvocationTargetException ex) {
+								foo = ex;
+							} catch (NoSuchMethodException ex) {
+								foo = ex;
+							} catch (SecurityException ex) {
+								foo = ex;
+							}
+
+						}
+						if (manager == null) {
+							UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
+							this.segments.add(data);
+						}  else if (manager instanceof SosSegment) {
+							seenSOS = true;
 						}
 					}
 				}
+
 			}
 		} catch (EOFException exception) {
 			// we're done.  so gracefully quit.
@@ -299,7 +314,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 				return false;
 			}
 
-			if (segment instanceof JunkSegment) {
+			if (segment instanceof UnknownSegment) {
 				return false;
 			}
 		}
@@ -394,6 +409,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 	/**
 	 * @return An iterator that will iterate over all the segments in the file
 	 */
+	@Override
 	public Iterator<SegmentBase> iterator() {
 		return segments.listIterator();
 	}

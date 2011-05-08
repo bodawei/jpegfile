@@ -17,9 +17,8 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.JpgNSegment;
-import bdw.formats.jpeg.segments.JpgSegment;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Before;
@@ -36,17 +35,15 @@ public class JpgNSegmentTest {
 	}
 
 	@Test
-	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(JpgNSegment.START_MARKER, new JpgNSegment().getMarker());
+	public void testThatHasTheRightMarkerByDefault() throws InvalidJpegFormat {
+		assertEquals(JpgNSegment.FIRST_SUBTYPE, new JpgNSegment(JpgNSegment.FIRST_SUBTYPE).getMarker());
 	}
 
 	@Test
 	public void testJpgNSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		JpgNSegment segment = new JpgNSegment();
-
-		segment.readFromStream(stream);
+		JpgNSegment segment = new JpgNSegment(JpgNSegment.FIRST_SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}
@@ -57,7 +54,7 @@ public class JpgNSegmentTest {
 	}
 
 	@Test
-	public void jpgNSegmentNotEqualToOther() throws IOException {
-		assertFalse(new JpgNSegment().equals(new Object()));
+	public void jpgNSegmentNotEqualToOther() throws IOException, InvalidJpegFormat {
+		assertFalse(new JpgNSegment(JpgNSegment.FIRST_SUBTYPE).equals(new Object()));
 	}
 }

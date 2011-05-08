@@ -17,8 +17,9 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,28 +56,64 @@ public class AppNSegment extends SegmentBase {
 	 * The offset in the file.
 	 */
 	protected long fileOffset;
-
-	/**
-	 * True if we have read all data from the input source.
-	 */
-	protected boolean dataRead;
-
 	/**
 	 * The number of bytes of data this segment represents
 	 */
 	protected int contentLength;
 
-
 	/**
 	 * construct the instance (duh)
 	 */
-	public AppNSegment() {
-		setMarker(0);
+	public AppNSegment(int subType) throws InvalidJpegFormat {
+		if (AppNSegment.canHandleMarker(subType)) {
+			setMarker(subType);
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
 
-		dataRead = true;
 		raFile = null;
 		contentLength = 0;
 		data = new byte[0];
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public AppNSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public AppNSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if ((marker >= AppNSegment.START_MARKER) && (marker <= AppNSegment.END_MARKER)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -102,75 +139,17 @@ public class AppNSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	public void readFromStream(InputStream stream) throws IOException, InvalidJpegFormat {
-		DataInputStream diStream;
-
-		if (stream instanceof DataInputStream) {
-			diStream = (DataInputStream) stream;
-		} else {
-			diStream = new DataInputStream(stream);
-		}
-
-		int dataLength = diStream.readUnsignedShort() - 2;
-		byte[] buffer = new byte[dataLength];
-
-		for (int index = 0; index < dataLength; index++) {
-			buffer[index] = (byte) diStream.readByte();
-		}
-
-		data = buffer;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
-	public void readFromFile(RandomAccessFile file) throws IOException, InvalidJpegFormat {
-		contentLength = file.readUnsignedShort() - 2;
-		byte[] buffer;
-
-		if (contentLength > 1024) {
-			buffer = new byte[0];
-			raFile = file;
-			fileOffset = file.getFilePointer();
-			file.skipBytes(contentLength);
-			long fileOffset2 = file.getFilePointer();
-			dataRead = false;
-
-		} else {
-			buffer = new byte[contentLength];
-
-			for (int count = 0; count < contentLength; count++) {
-				buffer[count] = file.readByte();
-			}
-			data = buffer;
-			dataRead = true;
-		}
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
 	public void write(OutputStream stream) throws IOException {
-		DataOutputStream doStream;
-
 		super.write(stream);
 
 		forceContentLoading();
 
-		if (stream instanceof DataOutputStream) {
-			doStream = (DataOutputStream) stream;
-		} else {
-			doStream = new DataOutputStream(stream);
-		}
+		DataOutputStream dataStream = wrapAsDataOutputStream(stream);
 
-		doStream.writeShort(getBytes().length + 2);
+		dataStream.writeShort(getBytes().length + 2);
 		for (int index = 0; index < getBytes().length; index++) {
-			doStream.write(data[index]);
+			dataStream.write(getBytes()[index]);
 		}
-
 	}
 
 	/**
@@ -178,19 +157,17 @@ public class AppNSegment extends SegmentBase {
 	 */
 	@Override
 	public void forceContentLoading() throws IOException {
-		if ( ! dataRead) {
-
+		if (raFile != null) {
 			long currentLoc = raFile.getFilePointer();
-			raFile.seek(fileOffset);
 			data = new byte[(int)contentLength];
+			raFile.seek(fileOffset);
 
 			for (int index = 0; index < contentLength; index++) {
 				data[index] = raFile.readByte();
 			}
 
-			dataRead = true;
 			raFile.seek(currentLoc);
-			raFile = null;	// release our hold on the file
+			raFile = null;
 			fileOffset = 0;
 		}
 	}
@@ -203,8 +180,6 @@ public class AppNSegment extends SegmentBase {
 			AppNSegment castOther = (AppNSegment) other;
 
 			try {
-				forceContentLoading();
-
 				if (getBytes().length != castOther.getBytes().length) {
 					return false;
 				}
@@ -218,7 +193,6 @@ public class AppNSegment extends SegmentBase {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -233,5 +207,44 @@ public class AppNSegment extends SegmentBase {
 		int hash = 3;
 		hash = 29 * hash + Arrays.hashCode(this.data);
 		return hash;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readData(DataInput input, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int dataLength = input.readUnsignedShort() - 2;
+		byte[] buffer = new byte[dataLength];
+
+		for (int index = 0; index < dataLength; index++) {
+			buffer[index] = (byte) input.readByte();
+		}
+
+		data = buffer;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readFromFile(RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		contentLength = file.readUnsignedShort() - 2;
+		byte[] buffer;
+
+		if (contentLength > SegmentBase.READ_LIMIT) {
+			buffer = new byte[0];
+			raFile = file;
+			fileOffset = file.getFilePointer();
+			file.skipBytes(contentLength);
+		} else {
+			buffer = new byte[contentLength];
+
+			for (int count = 0; count < contentLength; count++) {
+				buffer[count] = file.readByte();
+			}
+			data = buffer;
+			raFile = null;
+		}
 	}
 }

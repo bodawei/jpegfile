@@ -15,12 +15,16 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.support.SosDescriptor;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class SosSegment extends SegmentBase {
 	/**
 	 * The marker that this type accepts
 	 */
-	public static final int MARKER = 0xDA;
+	public static final int SUBTYPE = 0xDA;
 
 	/**
 	 * Array of ScanDescriptors
@@ -62,8 +66,61 @@ public class SosSegment extends SegmentBase {
 		spectralSelectionStart = 0;
 		spectralSelectionEnd = 0;
 		successiveApproximation = 0;
-		setMarker(SosSegment.MARKER);
+		setMarker(SosSegment.SUBTYPE);		
 	}
+	
+	/**
+	 * Constructs an instance with all properties empty
+	 */
+	public SosSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (SosSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SosSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SosSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == SosSegment.SUBTYPE) {
+			return true;
+		}
+		return false;
+	}
+
 
 	/**
 	 * @return the start of the spectral selection
@@ -187,13 +244,7 @@ public class SosSegment extends SegmentBase {
 	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
-		DataOutputStream dataStream;
-
-		if (stream instanceof DataOutputStream) {
-			dataStream = (DataOutputStream) stream;
-		} else {
-			dataStream = new DataOutputStream(stream);
-		}
+		DataOutputStream dataStream = super.wrapAsDataOutputStream(stream);
 
 		dataStream.writeShort(2 + 1 + (getDescriptorCount() * 2) + 3);
 
@@ -252,4 +303,26 @@ public class SosSegment extends SegmentBase {
 		return hash;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readData(DataInput input, ParseMode mode) throws IOException {
+		int contentLength = input.readUnsignedShort();
+		int componentCount = input.readUnsignedByte();
+
+		if ((2 + 1 + (componentCount * 2) + 3) != contentLength) {
+			throw new IllegalArgumentException("Need to report the error, and store the byte offset too.");
+		}
+
+		for (int index = 0; index < componentCount; index++) {
+			SosDescriptor entry = new SosDescriptor();
+			entry.readData(input);
+			addDescriptor(index, entry);
+		}
+
+		setSpectralSelectionStart(input.readUnsignedByte());
+		setSpectralSelectionEnd(input.readUnsignedByte());
+		setSuccessiveApproximation(input.readUnsignedByte());
+	}
 }

@@ -15,23 +15,79 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
- * Expand reference components
+ * Expand reference component
  */
 public class ExpSegment extends SegmentBase {
 
 	/**
 	 * The marker type for this class
 	 */
-	public static final int MARKER = 0xDF;
+	public static final int SUBTYPE = 0xDF;
 
 	/**
 	 * Constructor
 	 */
 	public ExpSegment() {
-		setMarker(ExpSegment.MARKER);
+		setMarker(ExpSegment.SUBTYPE);
+	}
+
+	/**
+	 * Constructs an instance with all properties empty
+	 */
+	public ExpSegment(int subType) throws InvalidJpegFormat {
+		if (ExpSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public ExpSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public ExpSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == ExpSegment.SUBTYPE) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -52,5 +108,4 @@ public class ExpSegment extends SegmentBase {
 		int hash = 5;
 		return hash;
 	}
-
 }

@@ -15,6 +15,9 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.formats.jpeg.ParseMode;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.io.EOFException;
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.segments.support.DhtRunLengthHeader;
@@ -54,9 +57,17 @@ public class DhtSegmentTest {
 				"34";
 	}
 
+	public DhtSegment createSegment(InputStream stream) throws InvalidJpegFormat, IOException {
+		return new DhtSegment(DhtSegment.SUBTYPE, stream, ParseMode.STRICT);
+	}
+
+	public DhtSegment createSegment(RandomAccessFile file) throws InvalidJpegFormat, IOException {
+		return new DhtSegment(DhtSegment.SUBTYPE, file, ParseMode.STRICT);
+	}
+
 	@Test
 	public void segmentHasExpectedMarker() {
-		assertEquals("marker", DhtSegment.MARKER, segment.getMarker());
+		assertEquals("marker", DhtSegment.SUBTYPE, segment.getMarker());
 	}
 
 	@Test
@@ -86,10 +97,9 @@ public class DhtSegmentTest {
 				output.toByteArray());
 	}
 
-
 	@Test
 	public void canReadSegmentWithTwoTables() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 26" +
+		segment = createSegment(utils.makeInputStreamFromString("00 26" +
 				sampleTable1String +
 				sampleTable2String));
 
@@ -102,9 +112,8 @@ public class DhtSegmentTest {
 
 	@Test(expected=EOFException.class)
 	public void incompleteDataGivesExeption() throws IOException, InvalidJpegFormat {
-		segment.readFromStream(utils.makeInputStreamFromString("00 26" +
+		segment = createSegment(utils.makeInputStreamFromString("00 26" +
 				sampleTable1String +
 				"00 01"));
-
 	}
 }

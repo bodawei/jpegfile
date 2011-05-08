@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 æŸ�å¤§è¡›
+ *  Copyright 2011 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
@@ -23,22 +24,31 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * Pseudo-segment that is used to represent data that doesn't match any known jpg
+ * segments.
+ * "Pseudo-segment" means a segment that isn't part of the Jpeg standard.  This is
+ * just a part of this implementation.  This reads in all data until it finds
+ * a 0xFF 0xXX pair (where 0xXX where XX is any value other than 00). However,
+ * if the initial byte of the data this is reading is 0xFF, this ignores that.
+ * The reason is that if this is being asked to consume unknown data, it will be
+ * being called after trying to read an 0xFF that failed.
  */
-public class DataSegment extends BlobSegmentBase {
-
-	public static int SUBTYPE = 0x0100;
-
-	public DataSegment() {
-		isDataSegment = true;
-	}
+public class UnknownSegment extends BlobSegmentBase {
 
 	/**
-	 * Constructs an instance with all properties empty
+	 * Marker for this type.
 	 */
-	public DataSegment(int subType) throws InvalidJpegFormat {
-		this();
-		if (DataSegment.canHandleMarker(subType)) {
+	public static int SUBTYPE = -1;
+
+	public UnknownSegment() {
+		setMarker(UnknownSegment.SUBTYPE);
+	}
+	
+	/**
+	 * Construct
+	 */
+	public UnknownSegment(int subType) throws InvalidJpegFormat {
+		if (UnknownSegment.canHandleMarker(subType)) {
 			setMarker(subType);		
 		} else {
 			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
@@ -53,7 +63,7 @@ public class DataSegment extends BlobSegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DataSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+	public UnknownSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this(subType);
 		super.readFromStream(stream, mode);
     }
@@ -66,7 +76,7 @@ public class DataSegment extends BlobSegmentBase {
 	 * @throws IOException If an error occurs while parsing (most likely EOFException)
 	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
 	 */
-	public DataSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+	public UnknownSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
 		this(subType);
 		super.readFromFile(file, mode);
     }
@@ -79,23 +89,29 @@ public class DataSegment extends BlobSegmentBase {
 	 * @return true if this conventionally can be associated with that marker.
 	 */
 	public static boolean canHandleMarker(int marker) {
-		if (marker == DataSegment.SUBTYPE) {
+		if (marker == UnknownSegment.SUBTYPE) {
 			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Contrary to the contract of SegmentBase, the JunkSegment always
+	 * has a marker of 0xFFFF.
+	 * @return
+	 */
 	@Override
 	public int getMarker() {
-		return DataSegment.SUBTYPE;
+		return UnknownSegment.SUBTYPE;
 	}
+	
 
 	@Override
 	public boolean equals(Object other) {
-		if ((other == null) || !(other instanceof DataSegment)) {
+		if ((other == null) || !(other instanceof UnknownSegment)) {
 			return false;
 		} else {
-			DataSegment segment = (DataSegment) other;
+			UnknownSegment segment = (UnknownSegment) other;
 			try {
 				if (segment.getDataLength() != getDataLength()) {
 					return false;
@@ -111,5 +127,6 @@ public class DataSegment extends BlobSegmentBase {
 		}
 		return true;
 	}
+
 
 }

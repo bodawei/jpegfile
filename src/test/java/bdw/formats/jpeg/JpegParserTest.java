@@ -18,7 +18,6 @@ package bdw.formats.jpeg;
 
 import java.io.IOException;
 import bdw.formats.encode.Hex2Bin;
-import bdw.formats.jpeg.JpegParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -69,22 +68,22 @@ public class JpegParserTest {
 		file.readFromFile(new File(uri));
 
 		assertEquals(2, file.getSegments().size());
-		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(1).getMarker());
+		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
+		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(1).getMarker());
 	}
 
     @Test
     public void testReadingSampleFile() throws Exception {
-//		JpegParser file = new JpegParser();
-//		file.addStandardSegments();
-//
-//		URI uri = this.getClass().getResource("resources/knuth.jpg").toURI();
-//
-//		file.readFromFile(new File(uri));
-//
-//		assertEquals(9, file.getSegments().size());
-//		assertEquals("Start of Image", SoiSegment.MARKER, file.getSegments().get(0).getMarker());
-//		assertEquals("End of Image", EoiSegment.MARKER, file.getSegments().get(8).getMarker());
+		JpegParser file = new JpegParser();
+		file.addStandardSegments();
+
+		URI uri = this.getClass().getResource("resources/knuth.jpg").toURI();
+
+		file.readFromFile(new File(uri));
+
+		assertEquals(9, file.getSegments().size());
+		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
+		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(8).getMarker());
 	}
 
     @Test

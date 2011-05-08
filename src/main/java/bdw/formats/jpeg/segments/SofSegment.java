@@ -21,10 +21,11 @@ import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.support.SofComponent;
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,43 +42,36 @@ public class SofSegment extends SegmentBase {
 	/**
 	 * Start of the first range of possible markers
 	 */
-	public static final int RANGE1_START = 0xc0;
+	public static final int FIRST1_SUBTYPE = 0xc0;
 	/**
 	 * End of the first range of possible markers
 	 */
-	public static final int RANGE1_END = 0xc3;
+	public static final int LAST1_SUBTYPE = 0xc3;
 	/**
 	 * Start of the second range of possible markers
 	 */
-	public static final int RANGE2_START = 0xc5;
+	public static final int FIRST2_SUBTYPE = 0xc5;
 	/**
 	 * End of the second range of possible markers
 	 */
-	public static final int RANGE2_END = 0xc7;
+	public static final int LAST2_SUBTYPE = 0xc7;
 	/**
 	 * Start of the third range of possible markers
 	 */
-	public static final int RANGE3_START = 0xc9;
+	public static final int FIRST3_SUBTYPE = 0xc9;
 	/**
 	 * End of the third range of possible markers
 	 */
-	public static final int RANGE3_END = 0xcb;
+	public static final int LAST3_SUBTYPE = 0xcb;
 	/**
 	 * Start of the fourth range of possible markers
 	 */
-	public static final int RANGE4_START = 0xcd;
+	public static final int FIRST4_SUBTYPE = 0xcd;
 	/**
 	 * End of the fourth range of possible markers
 	 */
-	public static final int RANGE4_END = 0xcf;
-	/**
-	 * Max size for the precision and number of components
-	 */
-	protected static final int UINT1_MAX_VALUE = 255;
-	/**
-	 * Max size for the width and height
-	 */
-	protected static final int UINT2_MAX_VALUE = 65535;
+	public static final int LAST4_SUBTYPE = 0xcf;
+
 	/**
 	 * Precision (?)
 	 */
@@ -96,11 +90,58 @@ public class SofSegment extends SegmentBase {
 	protected List<SofComponent> components;
 
 	/**
-	 * Construct
+	 * Constructs an instance with all properties empty
 	 */
-	public SofSegment() {
-		setMarker(0);
+	public SofSegment(int subType) throws InvalidJpegFormat {
 		components = new ArrayList<SofComponent>();
+		if (SofSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SofSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public SofSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (((marker >= SofSegment.FIRST1_SUBTYPE) && (marker <= SofSegment.LAST1_SUBTYPE)) ||
+			((marker >= SofSegment.FIRST2_SUBTYPE) && (marker <= SofSegment.LAST2_SUBTYPE)) ||	
+			((marker >= SofSegment.FIRST3_SUBTYPE) && (marker <= SofSegment.LAST3_SUBTYPE)) ||
+			((marker >= SofSegment.FIRST4_SUBTYPE) && (marker <= SofSegment.LAST4_SUBTYPE))) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -217,92 +258,18 @@ public class SofSegment extends SegmentBase {
 	}
 
 	/**
-	 * Read all the data and populate this instance.
-	 * This resets all contents of this segment. This means that this is like
-	 * deleting all components and then setting all properties afresh.
-	 *
-	 * Because this will never be more than 1 kilobyte of data, we never defer
-	 * reading until later.
-	 * Note: If any errors occur while reading, this instance will not be
-	 * changed.
-	 *
-	 * @param dataSource The input source to read from
-	 *
-	 * @throws IOException If something happens while reading
-	 */
-	@Override
-	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
-		int precision;
-		int height;
-		int width;
-		List<SofComponent> comps = new ArrayList<SofComponent>();
-
-		try {
-			int contentLength = dataSource.readUnsignedShort();
-
-			if (contentLength < 7) {
-				throw new InvalidJpegFormat("Sof segment found not enough length");
-			}
-
-			precision = dataSource.readUnsignedByte();
-			height = dataSource.readUnsignedShort();
-			width = dataSource.readUnsignedShort();
-			int numComponents = dataSource.readUnsignedByte();
-
-			if (contentLength != 8 + (SofComponent.DISK_SIZE * numComponents)) {
-				throw new InvalidJpegFormat("Sof segment found not enough length");
-			}
-
-			// Note: According to one source, usually numComponents is:
-			// 1 = grey scale
-			// 3 = color YCbCr or YIQ
-			// 4 = color CMYK
-
-			if ((numComponents == 0) ||
-				(numComponents == 2) ||
-				(numComponents > 4)) {
-				if (strict == ParseMode.STRICT) {
-					throw new InvalidJpegFormat("Sof segment found with " + numComponents + " components. This should be 1, 3 or 4");
-				} else {
-					setValid(false);
-				}
-			}
-
-			for (int index = 0; index < numComponents; index++) {
-				SofComponent entry = new SofComponent();
-				entry.read(dataSource, strict);
-				comps.add(entry);
-			}
-		} catch (EOFException exception) {
-			throw new InvalidJpegFormat("EOF found before Sof segment fully read");
-		}
-
-		// If we get this far, all is good. We can now commit these values:
-		setSamplePrecision(precision);
-		setImageHeight(height);
-		setImageWidth(width);
-		components.clear();
-		components.addAll(comps);
-	}
-
-	/**
 	 * Write this segment out to the specified output stream
 	 * @param output The stream to write out to
 	 * @throws IOException If any errors occur
 	 */
 	@Override
 	public void write(OutputStream output) throws IOException {
-		DataOutput out;
+		DataOutput out = super.wrapAsDataOutputStream(output);
 
 		if ( ! isValid()) {
 			throw new IOException("The Number of components is not valid, or the components themselves are not valid");
 		}
 
-		if (output instanceof DataOutput) {
-			out = (DataOutput) output;
-		} else {
-			out = new DataOutputStream(output);
-		}
 		out.writeShort(2 + 6 + (SofComponent.DISK_SIZE * components.size()));
 		out.writeByte(getSamplePrecision());
 		out.writeShort(getImageHeight());
@@ -347,5 +314,74 @@ public class SofSegment extends SegmentBase {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Read all the data and populate this instance.
+	 * This resets all contents of this segment. This means that this is like
+	 * deleting all components and then setting all properties afresh.
+	 *
+	 * Because this will never be more than 1 kilobyte of data, we never defer
+	 * reading until later.
+	 * Note: If any errors occur while reading, this instance will not be
+	 * changed.
+	 *
+	 * @param dataSource The input source to read from
+	 *
+	 * @throws IOException If something happens while reading
+	 */
+	@Override
+	protected void readData(DataInput dataSource, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int precision;
+		int height;
+		int width;
+		List<SofComponent> comps = new ArrayList<SofComponent>();
+
+		try {
+			int contentLength = dataSource.readUnsignedShort();
+
+			if (contentLength < 7) {
+				throw new InvalidJpegFormat("Sof segment found not enough length");
+			}
+
+			precision = dataSource.readUnsignedByte();
+			height = dataSource.readUnsignedShort();
+			width = dataSource.readUnsignedShort();
+			int numComponents = dataSource.readUnsignedByte();
+
+			if (contentLength != 8 + (SofComponent.DISK_SIZE * numComponents)) {
+				throw new InvalidJpegFormat("Sof segment found not enough length");
+			}
+
+			// Note: According to one source, usually numComponents is:
+			// 1 = grey scale
+			// 3 = color YCbCr or YIQ
+			// 4 = color CMYK
+
+			if ((numComponents == 0) ||
+				(numComponents == 2) ||
+				(numComponents > 4)) {
+				if (mode == ParseMode.STRICT) {
+					throw new InvalidJpegFormat("Sof segment found with " + numComponents + " components. This should be 1, 3 or 4");
+				} else {
+					setValid(false);
+				}
+			}
+
+			for (int index = 0; index < numComponents; index++) {
+				SofComponent entry = new SofComponent();
+				entry.read(dataSource, mode);
+				comps.add(entry);
+			}
+		} catch (EOFException exception) {
+			throw new InvalidJpegFormat("EOF found before Sof segment fully read");
+		}
+
+		// If we get this far, all is good. We can now commit these values:
+		setSamplePrecision(precision);
+		setImageHeight(height);
+		setImageWidth(width);
+		components.clear();
+		components.addAll(comps);
 	}
 }

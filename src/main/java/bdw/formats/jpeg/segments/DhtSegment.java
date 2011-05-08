@@ -16,15 +16,17 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.support.DhtHuffmanTable;
-import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
 import bdw.io.LimitExceeded;
 import bdw.io.LimitingDataInput;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class DhtSegment extends SegmentBase {
 	/**
 	 * Standard marker for this type
 	 */
-	public static final int MARKER = 0xC4;
+	public static final int SUBTYPE = 0xC4;
 
 	/**
 	 * list of quantization tables
@@ -47,8 +49,60 @@ public class DhtSegment extends SegmentBase {
 	 * Constructor
 	 */
 	public DhtSegment() {
-		setMarker(DhtSegment.MARKER);
+		setMarker(DhtSegment.SUBTYPE);
 		tables = new ArrayList<DhtHuffmanTable>();
+	}
+
+	/**
+	 * Constructs an instance with all properties empty
+	 */
+	public DhtSegment(int subType) throws InvalidJpegFormat {
+		this();
+		if (DhtSegment.canHandleMarker(subType)) {
+			setMarker(subType);		
+		} else {
+			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param stream The stream to read from
+	 * @param mode The mode to parse this in.
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DhtSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromStream(stream, mode);
+    }
+
+	/**
+	 * Construct an instance from a stream.
+	 *
+	 * @param file The file to read from
+	 * @param mode The mode to parse this in. 
+	 * @throws IOException If an error occurs while parsing (most likely EOFException)
+	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 */
+	public DhtSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
+		this(subType);
+		super.readFromFile(file, mode);
+    }
+
+	/**
+	 * Checks whether instances of this class should be constructed
+	 * with the specified marker.
+	 *
+	 * @param marker The marker to check.
+	 * @return true if this conventionally can be associated with that marker.
+	 */
+	public static boolean canHandleMarker(int marker) {
+		if (marker == DhtSegment.SUBTYPE) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -78,39 +132,10 @@ public class DhtSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	protected void readData(DataInput input) throws IOException, InvalidJpegFormat {
-		int contentLength = input.readUnsignedShort();
-		LimitingDataInput limited = new LimitingDataInput(input, contentLength -2);
-		int index = 0;
-
-		while (limited.getRemainingLimit() != 0) {
-			DhtHuffmanTable table = new DhtHuffmanTable();
-
-			try {
-				table.read(limited, strict);
-			} catch (LimitExceeded e) {
-				throw new InvalidJpegFormat("Dht segment length doesn't match actual data");
-			}
-			insertTable(index, table);
-			index++;
-		}
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
-		DataOutputStream dataStream;
+		DataOutputStream dataStream = super.wrapAsDataOutputStream(stream);
 		int length = 0;
-
-		if (stream instanceof DataOutputStream) {
-			dataStream = (DataOutputStream) stream;
-		} else {
-			dataStream = new DataOutputStream(stream);
-		}
 
 		for (int index = 0; index < getTableCount(); index++) {
 			length += getTable(index).getSizeOnDisk();
@@ -155,5 +180,25 @@ public class DhtSegment extends SegmentBase {
 		return hash;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	protected void readData(DataInput input, ParseMode mode) throws IOException, InvalidJpegFormat {
+		int contentLength = input.readUnsignedShort();
+		LimitingDataInput limited = new LimitingDataInput(input, contentLength -2);
+		int index = 0;
 
+		while (limited.getRemainingLimit() != 0) {
+			DhtHuffmanTable table = new DhtHuffmanTable();
+
+			try {
+				table.read(limited, mode);
+			} catch (LimitExceeded e) {
+				throw new InvalidJpegFormat("Dht segment length doesn't match actual data");
+			}
+			insertTable(index, table);
+			index++;
+		}
+	}
 }

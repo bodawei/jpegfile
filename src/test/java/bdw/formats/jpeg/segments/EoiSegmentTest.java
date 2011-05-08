@@ -16,11 +16,11 @@
 
 package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.EoiSegment;
-import java.io.IOException;
 import java.io.InputStream;
+import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.formats.jpeg.ParseMode;
+import bdw.formats.jpeg.TestUtils;
+import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,16 +44,13 @@ public class EoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(EoiSegment.MARKER, new EoiSegment().getMarker());
+		assertEquals(EoiSegment.SUBTYPE, new EoiSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
-
-		EoiSegment segment = new EoiSegment();
-
-		segment.readFromStream(stream);
+		EoiSegment segment = new EoiSegment(EoiSegment.SUBTYPE, stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}
