@@ -70,7 +70,7 @@ public class ValidateUtf8File {
 				} catch (MalformedIntException e) {
 					byteCount +=  iis.getInterceptedLength();
 					iis.flushInterception();
-					System.out.printf("Line %d col %d : Invalid integer (%d  0x%x) : @byte %d - %s\n", lineCount, colCount, e.getBadValue(), e.getBadValue(), byteCount, e.getMessage());
+					System.out.printf("Line %d col %d : Invalid integer (%d  0x%x %c) : @byte %d - %s\n", lineCount, colCount, e.getBadValue(), e.getBadValue(), e.getBadValue(), byteCount, e.getMessage());
 					allOK = false;
 				}
 			}

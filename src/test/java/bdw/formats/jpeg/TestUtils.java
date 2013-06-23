@@ -27,6 +27,27 @@ import java.io.StringReader;
 
 public class TestUtils {
 
+	
+	public byte[] makeStaightByteArrayFromString(String rawInput) throws IOException {
+		StringReader inputReader = new StringReader(rawInput);
+		byte[] rawInputBytes = new byte[rawInput.length()];
+		int aChar = inputReader.read();
+		int index = 0;
+		while (aChar != -1) {
+			rawInputBytes[index] = (byte) aChar;
+			aChar = inputReader.read();
+			index++;
+		}
+
+		return rawInputBytes;
+	}
+	
+	public InputStream makeStraightInputStreamFromString(String rawInput) throws IOException {
+		return new ByteArrayInputStream(makeStaightByteArrayFromString(rawInput));
+	}
+
+	
+	
 	public byte[] makeByteArrayFromString(String rawInput) throws IOException {
 		StringReader inputReader = new StringReader(rawInput);
 		byte[] rawInputBytes = new byte[rawInput.length()];

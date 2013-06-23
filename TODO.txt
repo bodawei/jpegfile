@@ -14,3 +14,18 @@
 
 * Exif and other AppN things
 	http://www.drewnoakes.com/code/exif/
+XMP
+http://www.adobe.com/devnet/xmp.html
+
+EXIF
+http://www.exif.org/
+
+JPEG
+http://videotechnology.com/jpeg/
+
+
+checksum
+http://www.jonelo.de/java/jacksum/index.html
+
+
+EMAIL

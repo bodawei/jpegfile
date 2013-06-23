@@ -163,7 +163,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 							}
 						} catch (IllegalArgumentException ex) {
 							foo = ex;
-							ex.printStackTrace();
+							//ex.printStackTrace();
 						} catch (InvocationTargetException ex) {
 							foo = ex;
 						} catch (NoSuchMethodException ex) {
