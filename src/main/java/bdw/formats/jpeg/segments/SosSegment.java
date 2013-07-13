@@ -219,29 +219,6 @@ public class SosSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	protected void readData(DataInput input) throws IOException {
-		int contentLength = input.readUnsignedShort();
-		int componentCount = input.readUnsignedByte();
-
-		if ((2 + 1 + (componentCount * 2) + 3) != contentLength) {
-			throw new IllegalArgumentException("Sos Got " + (2 + 1 + (componentCount * 2) + 3) + " bytes, but expected " + contentLength);
-		}
-
-		for (int index = 0; index < componentCount; index++) {
-			SosDescriptor entry = new SosDescriptor();
-			entry.readData(input);
-			addDescriptor(index, entry);
-		}
-
-		setSpectralSelectionStart(input.readUnsignedByte());
-		setSpectralSelectionEnd(input.readUnsignedByte());
-		setSuccessiveApproximation(input.readUnsignedByte());
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	@Override
 	public void write(OutputStream stream) throws IOException {
 		super.write(stream);
 		DataOutputStream dataStream = super.wrapAsDataOutputStream(stream);
@@ -307,12 +284,12 @@ public class SosSegment extends SegmentBase {
 	 * @inheritdoc
 	 */
 	@Override
-	protected void readData(DataInput input, ParseMode mode) throws IOException {
+	protected void readData(DataInput input, ParseMode mode) throws IOException, InvalidJpegFormat {
 		int contentLength = input.readUnsignedShort();
 		int componentCount = input.readUnsignedByte();
 
 		if ((2 + 1 + (componentCount * 2) + 3) != contentLength) {
-			throw new IllegalArgumentException("Need to report the error, and store the byte offset too.");
+			throw new IllegalArgumentException("Sos Got " + (2 + 1 + (componentCount * 2) + 3) + " bytes, but expected " + contentLength);
 		}
 
 		for (int index = 0; index < componentCount; index++) {

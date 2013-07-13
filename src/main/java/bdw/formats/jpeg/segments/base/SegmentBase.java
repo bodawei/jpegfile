@@ -17,6 +17,7 @@ package bdw.formats.jpeg.segments.base;
 
 import bdw.formats.jpeg.InvalidJpegFormat;
 import bdw.formats.jpeg.ParseMode;
+import bdw.formats.jpeg.segments.support.Problem;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,19 +25,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for all segments.
  * A segment represents all the data in one segment of a JPEG file after the 0xFF and marker flags,
- * and before the next ones.  The raw bytes that it represents are accessible as the "Content"
- * property.  However, subclasses of this class may have specialized accessors to access the
- * data more usefully than a raw set of bytes.
+ * and before the next ones.
  *
- * Segments are expected to be able to be constructed fresh (with no existing data), or
- * from an existing data source (random access file, or a stream).  In the case of a random access
- * file, the segment is free to not actually read the data into memory until it is needed.
+ * In addition to inheriting the behavior explicitly mentioned in this class:
+ * <ul>
+ * <li>It must respond to the canHandlerMarker method</li>
+ * <li>It must be able to write()</li>
+ * <li>It must be able to have content forced to be loaded</li>
+ * <li>It must be able to report on validity</li>
+ * <li>It must be able to return the marker that it is representing</li>
+ * </ul>
+ * subclasses must also provide two constructors:
+ * <ul>
+ * <li>The first must accept a marker, an input stream, and a parse mode</li>
+ * <li>The second must accept a marker, a random access file, and a parse mode</li>
+ * </ul>
+ *
+ * The semantics for the two constructors is important:
+ * Each constructor must parse the data is is passed (in the input stream or file) at least
+ * far enough to determine whether the data is valid for this kind of segment.  If it is not
+ * then the constructor must throw an InvalidJpegFormat. It is up to the caller to clean up
+ * after an unsuccessful parse (e.g. rolling back the input stream or resetting the file marker).
+ * If the data is conceivable valid, but doesn't match the parsing strictness, then problems should be
+ * stored on the segment, but the constructor should still succeed.
+ *
+ * The random access file constructor may freely choose not to eagerly read in chunks of data that exceed
+ * SegmentBase.READ_LIMIT data.
  * This allows users to analyze the structure of a potentially large JPEG file without loading
  * all of the data into memory. At an time, however, the user can force that data into memory.
+ *
+ * Note: In the case of a large segment, it is not necessary that all bytes be read into memory, but only
+ * enough to garantuee that this segment can manage th data.
+ * The constructors must also fail if the marker type they are presented is not valid.
+ *
+ * In addition to these requirements, a segment class is encouraged to provide other useful constructors.
+ * The result of calling any other constructor must be a segment which is at least "lax" valid. Which is
+ * to say, any values that are absolutely required in order to generate a "lax" valid segment must be
+ * included in the constructor calls.
  */
 public abstract class SegmentBase extends JpegDataStructureBase {
 
@@ -45,11 +76,12 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	private int marker;
 
 	private boolean valid;
+	protected List<Problem> problems;
 
 	public SegmentBase() {
 		valid = true;
+		problems = new ArrayList<Problem>();
 	}
-
 
 	/**
 	 * @return true if the segment is strictly valid
@@ -72,12 +104,26 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 		return marker;
 	}
 
+	/**
+	 * Used by subclasses to set the marker value
+	 */
 	protected void setMarker(int newMarker) {
 		marker = newMarker;
 	}
 
-
+	public List<Problem> getProblems() {
+		return problems;
+	}
+	
 	/**
+	 * Called from constructors building a segment from a random access file. This must do the following:
+	 * <ul>
+	 * <li>This must determine whether the input stream can possibly be parsed as this kind of segment. If
+	 *     not it must throw InvalidJpegFormat</li>
+	 * <li>If the data is viably this kind of segment (e.g. expected structures are present and neither too large or too short) then this should log any violations of the parse mode as problems on the segment itself</li>
+	 * <li>This may, optionally, not read in large segments of data that are not needed to be used to validate the segment. This must later be able to retrieve that data when forceContentLoading is called</li>
+	 * <li>This must store enough information that write() will be able to write out the exact same bit sequence that this read in</li>
+	 * </ul>
 	 * @param file The file to read from (not null)
 	 * @param mode The mode to parse the file in
 	 *
@@ -92,6 +138,13 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	}
 
 	/**
+	 * Called from constructors building a segment from a random access file. This must do the following:
+	 * <ul>
+	 * <li>This must determine whether the input stream can possibly be parsed as this kind of segment. If
+	 *     not it must throw InvalidJpegFormat</li>
+	 * <li>If the data is viably this kind of segment (e.g. expected structures are present and neither too large or too short) then this should log any violations of the parse mode as problems on the segment itself</li>
+	 * <li>This must store enough information that write() will be able to write out the exact same bit sequence that this read in</li>
+	 * </ul>
 	 * @param stream The stream to read from (not null)
 	 * @param mode The mode to parse the file in
 	 *
@@ -112,17 +165,10 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	/**
 	 * Read all the data and populate this instance.
 	 * This resets all contents of this segment.
+	 * By default, readFromStream() calls this to do its reading, and so this must conform to the expectations for
+	 * that method.  Subclasses that do not need to not read in some of the segment's data are encouraged to have
+	 * readFromFile() direct to this as well.
 	 *
-	 * @param dataSource The input source to read from
-	 *
-	 * @throws IOException If something happens while reading
-	 */
-	protected void readData(DataInput dataSource) throws IOException, InvalidJpegFormat {
-	}
-
-	/**
-	 * Read all the data and populate this instance.
-	 * This resets all contents of this segment.
 	 *
 	 * @param dataSource The input source to read from
 	 * @param mode The mode to read the file in
@@ -142,6 +188,10 @@ public abstract class SegmentBase extends JpegDataStructureBase {
 	/**
 	 * Writes the contents of this segment to the output stream, including the size info,
 	 * if appropriate, but not the 0xFF and marker info.
+	 *
+	 * Note, if this is done immediately after reading from an inputstream or file, this must write out
+	 * the exact same bytes that were read in.  However, if this was "hand built" or is a modified version
+	 * of one read from a file, then this garantuee is not maintained.
 	 *
 	 * @param stream a non-null stream to write data to.
 	 * @throw IllegalArgumentException if param is null
