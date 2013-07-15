@@ -17,8 +17,8 @@
 package bdw.formats.jpeg.segments;
 
 import java.io.RandomAccessFile;
-import bdw.formats.jpeg.ParseMode;
-import bdw.formats.jpeg.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
+import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package bdw.formats.jpeg;
+package bdw.cli;
 
+import bdw.formats.jpeg.JpegParser;
 import bdw.formats.jpeg.segments.ComSegment;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import java.io.File;

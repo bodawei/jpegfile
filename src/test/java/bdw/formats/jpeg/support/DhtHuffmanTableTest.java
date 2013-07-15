@@ -16,11 +16,11 @@
 
 package bdw.formats.jpeg.support;
 
-import bdw.formats.jpeg.ParseMode;
+import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
-import bdw.formats.jpeg.InvalidJpegFormat;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.InputStream;

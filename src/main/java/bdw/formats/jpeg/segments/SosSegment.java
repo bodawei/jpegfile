@@ -15,8 +15,8 @@
  */
 package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.ParseMode;
+import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.segments.base.SegmentBase;
 import bdw.formats.jpeg.segments.support.SosDescriptor;
 import java.io.DataInput;

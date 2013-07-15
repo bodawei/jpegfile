@@ -15,8 +15,9 @@
  */
 package bdw.formats.jpeg.segments.support;
 
-import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.ParseMode;
+import bdw.format.jpeg.support.Problem;
+import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import bdw.io.LimitingDataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -16,10 +16,10 @@
 
 package bdw.formats.jpeg.segments;
 
-import bdw.formats.jpeg.InvalidJpegFormat;
-import bdw.formats.jpeg.ParseMode;
+import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.support.Problem;
+import bdw.format.jpeg.support.Problem;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;

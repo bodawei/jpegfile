@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 柏大衛
+ *  Copyright 2013 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package bdw.formats.jpeg;
-
 /**
- * Identify the modes that a jpeg file can be parsed in.
+ * Provides basic base classes for the JPEG parsing system.
  */
-public enum ParseMode {
-	/**
-	 * Throw an exception any time there is anything at all wrong
-	 */
-	STRICT,
-	/**
-	 * Throw an exception only with catastrophic errors.  Accept minor
-	 * errors (and mark the relevant data accordingly)
-	 */
-	LAX
-}
+package bdw.format.jpeg.data;
+
+
