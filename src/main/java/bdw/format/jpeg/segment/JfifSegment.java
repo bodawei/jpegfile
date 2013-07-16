@@ -52,10 +52,10 @@ public class JfifSegment extends AppNSegment {
 	public static int WARNING_UNKNOWN_UNITS = 2;
 	
 	/**
-	 * The thumbnail width and height don't match the thumbnail bytes
+	 * The horizontal or vertical pixel density is 0
 	 */
-	public static int ERROR_BYTES_SIZE_DONT_MATCH = 3;
-	
+	public static int WARNING_DENSITY_ZERO = 3;
+
 
 	public static enum UnitsEnum {
 		NO_UNITS(0),
@@ -80,9 +80,6 @@ public class JfifSegment extends AppNSegment {
 	private int units;
 	private int xDensity;
 	private int yDensity;
-	private int width;
-	private int height;
-	private byte[] pixelBytes;
 	private ThreeBytesPerPixelThumbnail thumbnail;
 	
 	/**
@@ -96,9 +93,6 @@ public class JfifSegment extends AppNSegment {
 		units = 0;
 		xDensity = 0;
 		yDensity = 0;
-		width = 0;
-		height = 0;
-		pixelBytes = new byte[0];
 		thumbnail = new ThreeBytesPerPixelThumbnail();
 	}
 
@@ -322,6 +316,10 @@ public class JfifSegment extends AppNSegment {
 
 		if (units >= 3) {
 			problems.add(new Problem(Problem.ProblemType.WARNING, WARNING_UNKNOWN_UNITS));
+		}
+
+		if ((xDensity == 0) || (yDensity == 0)) {
+			problems.add(new Problem(Problem.ProblemType.WARNING, WARNING_DENSITY_ZERO));
 		}
 
 		List<Problem> subProblems = thumbnail.getProblems();

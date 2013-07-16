@@ -17,6 +17,7 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.format.jpeg.segment.JfifSegment;
+import bdw.format.jpeg.segment.support.ThreeBytesPerPixelThumbnail;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;
@@ -166,6 +167,7 @@ public class JfifSegmentTest {
 
 		ArrayList<Problem> list = new ArrayList<Problem>();
 		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_UNKNOWN_VERSION));
+		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_DENSITY_ZERO));
 		assertEquals(list, segment.getProblems());
 	}
 
@@ -175,6 +177,7 @@ public class JfifSegmentTest {
 
 		ArrayList<Problem> list = new ArrayList<Problem>();
 		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_UNKNOWN_UNITS));
+		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_DENSITY_ZERO));
 		assertEquals(list, segment.getProblems());
 	}
 
@@ -184,7 +187,8 @@ public class JfifSegmentTest {
 		segment.getThumbnail().setWidth(129);
 
 		ArrayList<Problem> list = new ArrayList<Problem>();
-		list.add(new Problem(Problem.ProblemType.ERROR, JfifSegment.ERROR_BYTES_SIZE_DONT_MATCH));
+		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_DENSITY_ZERO));
+		list.add(new Problem(Problem.ProblemType.ERROR, ThreeBytesPerPixelThumbnail.ERROR_BYTES_SIZE_DONT_MATCH));
 		assertEquals(list, segment.getProblems());
 	}
 
@@ -205,6 +209,7 @@ public class JfifSegmentTest {
 		segment.setUnits(1);
 
 		ArrayList<Problem> list = new ArrayList<Problem>();
+		list.add(new Problem(Problem.ProblemType.WARNING, JfifSegment.WARNING_DENSITY_ZERO));
 		assertEquals(list, segment.getProblems());
 	}
 
