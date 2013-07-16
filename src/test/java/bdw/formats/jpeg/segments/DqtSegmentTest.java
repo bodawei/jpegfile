@@ -16,13 +16,14 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.DqtSegment;
 import bdw.format.jpeg.support.ParseMode;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
 import java.io.ByteArrayOutputStream;
-import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
+import bdw.format.jpeg.segment.support.DqtQuantizationTable;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;

@@ -5,9 +5,9 @@
 
 package bdw.cli;
 
-import bdw.formats.jpeg.JpegParser;
-import bdw.formats.jpeg.segments.ComSegment;
-import bdw.formats.jpeg.segments.base.SegmentBase;
+import bdw.format.jpeg.JpegParser;
+import bdw.format.jpeg.segment.ComSegment;
+import bdw.format.jpeg.segment.base.SegmentBase;
 import java.io.File;
 
 /**

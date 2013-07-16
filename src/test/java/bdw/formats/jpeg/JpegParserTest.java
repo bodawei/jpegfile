@@ -16,16 +16,17 @@
 
 package bdw.formats.jpeg;
 
+import bdw.format.jpeg.JpegParser;
 import java.io.IOException;
-import bdw.formats.encode.Hex2Bin;
+import bdw.format.encoder.Hex2Bin;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.io.File;
-import bdw.formats.jpeg.segments.EoiSegment;
-import bdw.formats.jpeg.segments.SoiSegment;
+import bdw.format.jpeg.segment.EoiSegment;
+import bdw.format.jpeg.segment.SoiSegment;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

@@ -15,7 +15,7 @@
  */
 package bdw.formats.jpeg;
 
-import bdw.formats.encode.Hex2Bin;
+import bdw.format.encoder.Hex2Bin;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

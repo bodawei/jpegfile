@@ -16,7 +16,7 @@
 
 package bdw.formats.jpeg.support;
 
-import bdw.formats.jpeg.segments.support.DhtRunLengthHeader;
+import bdw.format.jpeg.segment.support.DhtRunLengthHeader;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

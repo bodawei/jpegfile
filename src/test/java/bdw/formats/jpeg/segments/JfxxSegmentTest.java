@@ -16,11 +16,12 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.JfxxSegment;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import bdw.format.jpeg.support.Problem;
-import bdw.formats.jpeg.segments.support.ThreeBytesPerPixelThumbnail;
+import bdw.format.jpeg.segment.support.ThreeBytesPerPixelThumbnail;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

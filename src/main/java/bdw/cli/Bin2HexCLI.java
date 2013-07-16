@@ -16,7 +16,7 @@
 
 package bdw.cli;
 
-import bdw.formats.encode.Bin2Hex;
+import bdw.format.encoder.Bin2Hex;
 import java.io.IOException;
 
 /**

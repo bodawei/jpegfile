@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.EoiSegment;
 import java.io.InputStream;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.ParseMode;

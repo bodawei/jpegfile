@@ -16,6 +16,8 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.JpgNSegment;
+import bdw.format.jpeg.segment.JpgSegment;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;

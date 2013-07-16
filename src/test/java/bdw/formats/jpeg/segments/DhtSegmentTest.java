@@ -15,13 +15,14 @@
  */
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.DhtSegment;
 import bdw.format.jpeg.support.ParseMode;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.EOFException;
 import bdw.format.jpeg.support.InvalidJpegFormat;
-import bdw.formats.jpeg.segments.support.DhtRunLengthHeader;
-import bdw.formats.jpeg.segments.support.DhtHuffmanTable;
+import bdw.format.jpeg.segment.support.DhtRunLengthHeader;
+import bdw.format.jpeg.segment.support.DhtHuffmanTable;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import bdw.formats.jpeg.TestUtils;

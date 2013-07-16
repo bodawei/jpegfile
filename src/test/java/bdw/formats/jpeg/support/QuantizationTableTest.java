@@ -18,7 +18,7 @@ package bdw.formats.jpeg.support;
 
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.formats.jpeg.TestUtils;
-import bdw.formats.jpeg.segments.support.DqtQuantizationTable;
+import bdw.format.jpeg.segment.support.DqtQuantizationTable;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

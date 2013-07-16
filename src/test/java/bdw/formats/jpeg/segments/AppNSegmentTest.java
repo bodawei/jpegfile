@@ -16,6 +16,7 @@
 
 package bdw.formats.jpeg.segments;
 
+import bdw.format.jpeg.segment.AppNSegment;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.ByteArrayOutputStream;
