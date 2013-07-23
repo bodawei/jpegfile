@@ -19,6 +19,7 @@ package bdw.formats.jpeg;
 import bdw.format.jpeg.JpegParser;
 import java.io.IOException;
 import bdw.format.encoder.Hex2Bin;
+import bdw.format.jpeg.data.Segment;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -27,6 +28,7 @@ import java.net.URI;
 import java.io.File;
 import bdw.format.jpeg.segment.EoiSegment;
 import bdw.format.jpeg.segment.SoiSegment;
+import bdw.format.jpeg.segment.base.SegmentBase;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -69,8 +71,29 @@ public class JpegParserTest {
 		file.readFromFile(new File(uri));
 
 		assertEquals(2, file.getSegments().size());
-		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(1).getMarker());
+		Object segment = file.getSegments().get(0);
+		
+		if (segment instanceof SegmentBase) {
+			SegmentBase sgmt = (SegmentBase) segment;
+			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+
+		if (segment instanceof Segment) {
+			Segment sgmt = (Segment) segment;
+			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+
+		segment = file.getSegments().get(1);
+		
+		if (segment instanceof SegmentBase) {
+			SegmentBase sgmt = (SegmentBase) segment;
+			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+
+		if (segment instanceof Segment) {
+			Segment sgmt = (Segment) segment;
+			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+		}
 	}
 
     @Test
@@ -83,8 +106,28 @@ public class JpegParserTest {
 		file.readFromFile(new File(uri));
 
 		assertEquals(9, file.getSegments().size());
-		assertEquals("Start of Image", SoiSegment.SUBTYPE, file.getSegments().get(0).getMarker());
-		assertEquals("End of Image", EoiSegment.SUBTYPE, file.getSegments().get(8).getMarker());
+		Object segment = file.getSegments().get(0);
+		
+		if (segment instanceof SegmentBase) {
+			SegmentBase sgmt = (SegmentBase) segment;
+			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+
+		if (segment instanceof Segment) {
+			Segment sgmt = (Segment) segment;
+			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+		
+		segment = file.getSegments().get(8);
+		if (segment instanceof SegmentBase) {
+			SegmentBase sgmt = (SegmentBase) segment;
+			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+		}
+
+		if (segment instanceof Segment) {
+			Segment sgmt = (Segment) segment;
+			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+		}
 	}
 
     @Test
