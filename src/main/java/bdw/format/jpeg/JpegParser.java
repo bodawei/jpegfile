@@ -15,8 +15,6 @@
  */
 package bdw.format.jpeg;
 
-import bdw.format.jpeg.support.InvalidJpegFormat;
-import bdw.format.jpeg.support.ParseMode;
 import bdw.format.jpeg.segment.AppNSegment;
 import bdw.format.jpeg.segment.ComSegment;
 import bdw.format.jpeg.segment.DacSegment;
@@ -30,13 +28,15 @@ import bdw.format.jpeg.segment.EoiSegment;
 import bdw.format.jpeg.segment.ExpSegment;
 import bdw.format.jpeg.segment.JpgNSegment;
 import bdw.format.jpeg.segment.JpgSegment;
-import bdw.format.jpeg.segment.UnknownSegment;
 import bdw.format.jpeg.segment.RstSegment;
-import bdw.format.jpeg.segment.base.SegmentBase;
 import bdw.format.jpeg.segment.SofSegment;
 import bdw.format.jpeg.segment.SoiSegment;
 import bdw.format.jpeg.segment.SosSegment;
 import bdw.format.jpeg.segment.TemSegment;
+import bdw.format.jpeg.segment.UnknownSegment;
+import bdw.format.jpeg.segment.base.SegmentBase;
+import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -75,7 +75,8 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 	/**
 	 * Adds all standard Jpeg segments to this instance.
-	 * */
+	 *
+	 */
 	public void addStandardSegments() {
 		addSegmentHandler(SoiSegment.class);
 		addSegmentHandler(EoiSegment.class);
@@ -173,12 +174,12 @@ public class JpegParser implements Iterable<SegmentBase> {
 						} catch (SecurityException ex) {
 							foo = ex;
 						}
-					
+
 					}
 					if (manager == null) {
 						UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, file, ParseMode.STRICT);
 						this.segments.add(data);
-					}  else if (manager instanceof SosSegment) {
+					} else if (manager instanceof SosSegment) {
 						seenSOS = true;
 					}
 				}
@@ -257,7 +258,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 						if (manager == null) {
 							UnknownSegment data = new UnknownSegment(UnknownSegment.SUBTYPE, dataStream, ParseMode.STRICT);
 							this.segments.add(data);
-						}  else if (manager instanceof SosSegment) {
+						} else if (manager instanceof SosSegment) {
 							seenSOS = true;
 						}
 					}
@@ -270,9 +271,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * Writes a copy of the contents of this file to the specified stream.
-	 * Note that this is a copy of whatever the set of segments have, not necessarily what
-	 * was in the file this was passed in the constructor.
+	 * Writes a copy of the contents of this file to the specified stream. Note
+	 * that this is a copy of whatever the set of segments have, not necessarily
+	 * what was in the file this was passed in the constructor.
+	 *
 	 * @param stream the stream to write to
 	 */
 	public void write(OutputStream stream) throws IOException {
@@ -283,9 +285,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * Returns whether the set of segments in the file describe a reasonable jpeg file
-	 * for example, starts with a SOI segment, and ends with an EOI. Overlooks details which
-	 * are generally OK even if not defined by the spec.
+	 * Returns whether the set of segments in the file describe a reasonable
+	 * jpeg file for example, starts with a SOI segment, and ends with an EOI.
+	 * Overlooks details which are generally OK even if not defined by the spec.
+	 *
 	 * @return true if the segments describe a legitimate Jpeg file
 	 */
 	public boolean isValid() {
@@ -312,7 +315,7 @@ public class JpegParser implements Iterable<SegmentBase> {
 		}
 
 		for (SegmentBase segment : this) {
-			if ( ! segment.isValid()) {
+			if (!segment.isValid()) {
 				return false;
 			}
 
@@ -325,7 +328,8 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * @return true if the segments describe a jpeg file that exactly matches the jpeg spec.
+	 * @return true if the segments describe a jpeg file that exactly matches
+	 * the jpeg spec.
 	 */
 	public boolean isStrictlyValid() {
 		return false;
@@ -343,10 +347,13 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * Inserts the segment at the specified location. If the segment is already in the file,
-	 * it will be moved and put at the location that (before the move) was index.
+	 * Inserts the segment at the specified location. If the segment is already
+	 * in the file, it will be moved and put at the location that (before the
+	 * move) was index.
+	 *
 	 * @param segment The segment to be inserted (null is ignored)
-	 * @param index The index to add the segment at. If out of range, will be put at the start or end of the list
+	 * @param index The index to add the segment at. If out of range, will be
+	 * put at the start or end of the list
 	 */
 	public void insertSegmentAt(SegmentBase segment, int index) {
 		if (index >= segments.size()) {
@@ -362,8 +369,10 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 	/**
 	 * Returns the segment at the specified index.
+	 *
 	 * @param index the index of the segment
-	 * @return the segment at the specified index in the file, or null if no such segment.
+	 * @return the segment at the specified index in the file, or null if no
+	 * such segment.
 	 */
 	public SegmentBase getSegmentAt(int index) {
 		if ((index >= 0) && (index <= segments.size())) {
@@ -375,7 +384,9 @@ public class JpegParser implements Iterable<SegmentBase> {
 
 	/**
 	 * Returns a list of all the segments in the file.
-	 * @return a new (possibly empty) array containing all the segments in the file in order
+	 *
+	 * @return a new (possibly empty) array containing all the segments in the
+	 * file in order
 	 */
 	public List<SegmentBase> getSegments() {
 		List<SegmentBase> copy = new ArrayList<SegmentBase>();
@@ -386,8 +397,9 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * Removes the specified segment from the file.  If the segment is not in the file
-	 * does nothing.
+	 * Removes the specified segment from the file. If the segment is not in the
+	 * file does nothing.
+	 *
 	 * @param segment The segment to remove from the file
 	 */
 	public void removeSegment(SegmentBase segment) {
@@ -398,8 +410,9 @@ public class JpegParser implements Iterable<SegmentBase> {
 	}
 
 	/**
-	 * Removes the segment from the specified index in the file
-	 * If no segment at that position, nothing is changed
+	 * Removes the segment from the specified index in the file If no segment at
+	 * that position, nothing is changed
+	 *
 	 * @param index index of the segment to remove
 	 */
 	public void removeSegmentAt(int index) {
