@@ -42,14 +42,15 @@ public class TemSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(TemSegment.SUBTYPE, new TemSegment().getMarker());
+		assertEquals(TemSegment.MARKER, new TemSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		TemSegment segment = new TemSegment(TemSegment.SUBTYPE, stream, ParseMode.STRICT);
+		TemSegment segment = new TemSegment();
+		segment.readFromStream(stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

@@ -17,15 +17,15 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.format.jpeg.segment.EoiSegment;
-import java.io.InputStream;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class EoiSegmentTest {
 
@@ -45,13 +45,14 @@ public class EoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(EoiSegment.SUBTYPE, new EoiSegment().getMarker());
+		assertEquals(EoiSegment.MARKER, new EoiSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
-		EoiSegment segment = new EoiSegment(EoiSegment.SUBTYPE, stream, ParseMode.STRICT);
+		EoiSegment segment = new EoiSegment();
+		segment.readFromStream(stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

@@ -73,26 +73,15 @@ public class JpegParserTest {
 		assertEquals(2, file.getSegments().size());
 		Object segment = file.getSegments().get(0);
 		
-		if (segment instanceof SegmentBase) {
-			SegmentBase sgmt = (SegmentBase) segment;
-			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
-		}
-
 		if (segment instanceof Segment) {
 			Segment sgmt = (Segment) segment;
-			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+			assertEquals("Start of Image", SoiSegment.MARKER, sgmt.getMarker());
 		}
 
 		segment = file.getSegments().get(1);
-		
-		if (segment instanceof SegmentBase) {
-			SegmentBase sgmt = (SegmentBase) segment;
-			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
-		}
-
 		if (segment instanceof Segment) {
 			Segment sgmt = (Segment) segment;
-			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+			assertEquals("End of Image", EoiSegment.MARKER, sgmt.getMarker());
 		}
 	}
 
@@ -107,26 +96,15 @@ public class JpegParserTest {
 
 		assertEquals(9, file.getSegments().size());
 		Object segment = file.getSegments().get(0);
-		
-		if (segment instanceof SegmentBase) {
-			SegmentBase sgmt = (SegmentBase) segment;
-			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
-		}
-
 		if (segment instanceof Segment) {
 			Segment sgmt = (Segment) segment;
-			assertEquals("Start of Image", SoiSegment.SUBTYPE, sgmt.getMarker());
+			assertEquals("Start of Image", SoiSegment.MARKER, sgmt.getMarker());
 		}
 		
 		segment = file.getSegments().get(8);
-		if (segment instanceof SegmentBase) {
-			SegmentBase sgmt = (SegmentBase) segment;
-			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
-		}
-
 		if (segment instanceof Segment) {
 			Segment sgmt = (Segment) segment;
-			assertEquals("End of Image", EoiSegment.SUBTYPE, sgmt.getMarker());
+			assertEquals("End of Image", EoiSegment.MARKER, sgmt.getMarker());
 		}
 	}
 

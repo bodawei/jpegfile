@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -83,15 +82,15 @@ public class JpegParser implements Iterable<Object> {
 	 *
 	 */
 	public void addStandardSegments() {
-		addSegmentHandler(SoiSegment.class);
-		addSegmentHandler(EoiSegment.class);
+		addNewSegmentHandler(SoiSegment.class);
+		addNewSegmentHandler(EoiSegment.class);
 		addSegmentHandler(DqtSegment.class);
 		addSegmentHandler(SofSegment.class);
 		addSegmentHandler(DhtSegment.class);
 		addSegmentHandler(SosSegment.class);
 
 		// test
-		addSegmentHandler(TemSegment.class);
+		addNewSegmentHandler(TemSegment.class);
 		addSegmentHandler(DacSegment.class);
 		addSegmentHandler(DnlSegment.class);
 		addSegmentHandler(JpgSegment.class);
@@ -163,7 +162,7 @@ public class JpegParser implements Iterable<Object> {
 						newManagerClass = this.newSegmentManagers.get(index);
 						try {
 							Marker markerAnnotation = newManagerClass.getAnnotation(Marker.class);
-							if ((markerAnnotation != null) && (markerAnnotation.marker() == markerByte)) {
+							if ((markerAnnotation != null) && (markerAnnotation.value() == markerByte)) {
 								constructor = newManagerClass.getDeclaredConstructor();
 								try {
 									newManager = (Segment) constructor.newInstance();
@@ -276,7 +275,7 @@ public class JpegParser implements Iterable<Object> {
 							newManagerClass = this.newSegmentManagers.get(index);
 							try {
 								Marker markerAnnotation = newManagerClass.getAnnotation(Marker.class);
-								if ((markerAnnotation != null) && (markerAnnotation.marker() == markerByte)) {
+								if ((markerAnnotation != null) && (markerAnnotation.value() == markerByte)) {
 									constructor = newManagerClass.getDeclaredConstructor();
 									try {
 										newManager = (Segment) constructor.newInstance();

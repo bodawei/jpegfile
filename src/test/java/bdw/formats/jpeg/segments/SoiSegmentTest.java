@@ -17,14 +17,14 @@
 package bdw.formats.jpeg.segments;
 
 import bdw.format.jpeg.segment.SoiSegment;
-import bdw.format.jpeg.support.ParseMode;
 import bdw.format.jpeg.support.InvalidJpegFormat;
+import bdw.format.jpeg.support.ParseMode;
 import bdw.formats.jpeg.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class SoiSegmentTest {
 
@@ -37,14 +37,15 @@ public class SoiSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() {
-		assertEquals(SoiSegment.SUBTYPE, new SoiSegment().getMarker());
+		assertEquals(SoiSegment.MARKER, new SoiSegment().getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		SoiSegment segment = new SoiSegment(SoiSegment.SUBTYPE, stream, ParseMode.STRICT);
+		SoiSegment segment = new SoiSegment();
+		segment.readFromStream(stream, ParseMode.STRICT);
 
 		assertEquals(0xAA, stream.read());
 	}

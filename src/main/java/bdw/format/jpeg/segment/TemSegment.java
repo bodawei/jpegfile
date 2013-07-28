@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 柏大衛
+ *  Copyright 2013 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,74 +15,26 @@
  */
 package bdw.format.jpeg.segment;
 
-import bdw.format.jpeg.support.InvalidJpegFormat;
-import bdw.format.jpeg.support.ParseMode;
-import bdw.format.jpeg.segment.base.SegmentBase;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import bdw.format.jpeg.data.Segment;
+import bdw.format.jpeg.support.Marker;
 
 /**
  * "Temporary for arithmetic coding" segment.
- * This seems to carry no data
+ * This isn't supposed to appear in JPEG streams.
  */
-public class TemSegment extends SegmentBase {
-
+@Marker(TemSegment.MARKER)
+public class TemSegment extends Segment {
 	/**
 	 * Marker for this type of segment
 	 */
-	public static final int SUBTYPE = 0x01;
-
-	public TemSegment() {
-		setMarker(TemSegment.SUBTYPE);		
-	}
-
-	public TemSegment(int subType) throws InvalidJpegFormat {
-		if (TemSegment.canHandleMarker(subType)) {
-			setMarker(subType);		
-		} else {
-			throw new InvalidJpegFormat("The subtype " + subType + " is not applicable to " + this.getClass().getSimpleName());
-		}
-	}
+	public static final int MARKER = 0x01;
 
 	/**
-	 * Construct an instance from a stream.
-	 *
-	 * @param stream The stream to read from
-	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
+	 * @inheritdoc
 	 */
-	public TemSegment(int subType, InputStream stream, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this(subType);
-		super.readFromStream(stream, mode);
-    }
-
-	/**
-	 * Construct an instance from a stream.
-	 *
-	 * @param file The file to read from
-	 * @param mode The mode to parse this in. At this time, no distinction is made between modes.
-	 * @throws IOException If an error occurs while parsing (most likely EOFException)
-	 * @throws InvalidJpegFormat If the data is overtly malformed (at this time, can't happen with a comment)
-	 */
-	public TemSegment(int subType, RandomAccessFile file, ParseMode mode) throws IOException, InvalidJpegFormat {
-		this(subType);
-		super.readFromFile(file, mode);
-    }
-
-	/**
-	 * Checks whether instances of this class should be constructed
-	 * with the specified marker.
-	 *
-	 * @param marker The marker to check.
-	 * @return true if this conventionally can be associated with that marker.
-	 */
-	public static boolean canHandleMarker(int marker) {
-		if (marker == TemSegment.SUBTYPE) {
-			return true;
-		}
-		return false;
+	@Override
+	public int getMarker() {
+		return MARKER;
 	}
 
 	/**

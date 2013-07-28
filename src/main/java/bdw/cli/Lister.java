@@ -6,6 +6,7 @@
 package bdw.cli;
 
 import bdw.format.jpeg.JpegParser;
+import bdw.format.jpeg.data.Segment;
 import bdw.format.jpeg.segment.ComSegment;
 import bdw.format.jpeg.segment.base.SegmentBase;
 import java.io.File;
@@ -27,11 +28,22 @@ public class Lister {
 			if ( ! parser.isValid()) {
 				System.out.println("INVALID FILE: " + args[0]);
 			}
-			for (SegmentBase base : parser) {
-				System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
-				if (base instanceof ComSegment) {
-					ComSegment segment = (ComSegment) base;
-					System.out.println("\t\tComment: " + segment.getComment());
+			for (Object sgmt : parser) {
+				if (sgmt instanceof SegmentBase) {
+					SegmentBase base = (SegmentBase) sgmt;
+					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
+					if (base instanceof ComSegment) {
+						ComSegment segment = (ComSegment) base;
+						System.out.println("\t\tComment: " + segment.getComment());
+					}
+				}
+				if (sgmt instanceof Segment) {
+					Segment base = (Segment) sgmt;
+					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
+//					if (base instanceof ComSegment) {
+//						ComSegment segment = (ComSegment) base;
+//						System.out.println("\t\tComment: " + segment.getComment());
+//					}
 				}
 //				if (base instanceof DataSegment) {
 //					DataSegment segment = (DataSegment) base;
