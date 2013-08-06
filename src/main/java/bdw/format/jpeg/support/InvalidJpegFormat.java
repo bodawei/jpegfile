@@ -15,13 +15,23 @@
  */
 package bdw.format.jpeg.support;
 
+import java.util.ArrayList;
+
 /**
  *
  */
 public class InvalidJpegFormat extends Exception{
 	private static final long serialVersionUID = 1L;
+	
+	private ArrayList<Problem> problems;
 
 	public InvalidJpegFormat(String info) {
 	   super(info);
+	}
+
+	public InvalidJpegFormat(String info, Problem problem) {
+	   super(info);
+	   problems = new ArrayList<Problem>();
+	   problems.add(problem);
 	}
 }

@@ -32,18 +32,14 @@ public class Lister {
 				if (sgmt instanceof SegmentBase) {
 					SegmentBase base = (SegmentBase) sgmt;
 					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
-					if (base instanceof ComSegment) {
-						ComSegment segment = (ComSegment) base;
-						System.out.println("\t\tComment: " + segment.getComment());
-					}
 				}
 				if (sgmt instanceof Segment) {
 					Segment base = (Segment) sgmt;
 					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
-//					if (base instanceof ComSegment) {
-//						ComSegment segment = (ComSegment) base;
-//						System.out.println("\t\tComment: " + segment.getComment());
-//					}
+					if (base instanceof ComSegment) {
+						ComSegment segment = (ComSegment) base;
+						System.out.println("\t\tComment: " + segment.getStringComment());
+					}
 				}
 //				if (base instanceof DataSegment) {
 //					DataSegment segment = (DataSegment) base;

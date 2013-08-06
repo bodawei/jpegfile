@@ -45,25 +45,26 @@ public class RstSegmentTest {
 
 	@Test
 	public void testThatHasTheRightMarkerByDefault() throws InvalidJpegFormat {
-		assertEquals(RstSegment.FIRST_SUBTYPE, new RstSegment(RstSegment.FIRST_SUBTYPE).getMarker());
+		assertEquals(RstSegment.FIRST_MARKER, new RstSegment(RstSegment.FIRST_MARKER).getMarker());
 	}
 
 	@Test
 	public void testSoiSegmentReadsNoData() throws IOException, InvalidJpegFormat {
 		InputStream stream = utils.makeInputStreamFromString("AA BB");
 
-		RstSegment segment = new RstSegment(RstSegment.FIRST_SUBTYPE, stream, ParseMode.STRICT);
+		RstSegment segment = new RstSegment(RstSegment.FIRST_MARKER);
+		segment.readFromStream(stream, ParseMode.STRICT);
 		
 		assertEquals(0xAA, stream.read());
 	}
 
 	@Test
 	public void rstSegmentsEqual() throws IOException, InvalidJpegFormat {
-		assertTrue(new RstSegment(RstSegment.FIRST_SUBTYPE).equals(new RstSegment(RstSegment.FIRST_SUBTYPE)));
+		assertTrue(new RstSegment(RstSegment.FIRST_MARKER).equals(new RstSegment(RstSegment.FIRST_MARKER)));
 	}
 
 	@Test
 	public void rstSegmentNotEqualToOther() throws IOException, InvalidJpegFormat {
-		assertFalse(new RstSegment(RstSegment.FIRST_SUBTYPE).equals(new Object()));
+		assertFalse(new RstSegment(RstSegment.FIRST_MARKER).equals(new Object()));
 	}
 }

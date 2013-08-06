@@ -94,11 +94,11 @@ public class JpegParser implements Iterable<Object> {
 		addSegmentHandler(DacSegment.class);
 		addSegmentHandler(DnlSegment.class);
 		addSegmentHandler(JpgSegment.class);
-		addSegmentHandler(RstSegment.class);
+		addNewSegmentHandler(RstSegment.class);
 		addSegmentHandler(DriSegment.class);
 		addSegmentHandler(DhpSegment.class);
 		addSegmentHandler(ExpSegment.class);
-		addSegmentHandler(ComSegment.class);
+		addNewSegmentHandler(ComSegment.class);
 		addSegmentHandler(JpgNSegment.class);
 
 		addSegmentHandler(AppNSegment.class);
@@ -352,7 +352,7 @@ public class JpegParser implements Iterable<Object> {
 	 *
 	 * @param stream the stream to write to
 	 */
-	public void write(OutputStream stream) throws IOException {
+	public void write(OutputStream stream) throws IOException, InvalidJpegFormat {
 		Iterator<Object> i = iterator();
 		while (i.hasNext()) {
 			Object nxt = i.next();
