@@ -38,7 +38,8 @@ public class Lister {
 					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
 					if (base instanceof ComSegment) {
 						ComSegment segment = (ComSegment) base;
-						System.out.println("\t\tComment: " + segment.getStringComment());
+						String s = segment.getStringComment();
+						System.out.println("\t\tComment: " + s);
 					}
 				}
 //				if (base instanceof DataSegment) {

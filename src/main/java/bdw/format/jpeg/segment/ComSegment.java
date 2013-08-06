@@ -36,6 +36,8 @@ import java.util.Arrays;
  * Segment that represents a comment in a jpeg file.
  * When it exists, it is usually a short string identifying the program
  * that was used to create the jpeg data, or the camera used to take it.
+ * 
+ * Note: This is defined on pages B-16 and B-17 of the standard.
  */
 @Marker(ComSegment.MARKER)
 public class ComSegment extends Segment {
@@ -249,6 +251,7 @@ public class ComSegment extends Segment {
 			this.mode = mode;
 			file.seek(position);
 		} else {
+			file.seek(position);
 			readData(file, mode);
 		}
 	}

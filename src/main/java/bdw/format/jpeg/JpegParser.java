@@ -38,6 +38,7 @@ import bdw.format.jpeg.segment.UnknownSegment;
 import bdw.format.jpeg.segment.base.SegmentBase;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.format.jpeg.support.Marker;
+import bdw.format.jpeg.support.MarkerRange;
 import bdw.format.jpeg.support.ParseMode;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -162,10 +163,25 @@ public class JpegParser implements Iterable<Object> {
 						newManagerClass = this.newSegmentManagers.get(index);
 						try {
 							Marker markerAnnotation = newManagerClass.getAnnotation(Marker.class);
+							MarkerRange markerRangeAnnotation = newManagerClass.getAnnotation(MarkerRange.class);
 							if ((markerAnnotation != null) && (markerAnnotation.value() == markerByte)) {
 								constructor = newManagerClass.getDeclaredConstructor();
 								try {
 									newManager = (Segment) constructor.newInstance();
+									newManager.readFromFile(file, ParseMode.STRICT);
+									this.segments.add(newManager);
+									consumed = true;
+									break;
+								} catch (Exception e) {
+									newManager = null;
+									canHandle = Boolean.FALSE;
+								}
+							} else if ((markerRangeAnnotation != null) &&
+									(markerByte >= markerRangeAnnotation.first()) &&
+									(markerByte <= markerRangeAnnotation.last())) {
+								constructor = newManagerClass.getDeclaredConstructor(int.class);
+								try {
+									newManager = (Segment) constructor.newInstance(markerByte);
 									newManager.readFromFile(file, ParseMode.STRICT);
 									this.segments.add(newManager);
 									consumed = true;
@@ -275,11 +291,26 @@ public class JpegParser implements Iterable<Object> {
 							newManagerClass = this.newSegmentManagers.get(index);
 							try {
 								Marker markerAnnotation = newManagerClass.getAnnotation(Marker.class);
+								MarkerRange markerRangeAnnotation = newManagerClass.getAnnotation(MarkerRange.class);
 								if ((markerAnnotation != null) && (markerAnnotation.value() == markerByte)) {
 									constructor = newManagerClass.getDeclaredConstructor();
 									try {
 										newManager = (Segment) constructor.newInstance();
 										newManager.readFromStream(dataStream, ParseMode.STRICT);
+										this.segments.add(newManager);
+										consumed = true;
+										break;
+									} catch (Exception e) {
+										newManager = null;
+										canHandle = Boolean.FALSE;
+									}
+								} else if ((markerRangeAnnotation != null) &&
+										(markerByte >= markerRangeAnnotation.first()) &&
+										(markerByte <= markerRangeAnnotation.last())) {
+									constructor = newManagerClass.getDeclaredConstructor(int.class);
+									try {
+										newManager = (Segment) constructor.newInstance(markerByte);
+										newManager.readFromStream(stream, ParseMode.STRICT);
 										this.segments.add(newManager);
 										consumed = true;
 										break;
