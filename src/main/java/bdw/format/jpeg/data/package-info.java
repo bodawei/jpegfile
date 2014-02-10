@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 柏大衛
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,35 @@
  */
 
 /**
- * Provides basic base classes for the JPEG parsing system.
+ * This package contains the super types used to govern all the data classes
+ * in the JPEG system.  The diagram below represents the inheritance hierarchy
+ * of the major types.
+ * <pre>
+ *                      +----------------+
+ *                      |                |
+ *                      |    DataItem    |
+ *                      |                |- ... other types
+ *                      +----------------+
+ *                    /          |         \
+ *  +----------------+  +----------------+  +----------------+
+ *  |                |  |                |  |                |
+ *  |   Component    |  |  EntropyData   |  |     Marker     |
+ *  |                |  |                |  |                |
+ *  +----------------+  +----------------+  +----------------+
+ *         /|\                                  /          \
+ *                                     +----------------+
+ *                                     |                |
+ *                                     | MarkerSegment  |
+ *                                     |                |- ... many other types
+ *                                     +----------------+
+ *                                   /         |          \
+ *                 +----------------+  +----------------+  +----------------+
+ *                 |                |  |                |  |                |
+ *                 | GenericSegment |  |  FrameSegment  |  |  TableSegment  |
+ *                 |                |  |                |  |                |
+ *                 +----------------+  +----------------+  +----------------+
+ *                        /|\                  /\                 /|\
+ * </pre>
  */
 package bdw.format.jpeg.data;
 

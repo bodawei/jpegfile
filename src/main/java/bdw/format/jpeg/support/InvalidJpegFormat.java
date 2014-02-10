@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 柏大衛
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,19 @@
  */
 package bdw.format.jpeg.support;
 
-import java.util.ArrayList;
-
 /**
- *
+ * Special exception used to indicate that a value is not allowable within a
+ * JPEG file. For instance given the current frame mode, one field may not be
+ * able to be set to a requested value.
  */
-public class InvalidJpegFormat extends Exception{
+public class InvalidJpegFormat extends RuntimeException {
 	private static final long serialVersionUID = 1L;
-	
-	private ArrayList<Problem> problems;
 
 	public InvalidJpegFormat(String info) {
 	   super(info);
 	}
 
-	public InvalidJpegFormat(String info, Problem problem) {
-	   super(info);
-	   problems = new ArrayList<Problem>();
-	   problems.add(problem);
+	public InvalidJpegFormat(String info, Throwable cause) {
+	   super(info, cause);
 	}
 }

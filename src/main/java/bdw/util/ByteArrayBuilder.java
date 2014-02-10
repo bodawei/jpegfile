@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 æŸ�å¤§è¡›
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package bdw.util;
 
 import java.util.Arrays;
@@ -21,18 +20,13 @@ import java.util.Arrays;
 /**
  * This is something like a string builder, but instead builds an array
  * of bytes.
- * At this moment, this is a minimal API, and it really needs to be extended
  */
 public class ByteArrayBuilder {
-	// Realistically, this implementation is probably not good, as it
-	// involves a lot of realloc()'s.  Better, I think, if it just kept
-	// an array of array chunks.  But, the implementation should not be
-	// visible from outside this.
-
 	/**
 	 * Amount to realloc the buffer by
 	 */
 	private static final int REALLOC_SIZE = 1024;
+
 	/**
 	 * The buffer we use to keep the array of bytes.
 	 */
@@ -64,7 +58,7 @@ public class ByteArrayBuilder {
 	 */
 	public void append(byte value) {
 		if (dataLength >= buffer.length) {
-			reallocBuffer();
+			buffer = Arrays.copyOf(buffer, buffer.length + ByteArrayBuilder.REALLOC_SIZE);
 		}
 		buffer[dataLength] = value;
 		dataLength++;
@@ -143,9 +137,10 @@ public class ByteArrayBuilder {
 	}
 
 	/**
-	 * Make the buffer larger, if needed.
+	 * @return an array of bytes equivalent to the bytes being built by this
+	 * builder.
 	 */
-	private void reallocBuffer() {
-		buffer = Arrays.copyOf(buffer, buffer.length + ByteArrayBuilder.REALLOC_SIZE);
+	public byte[] toArray() {
+		return Arrays.copyOf(buffer, dataLength);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 柏大衛
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package bdw.io;
 
-import bdw.io.LimitingDataInput;
-import java.io.IOException;
+import java.io.EOFException;
 
 /**
- * Exception to use when to indicate a limitingDataInput has been asked to read
- * more than it can.
+ * Used to indicate a LimitingDatainput has been asked to read beyond its limit.
  */
-public class LimitExceeded extends IOException {
+public class LimitExceeded extends EOFException {
 
    private static final long serialVersionUID = 1L;
 
@@ -42,7 +40,7 @@ public class LimitExceeded extends IOException {
 	 * @param message Exception message
 	 */
 	public LimitExceeded(String message) {
-		this(message, 0, null, null);
+		this(message, 0, null);
 	}
 
 	/**
@@ -53,8 +51,8 @@ public class LimitExceeded extends IOException {
 	 * @param cause An underlying cause of this problem
 	 */
 	public LimitExceeded(String message, int exceededAmount,
-			LimitingDataInput instance, Throwable cause) {
-		super(message, cause);
+			LimitingDataInput instance) {
+		super(message);
 		this.amount = exceededAmount;
 		this.instance = instance;
 	}

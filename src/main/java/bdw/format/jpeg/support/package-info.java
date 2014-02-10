@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 柏大衛
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 /**
  * Classes that are necessary for the functioning of the JPEG parsing system,
- * but not things that a common user of the library will be directly creating.
+ * but not primary parts of the interface
  */
 package bdw.format.jpeg.support;
 

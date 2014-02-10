@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 柏大衛
+ *  Copyright 2014 柏大衛
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,28 @@ package bdw.io;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Wraps another instance of a DataInput interface, but limit how many
- * bytes it may be used to read.  If this is asked to read more than the
- * specified number of bytes, throw an LimitExceeded exception.
+ * Wraps a DataInput instance, and impose a limit on how many bytes may be read.
+ * If this is asked to read more than the specified number of bytes, throw an
+ * LimitExceeded exception.  You can think of this as imposing an artificial
+ * EOF. The purpose of this is where a caller wants to make sure that a callee
+ * doesn't read beyond a particular boundary.
  *
  * If a LimitExceeded exception is throw, you can be certain that all
  * all the bytes up to that limit have been read.  However, if another
- * exception is thrown (e.g. eof), the limit that this imposes may not
- * be in alignment with the number of bytes read. (ICK) To be safe, do
- * not use this instance again if any exception has been thrown.
+ * exception is thrown (e.g. EOFException), the limit may not have been reached.
  *
- * Note: This only wraps the methods defined by the DataInput interface,
- * and not things like read() which may be on a class that implements this.
+ * Note: This this doesn't actually implement all the DataInput methods, but
+ * only enough to support this JPEG system.
  */
-public class LimitingDataInput implements DataInput {
-	
+public class LimitingDataInput extends InputStream implements DataInput {
+
 	private int limit;
 	private DataInput input;
+	private ByteBuffer buffer;
+	private int markLimit;
 
 	/**
 	 * Constructor
@@ -54,7 +57,37 @@ public class LimitingDataInput implements DataInput {
 
 		this.limit = limit;
 		this.input = input;
+		this.buffer = new ByteBuffer();
+	}
 
+	/**
+	 * Put a mark on the input stream.  This allows one to read up to size bytes
+	 * and then reset() back to the current point, and read those bytes again.
+	 *
+	 * @param size The number of bytes to preserve.
+	 */
+	@Override
+	public void mark(int size) {
+		markLimit = limit;
+		buffer.mark(size);
+	}
+
+	/**
+	 * Roll back to the position marked with mark().  Note that if mark() has
+	 * not been called, an exception may be thrown.
+	 */
+	@Override
+	public void reset() throws IOException {
+		buffer.reset();
+		limit = markLimit;
+	}
+
+	/**
+	 * @return true this supports a mark.
+	 */
+	@Override
+	public boolean markSupported() {
+		return true;
 	}
 
 	/**
@@ -65,186 +98,187 @@ public class LimitingDataInput implements DataInput {
 	}
 
 	/**
-	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * Read as many bytes as are in the byte array
 	 */
+	@Override
 	public void readFully(byte[] b) throws IOException {
-
-		throw new UnsupportedOperationException("Not supported yet.");
+		readFully(b, 0, b.length);
 	}
 
 	/**
-	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * Reads len bytes after skipping "off" bytes from the underlying DataInput.
 	 */
+	@Override
 	public void readFully(byte[] b, int off, int len) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet.");
+		skipBytes(off);
+
+		for (int index = 0; index < len; index++) {
+			b[index] = readByte();
+		}
 	}
 
 	/**
-	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * Read and discard "n" bytes from the input
 	 */
+	@Override
 	public int skipBytes(int n) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet.");
+		for (int index = 0; index < n; index++) {
+			readByte();
+		}
+
+		return n;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
+	@Override
 	public boolean readBoolean() throws IOException {
 		if (limit < 1) {
-			throw new LimitExceeded("Reading boolean exceeded read limit", 1, this, null);
-		} else {
-			boolean result = input.readBoolean();
-			limit --;
-			return result;
+			throw new LimitExceeded("Reading boolean exceeded read limit", 1, this);
 		}
+		byte result = readByte();
+
+		return (result == 0) ? false : true;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
+	@Override
+	public int read() throws IOException {
+		int foo = (0xFF & readByte());
+		return foo;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
 	public byte readByte() throws IOException {
 		if (limit < 1) {
-			throw new LimitExceeded("Reading byte exceeded read limit", 1, this, null);
-		} else {
-			byte result = input.readByte();
-			limit --;
-			return result;
+			throw new LimitExceeded("Reading byte exceeded read limit", 1, this);
 		}
+
+		byte result;
+
+		if (buffer.mustRead()) {
+			result = buffer.readByte();
+		} else {
+			result = input.readByte();
+
+			if (buffer.canAdd()) {
+				buffer.addByte(result);
+			}
+		}
+
+		limit --;
+
+		return result;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
+	@Override
 	public int readUnsignedByte() throws IOException {
 		if (limit < 1) {
-			throw new LimitExceeded("Reading unsigned byte exceeded read limit", 1, this, null);
-		} else {
-			int result = input.readUnsignedByte();
-			limit --;
-			return result;
+			throw new LimitExceeded("Reading unsigned byte exceeded read limit", 1, this);
 		}
+
+		byte aByte = readByte();
+
+		return aByte & 0xFF ;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
+	@Override
 	public short readShort() throws IOException {
 		if (limit < 2) {
 			input.skipBytes(limit);
 			int temp = limit;
 			limit = 0;
-			throw new LimitExceeded("Reading short exceeded limit", 2 - temp, this, null);
-		} else {
-			short result = input.readShort();
-			limit -= 2;
-			return result;
+			throw new LimitExceeded("Reading short exceeded limit", 2 - temp, this);
 		}
+
+		byte byteOne = readByte();
+		byte byteTwo = readByte();
+
+		return (short)((byteOne << 8) | (byteTwo & 0xff));
 	}
 
 
 	/**
 	 * @inheritdoc
 	 */
+	@Override
 	public int readUnsignedShort() throws IOException {
 		if (limit < 2) {
 			input.skipBytes(limit);
 			int temp = limit;
 			limit = 0;
-			throw new LimitExceeded("Reading unsigned short exceeded limit", 2 - temp, this, null);
-		} else {
-			int result = input.readUnsignedShort();
-			limit -= 2;
-			return result;
+			throw new LimitExceeded("Reading unsigned short exceeded limit", 2 - temp, this);
 		}
-	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public char readChar() throws IOException {
-		if (limit < 2) {
-			input.skipBytes(limit);
-			int temp = limit;
-			limit = 0;
-			throw new LimitExceeded("Reading char exceeded limit", 2 - temp, this, null);
-		} else {
-			char result = input.readChar();
-			limit -= 2;
-			return result;
-		}
-	}
+		byte byteOne = readByte();
+		byte byteTwo = readByte();
 
-	/**
-	 * @inheritdoc
-	 */
-	public int readInt() throws IOException {
-		if (limit < 4) {
-			input.skipBytes(limit);
-			int temp = limit;
-			limit = 0;
-			throw new LimitExceeded("Reading int exceeded limit", 4 - temp, this, null);
-		} else {
-			int result = input.readInt();
-			limit -= 4;
-			return result;
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public long readLong() throws IOException {
-		if (limit < 8) {
-			input.skipBytes(limit);
-			int temp = limit;
-			limit = 0;
-			throw new LimitExceeded("Reading long exceeded limit", 8 - temp, this, null);
-		} else {
-			long result = input.readLong();
-			limit -= 8;
-			return result;
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public float readFloat() throws IOException {
-		if (limit < 4) {
-			input.skipBytes(limit);
-			int temp = limit;
-			limit = 0;
-			throw new LimitExceeded("Reading float exceeded limit", 4 - temp, this, null);
-		} else {
-			float result = input.readFloat();
-			limit -= 4;
-			return result;
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public double readDouble() throws IOException {
-		if (limit < 8) {
-			input.skipBytes(limit);
-			int temp = limit;
-			limit = 0;
-			throw new LimitExceeded("Reading double exceeded limit", 8 - temp, this, null);
-		} else {
-			double result = input.readDouble();
-			limit -= 8;
-			return result;
-		}
+		int temp =  ((int) 0) | (((byteOne & 0xff) << 8) | (byteTwo & 0xff));
+		return temp;
 	}
 
 	/**
 	 * NOTE: This is not supported at this time
 	 * @throws UnsupportedOperationException
 	 */
+	@Override
+	public char readChar() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * NOTE: This is not supported at this time
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public int readInt() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * NOTE: This is not supported at this time
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public long readLong() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * NOTE: This is not supported at this time
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public float readFloat() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * NOTE: This is not supported at this time
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public double readDouble() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * NOTE: This is not supported at this time
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
 	public String readLine() throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
@@ -253,8 +287,8 @@ public class LimitingDataInput implements DataInput {
 	 * NOTE: This is not supported at this time
 	 * @throws UnsupportedOperationException
 	 */
+	@Override
 	public String readUTF() throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
-
 }

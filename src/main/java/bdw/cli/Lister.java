@@ -1,67 +1,65 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright 2014 柏大衛
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package bdw.cli;
 
-import bdw.format.jpeg.JpegParser;
-import bdw.format.jpeg.data.Segment;
-import bdw.format.jpeg.segment.ComSegment;
-import bdw.format.jpeg.segment.base.SegmentBase;
-import java.io.File;
+import bdw.format.jpeg.JpegData;
+import bdw.format.jpeg.data.DataItem;
+import bdw.format.jpeg.data.EntropyData;
+import bdw.format.jpeg.data.Marker;
+import bdw.format.jpeg.marker.ComSegment;
+import java.io.RandomAccessFile;
 
 /**
- *
- * @author bodawei
+ * Simple hacky routine which will read a JPEG file and write out what markers
+ * are in it.
  */
 public class Lister {
-
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args)  {
-        JpegParser parser = new JpegParser();
-		parser.addStandardSegments();
+        JpegData parser = new JpegData();
 		try {
-			parser.readFromFile(new File(args[0]));
+			RandomAccessFile file = new RandomAccessFile(args[0], "r");
+			try {
+				parser.read(file);
+			} catch (Exception e) {
+				System.out.println("EXCEPTION: " + e);
+				e.printStackTrace();
+			}
 			if ( ! parser.isValid()) {
 				System.out.println("INVALID FILE: " + args[0]);
-			}
-			for (Object sgmt : parser) {
-				if (sgmt instanceof SegmentBase) {
-					SegmentBase base = (SegmentBase) sgmt;
-					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
+				for (Exception e : parser.validate()) {
+					System.out.println("PROBLEM: " + e.getMessage());
 				}
-				if (sgmt instanceof Segment) {
-					Segment base = (Segment) sgmt;
-					System.out.println("Segment: " + base.getClass().getSimpleName() + " - " + base.getMarker());
+			}
+			for (DataItem item : parser) {
+				if (item instanceof Marker) {
+					Marker base = (Marker) item;
+					System.out.println("Marker: " + base.getClass().getSimpleName() + " - " + base.getMarkerId());
 					if (base instanceof ComSegment) {
 						ComSegment segment = (ComSegment) base;
 						String s = segment.getStringComment();
 						System.out.println("\t\tComment: " + s);
 					}
+				} else if (item instanceof EntropyData) {
+				//	System.out.println("        Entropy data (" + ((EntropyData)item).getData().length + " bytes)");
 				}
-//				if (base instanceof DataSegment) {
-//					DataSegment segment = (DataSegment) base;
-//					System.out.println("\t\tLength: " + segment.getDataLength());
-//				} else if (base instanceof JunkSegment) {
-//					JunkSegment segment = (JunkSegment) base;
-//					System.out.println("\t\tLength: " + segment.getDataLength());
-//					System.out.println("\t\tBytes 0-1: " + segment.getDataAt(0) + " " + segment.getDataAt(1));
-//				} else if (base instanceof AppNSegment) {
-//					AppNSegment segment = (AppNSegment) base;
-//					System.out.println("\t\tLength: " + segment.getBytes().length);
-//					System.out.println("\t\tBytes 0-1: " + segment.getBytes()[0] + " " + segment.getBytes()[1]);
-//					System.out.println("\t\tBytes last two: " + segment.getBytes()[segment.getBytes().length-2] + " " + segment.getBytes()[segment.getBytes().length-1]);
-//				}
 			}
 		} catch (Exception ex) {
 			System.out.println("EXCEPTION: " + ex);
 			ex.printStackTrace();
 		}
-
-
     }
 
 }
