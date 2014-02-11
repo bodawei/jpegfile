@@ -22,7 +22,6 @@ import bdw.format.jpeg.support.DataMode;
 import bdw.format.jpeg.support.InvalidJpegFormat;
 import bdw.io.LimitingDataInput;
 import bdw.util.Size;
-import com.sun.jdi.InvalidStackFrameException;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
