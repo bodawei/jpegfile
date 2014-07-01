@@ -9,6 +9,12 @@ Some examples of when you would use it would make it clear when and why you woul
 * You want to dig through a JPEG file and understand what is in it: This library is also great for yo!
 * You have an raw bitmapped image that you want to turn into a JPEG file: This library won't help you.
 
+Example Uses
+------------
+
+In the bin directory are a couple shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
+    bin/jpegLister.sh bin/example.jpg
+
 Version and Legal Stuff
 -----------------------
 
@@ -31,12 +37,6 @@ History
 Some time ago, I thought "Wouldn't it be great to add some metadata to all my JPEG files? I know there's some way to do that. I thought it would be easy to find a Java library which let me open my files and add the relevant metadata. However, I didn't find anything.  "Gosh, the world really needs this!" I figured.  So, I started reverse engineering the JPEG format. I got progressively more interested, found the book *JPEG Still Image Data Compression Standard*, and over time build this library which should read in any JPEG file and allow you access to all the internal data structures
 
 Of course, during this process, I realized that much of the info I wanted was in EXIF or related data formats which aren't part of JPEG itself. So, ironically, this doesn't actually solve my original problem fully.  But, this is a great foundation and it should be relatively easy to add those others on top of this.
-
-Example Uses
-------------
-
-In the bin directory are a couple shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.
-
 
 Design Architecture
 -------------------

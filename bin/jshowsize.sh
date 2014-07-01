@@ -4,7 +4,7 @@
 # > cat myFile.txt | hex2bin > binFile
 
 BINDIR="`dirname $0`"
-JARFILE="$BINDIR/../target/jpegfile-0.1-SNAPSHOT.jar"
+JARFILE="$BINDIR/../target/jpegfile-0.9-SNAPSHOT.jar"
 
 if [ ! -e ${JARFILE} ]
 then

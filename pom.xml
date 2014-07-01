@@ -4,7 +4,7 @@
   <groupId>bdw</groupId>
   <artifactId>jpegfile</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.9-SNAPSHOT</version>
   <name>JPEG File</name>
   <url>http://maven.apache.org</url>
     <build>

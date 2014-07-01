@@ -28,6 +28,12 @@ import java.io.RandomAccessFile;
  */
 public class Lister {
     public static void main(String[] args)  {
+		if (args.length != 1) {
+			System.out.println("This simple demo utility must be called with a JPEG file. For example:");
+			System.out.println("    bin/jpegLister.sh myWonderfulJpegFile.jpg");
+			return;
+		}
+
         JpegData parser = new JpegData();
 		try {
 			RandomAccessFile file = new RandomAccessFile(args[0], "r");
