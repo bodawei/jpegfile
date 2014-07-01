@@ -13,6 +13,7 @@ Example Uses
 ------------
 
 In the bin directory are a couple shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
+
     bin/jpegLister.sh bin/example.jpg
 
 Version and Legal Stuff
