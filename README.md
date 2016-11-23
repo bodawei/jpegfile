@@ -9,12 +9,22 @@ Some examples of when you would use it would make it clear when and why you woul
 * You want to dig through a JPEG file and understand what is in it: This library is also great for yo!
 * You have an raw bitmapped image that you want to turn into a JPEG file: This library won't help you.
 
+Building
+------------
+
+* Install a Java JRE or JDK if you don't already have it
+* Install Apache Maven <https://maven.apache.org/>
+* cd JPEGFile
+* mvn package
+
 Example Uses
 ------------
 
-In the bin directory are a couple shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
+In the bin directory are two shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
 
-    bin/jpegLister.sh bin/example.jpg
+    ./bin/jpegLister.sh ./bin/example.jpg
+    
+    ./bin/jshowsize.sh ./bin/example.jpg
 
 Version and Legal Stuff
 -----------------------
