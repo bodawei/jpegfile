@@ -20,11 +20,45 @@ Building
 Example Uses
 ------------
 
-In the bin directory are two shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
+In the bin directory are three shell scripts that use this library to do some simple work with JPEG files.  They might be a good place to start to see what this library can do.  None of them will alter your original file.  You can run them with:
 
     ./bin/jpegLister.sh ./bin/example.jpg
     
     ./bin/jshowsize.sh ./bin/example.jpg
+    
+    ./bin/addComment.sh ./bin/example.jpg newfile.jpg "Hello World!"
+
+The code for the latter demonstrates how easy it is to manipulate a JPEG file (error checking not shown here):
+
+    public class AddComment {
+
+        public static void main(String[] args)  {
+
+           // Read in the jpeg file
+           JpegData parser = new JpegData();
+           RandomAccessFile file = new RandomAccessFile(args[0], "r");
+           parser.read(file);
+
+           // Create a comment segment to add to the file
+           ComSegment comment = new ComSegment();
+           comment.setStringComment(args[2]);
+           
+           // Add the comment to the parsed results.
+           // We put it after position 0 since 0 will be
+           // the marker for the start of the image
+           parser.insertItem(1, comment);
+
+           // Write out the new image (take a look at it
+           // with jpegLister.sh or your favorite JPEG tool
+           // or just cat the file to see the string.
+           FileOutputStream out = new FileOutputStream(args[1]);
+           parser.write(out);
+           out.close();
+       }
+
+    }
+
+(Credit for the idea for this good example goes to [Alexander Zagnitov](https://github.com/azagniotov/stubby4j) (Thanks for the excellent suggestion!))
 
 Version and Legal Stuff
 -----------------------
