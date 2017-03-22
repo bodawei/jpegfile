@@ -58,7 +58,7 @@ The code for the latter demonstrates how easy it is to manipulate a JPEG file (e
 
     }
 
-(Credit for the idea for this good example goes to [Alexander Zagnitov](https://github.com/azagniotov/stubby4j) (Thanks for the excellent suggestion!))
+(Credit for the idea for this good example goes to [Alexander Zagniotov](https://github.com/azagniotov/stubby4j) (Thanks for the excellent suggestion!))
 
 Version and Legal Stuff
 -----------------------
