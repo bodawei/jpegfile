@@ -33,27 +33,23 @@ The code for the latter demonstrates how easy it is to manipulate a JPEG file (e
     public class AddComment {
 
         public static void main(String[] args)  {
+           RandomAccessFile file = new RandomAccessFile(args[0], "r");
+           FileOutputStream out = new FileOutputStream(args[1]);
 
            // Read in the jpeg file
            JpegData parser = new JpegData();
-           RandomAccessFile file = new RandomAccessFile(args[0], "r");
            parser.read(file);
 
            // Create a comment segment to add to the file
            ComSegment comment = new ComSegment();
            comment.setStringComment(args[2]);
            
-           // Add the comment to the parsed results.
-           // We put it after position 0 since 0 will be
-           // the marker for the start of the image
+           // Add the comment to the parsed results after position 0
+           // (0 is always the marker for the start of image)
            parser.insertItem(1, comment);
 
-           // Write out the new image (take a look at it
-           // with jpegLister.sh or your favorite JPEG tool
-           // or just cat the file to see the string.
-           FileOutputStream out = new FileOutputStream(args[1]);
+           // Write out the new image
            parser.write(out);
-           out.close();
        }
 
     }

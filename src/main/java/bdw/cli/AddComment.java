@@ -34,10 +34,12 @@ public class AddComment {
 			return;
 		}
 
-		try {
+		try (
+			RandomAccessFile file = new RandomAccessFile(args[0], "r");
+         FileOutputStream out = new FileOutputStream(args[1]);
+      ) {
          // read in the JPEG file
          JpegData parser = new JpegData();
-			RandomAccessFile file = new RandomAccessFile(args[0], "r");
          parser.read(file);
 
 			if (!parser.isValid()) {
@@ -61,10 +63,7 @@ public class AddComment {
          parser.insertItem(1, comment);
 
          // Write out the image
-         FileOutputStream out = new FileOutputStream(args[1]);
          parser.write(out);
-         out.close();
-
 		} catch (Exception ex) {
 			System.out.println("EXCEPTION: " + ex);
 			ex.printStackTrace();
