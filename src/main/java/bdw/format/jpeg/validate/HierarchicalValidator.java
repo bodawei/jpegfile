@@ -41,7 +41,7 @@ public class HierarchicalValidator extends HasFrameValidator {
 	};
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate(List<DataItem> elements) {

@@ -256,7 +256,7 @@ public abstract class DataItem {
 	 * they are currently valid.
 	 *
 	 * @param stream a non-null stream to write data to.
-	 * @throw IOException if a problem was encountered while writing
+	 * @throws IOException if a problem was encountered while writing
 	 * */
 	public void write(OutputStream stream) throws IOException {
 		if (stream == null) {

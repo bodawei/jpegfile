@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Defines an JFIF APP0 "JFIF" segment.
  *
- * @see http://www.w3.org/Graphics/JPEG/jfif3.pdf
+ * @see <a href="http://www.w3.org/Graphics/JPEG/jfif3.pdf">http://www.w3.org/Graphics/JPEG/jfif3.pdf</a>
  */
 @MarkerId(JfifSegment.MARKERID)
 public class JfifSegment extends MarkerSegment {
@@ -175,7 +175,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -183,7 +183,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -232,7 +232,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {
@@ -244,7 +244,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {
@@ -257,7 +257,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput input) throws IOException {
@@ -283,7 +283,7 @@ public class JfifSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream stream) throws IOException {

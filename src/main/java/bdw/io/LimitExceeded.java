@@ -48,7 +48,6 @@ public class LimitExceeded extends EOFException {
 	 * @param message Exception message
 	 * @param exceededAmount Number of bytes exceeded (0 means unknown)
 	 * @param instance The object that couldn't read in the bytes
-	 * @param cause An underlying cause of this problem
 	 */
 	public LimitExceeded(String message, int exceededAmount,
 			LimitingDataInput instance) {

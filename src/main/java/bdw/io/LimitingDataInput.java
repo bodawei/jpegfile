@@ -130,7 +130,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean readBoolean() throws IOException {
@@ -143,7 +143,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int read() throws IOException {
@@ -152,7 +152,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public byte readByte() throws IOException {
@@ -178,7 +178,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int readUnsignedByte() throws IOException {
@@ -192,7 +192,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public short readShort() throws IOException {
@@ -211,7 +211,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int readUnsignedShort() throws IOException {
@@ -231,7 +231,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public char readChar() throws IOException {
@@ -240,7 +240,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public int readInt() throws IOException {
@@ -249,7 +249,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public long readLong() throws IOException {
@@ -258,7 +258,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public float readFloat() throws IOException {
@@ -267,7 +267,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public double readDouble() throws IOException {
@@ -276,7 +276,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public String readLine() throws IOException {
@@ -285,7 +285,7 @@ public class LimitingDataInput extends InputStream implements DataInput {
 
 	/**
 	 * NOTE: This is not supported at this time
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If this is directly called.
 	 */
 	@Override
 	public String readUTF() throws IOException {

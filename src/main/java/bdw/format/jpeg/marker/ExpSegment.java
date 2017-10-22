@@ -75,7 +75,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -83,7 +83,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -97,7 +97,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -116,7 +116,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -127,7 +127,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput input) throws IOException {
@@ -141,7 +141,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream stream) throws IOException {
@@ -152,7 +152,7 @@ public class ExpSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

@@ -71,7 +71,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -79,7 +79,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -103,7 +103,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -113,7 +113,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput input) throws IOException {
@@ -124,7 +124,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream stream) throws IOException {
@@ -133,7 +133,7 @@ public class DriSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

@@ -99,7 +99,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -107,7 +107,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput source) throws IOException {
@@ -120,7 +120,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream stream) throws IOException {
@@ -131,7 +131,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -145,7 +145,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -161,7 +161,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -173,7 +173,7 @@ public class SosComponentSpec extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

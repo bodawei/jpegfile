@@ -207,7 +207,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -219,7 +219,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Note: In STRICT mode, if a marker segment has a problem, this will not
 	 * read it in. After reading all marker segments in, a syntax check across
@@ -309,7 +309,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Note: In STRICT mode, if a marker segment has a problem, this will not
 	 * read it in. After reading all marker segments in, a syntax check across
@@ -408,7 +408,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void write(OutputStream stream) throws IOException {
@@ -418,7 +418,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -432,7 +432,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void clearPassthrough() {
@@ -448,7 +448,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -481,7 +481,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {
@@ -493,7 +493,7 @@ public class JpegData extends DataItem implements Iterable<DataItem> {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

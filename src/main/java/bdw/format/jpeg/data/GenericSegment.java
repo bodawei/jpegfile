@@ -34,6 +34,7 @@ public class GenericSegment extends MarkerSegment {
 
 	/**
 	 * construct the instance
+    * @param markerId Id of the marker.
 	 */
 	public GenericSegment(int markerId) {
 		super(markerId);
@@ -41,7 +42,7 @@ public class GenericSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -67,7 +68,7 @@ public class GenericSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -83,7 +84,7 @@ public class GenericSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput input) throws IOException {
@@ -97,7 +98,7 @@ public class GenericSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream output) throws IOException {

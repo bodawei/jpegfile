@@ -49,7 +49,7 @@ public class JfifValidator extends NonHierarchicalValidator {
 	};
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate(List<DataItem> elements) {
@@ -113,6 +113,9 @@ public class JfifValidator extends NonHierarchicalValidator {
 
 	/**
 	 * Check that the SOF component matches the spec requirements for parameter values
+    * @param sof The SOF Component to examine
+    * @param problems Where to add any problems found
+    * @param thumbnail Whether this is a thumbnail or images.
 	 */
 	protected void checkComponents(SofSegment sof, List<Exception> problems, boolean thumbnail) {
 		String prefix = "JFIF " + (thumbnail ? "thumbnail" : "images");

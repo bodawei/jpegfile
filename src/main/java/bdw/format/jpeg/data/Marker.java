@@ -68,7 +68,7 @@ public abstract class Marker extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Writes however many leading 0xFF, as well as the required 0xFF byte and
 	 * marker ID.
@@ -85,7 +85,7 @@ public abstract class Marker extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -99,7 +99,7 @@ public abstract class Marker extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {

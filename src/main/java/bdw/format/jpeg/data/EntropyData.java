@@ -69,7 +69,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(RandomAccessFile file) throws IOException {
@@ -113,7 +113,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(InputStream stream) throws IOException {
@@ -160,7 +160,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void write(OutputStream stream) throws IOException {
@@ -178,7 +178,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -193,7 +193,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 * If read() found a trailing 0xFF, this will unset that, so that writing it
 	 * back out will write 0xFF 0x00
 	 */
@@ -204,7 +204,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -223,7 +223,7 @@ public class EntropyData extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

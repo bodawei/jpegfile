@@ -104,7 +104,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -112,7 +112,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput input) throws IOException {
@@ -124,7 +124,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream output) throws IOException {
@@ -135,7 +135,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -150,7 +150,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -170,7 +170,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -182,7 +182,7 @@ public class DacConditioningTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

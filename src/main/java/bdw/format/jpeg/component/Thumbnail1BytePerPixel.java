@@ -69,7 +69,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -148,7 +148,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput input) throws IOException {
@@ -171,7 +171,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream output) throws IOException {
@@ -194,7 +194,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -207,7 +207,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -224,7 +224,7 @@ public class Thumbnail1BytePerPixel extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {

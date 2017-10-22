@@ -37,11 +37,12 @@ public class ResNSegment extends GenericSegment {
 
 	/**
 	 * Constructs an instance with all properties empty
+    * @param markerId The MarkerID
 	 */
-	public ResNSegment(int marker) {
-		super(marker);
-		if (marker < FIRST_MARKERID || marker > LAST_MARKERID) {
-			throw new IllegalArgumentException("Marker out of range. Found " + marker);
+	public ResNSegment(int markerId) {
+		super(markerId);
+		if (markerId < FIRST_MARKERID || markerId > LAST_MARKERID) {
+			throw new IllegalArgumentException("Marker out of range. Found " + markerId);
 		}
 	}
 

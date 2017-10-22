@@ -126,7 +126,7 @@ public class SosSegment extends MarkerSegment {
 
 	/**
 	 * Sets the end spectral selection value
-	 * @param start a value between 0 and 255 indicating the start
+	 * @param end a value between 0 and 255 indicating the end
 	 */
 	public void setSpectralSelectionEnd(int end) {
 		spectralSelectionEndBounds.throwIfInvalid(end, getFrameMode(), getDataMode());
@@ -144,7 +144,7 @@ public class SosSegment extends MarkerSegment {
 
 	/**
 	 * Sets the end spectral selection value
-	 * @param start a value between 0 and 255 indicating the start
+	 * @param approx a value between 0 and 255 indicating the start
 	 */
 	public void setSuccessiveApproximationHigh(int approx) {
 		successiveApproximationHighBounds.throwIfInvalid(approx, getFrameMode(), getDataMode());
@@ -161,7 +161,7 @@ public class SosSegment extends MarkerSegment {
 
 	/**
 	 * Sets the end spectral selection value
-	 * @param start a value between 0 and 255 indicating the start
+	 * @param approx a value between 0 and 255 indicating the start
 	 */
 	public void setSuccessiveApproximationLow(int approx) {
 		successiveApproximationLowBounds.throwIfInvalid(approx, getFrameMode(), getDataMode());
@@ -201,7 +201,7 @@ public class SosSegment extends MarkerSegment {
 
 	/**
 	 * @param index The index to put the new componentSpec (others are moved "right"
-	 * @param component The componentSpec to add
+	 * @param componentSpec The componentSpec to add
 	 */
 	public void insertComponentSpec(int index, SosComponentSpec componentSpec) throws
 			IndexOutOfBoundsException {
@@ -222,7 +222,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -230,7 +230,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -251,7 +251,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -280,7 +280,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -294,7 +294,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput dataSource) throws IOException {
@@ -318,7 +318,7 @@ public class SosSegment extends MarkerSegment {
 		setSuccessiveApproximationLow(Nibble.getLower(approximation));
 	}
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream stream) throws IOException {
@@ -337,7 +337,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {
@@ -352,7 +352,7 @@ public class SosSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {

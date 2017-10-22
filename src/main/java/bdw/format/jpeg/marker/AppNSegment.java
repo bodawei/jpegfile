@@ -38,6 +38,7 @@ public class AppNSegment extends GenericSegment {
 
 	/**
 	 * Constructs an instance with all properties empty
+    * @param markerId The MarkerID
 	 */
 	public AppNSegment(int markerId) {
 		super(markerId);
@@ -47,14 +48,14 @@ public class AppNSegment extends GenericSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	public void setBytes(byte[] bytes) {
 		setByteArray(bytes);
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	public byte[] getBytes() {
 		return getByteArray();

@@ -63,7 +63,7 @@ public class MarkerSegment extends Marker {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 * @return The number of bytes this segment takes up on disk
 	 */
 	@Override
@@ -72,7 +72,7 @@ public class MarkerSegment extends Marker {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(RandomAccessFile file) throws IOException {
@@ -92,12 +92,12 @@ public class MarkerSegment extends Marker {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Reads the segment size, then any other parameters, and finally any trailing
 	 * bytes.
 	 *
-	 * @param file The file to read from (not null)
+	 * @param stream The file to read from (not null)
 	 *
 	 * @throws IOException If something really unexpected happens when reading.
 	 */
@@ -119,7 +119,7 @@ public class MarkerSegment extends Marker {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Writes out the size, then any other parameters for the segment, and then
 	 * the trailing bytes.
@@ -143,7 +143,7 @@ public class MarkerSegment extends Marker {
 	}
 
 	/*
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Clears any trailing bytes.
 	 */
@@ -154,7 +154,7 @@ public class MarkerSegment extends Marker {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {

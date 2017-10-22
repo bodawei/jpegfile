@@ -62,6 +62,7 @@ public class SofSegment extends FrameSegment {
 
 	/**
 	 * Constructs an instance with all properties empty
+    * @param markerId The Marker ID
 	 */
 	public SofSegment(int markerId) {
 		super(markerId);

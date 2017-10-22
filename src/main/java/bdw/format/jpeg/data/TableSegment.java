@@ -38,13 +38,15 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 
 	/**
 	 * Constructor.  What a surprise.
+    *
+    * @param markerId Id of the marker.
 	 */
 	public TableSegment(int markerId) {
 		super(markerId);
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -105,7 +107,7 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -154,7 +156,7 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void readParameters(LimitingDataInput input) throws IOException {
@@ -177,7 +179,7 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeParameters(DataOutputStream stream) throws IOException {
@@ -189,7 +191,7 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {
@@ -202,6 +204,7 @@ abstract public class TableSegment<E extends Component> extends MarkerSegment im
 
 	/**
 	 * Subclasses must override this to create a new entry instance.
+    * @return E
 	 */
 	abstract protected E createTable();
 }

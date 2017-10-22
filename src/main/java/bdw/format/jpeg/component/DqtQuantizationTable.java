@@ -102,7 +102,7 @@ public class DqtQuantizationTable extends Component  {
 	 * Values for this can be 0 or 1, except in baseline mode where only 0 is
 	 * allowed, and lossless mode where this is ignored (any value can be set)
 	 *
-	 * @param 0, 1, null, or any value depending on the frame mode.
+	 * @param precision 0, 1, null, or any value depending on the frame mode.
 	 */
 	public void setElementPrecision(Integer precision) {
 		if (precision == null) {
@@ -177,7 +177,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -185,7 +185,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput source) throws IOException {
@@ -205,7 +205,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream output) throws IOException {
@@ -225,7 +225,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -248,7 +248,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -281,7 +281,7 @@ public class DqtQuantizationTable extends Component  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

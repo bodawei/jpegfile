@@ -45,8 +45,8 @@ public class Hex2Bin {
 	 * Using any configuration properties set on the instance, convert the contents of
 	 * the input stream to the output stream.
 	 *
-	 * @param input The stream to read characters from (not null)
-	 * @param outputStream The stream to write the binary representation to (not null)
+	 * @param inputStream The stream to read characters from (not null)
+	 * @param output The stream to write the binary representation to (not null)
 	 * @throws IOException If something goes wonky on io.
 	 * @throws IllegalArgumentException If either argument is null
 	 */

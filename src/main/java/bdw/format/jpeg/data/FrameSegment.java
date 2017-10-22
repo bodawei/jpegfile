@@ -71,13 +71,15 @@ public class FrameSegment extends MarkerSegment {
 
 	/**
 	 * Constructs an instance with all properties empty
+    *
+    * @param markerId Id of the marker.
 	 */
 	public FrameSegment(int markerId) {
 		super(markerId);
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -178,7 +180,7 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -198,7 +200,7 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -238,7 +240,7 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {
@@ -253,7 +255,7 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * @param dataSource The input source to read from
 	 *
@@ -291,9 +293,9 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
-	 * @param output The stream to write out to
+	 * @param stream The stream to write out to
 	 * @throws IOException If any errors occur
 	 */
 	@Override
@@ -348,7 +350,7 @@ public class FrameSegment extends MarkerSegment {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {

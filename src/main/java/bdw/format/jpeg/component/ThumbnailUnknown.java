@@ -38,7 +38,7 @@ public class ThumbnailUnknown extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -61,7 +61,7 @@ public class ThumbnailUnknown extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -74,7 +74,7 @@ public class ThumbnailUnknown extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -84,7 +84,7 @@ public class ThumbnailUnknown extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput input) throws IOException {
@@ -111,7 +111,7 @@ public class ThumbnailUnknown extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream output) throws IOException {

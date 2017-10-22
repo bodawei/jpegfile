@@ -49,6 +49,11 @@ public class HasFrameValidator extends Validator {
 
 	/**
 	 * Validates a frame
+    * @param elements The DataItems to use
+    * @param startIndex The index to start at
+    * @param hierarchical True if this is hierarchical
+    * @param problems Problems that are found
+    * @return The index
 	 */
 	protected int validateFrame(List<DataItem> elements, int startIndex, boolean hierarchical, List<Exception> problems) {
 		State state = State.WANT_TABLES_OR_SOF;

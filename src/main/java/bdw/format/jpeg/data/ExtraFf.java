@@ -59,7 +59,7 @@ public class ExtraFf extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * Writes however many leading 0xFF, as well as the required 0xFF byte and
 	 * marker ID.
@@ -77,7 +77,7 @@ public class ExtraFf extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {

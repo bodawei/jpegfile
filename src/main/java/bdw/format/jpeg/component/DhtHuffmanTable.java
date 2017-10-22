@@ -78,7 +78,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @param class of the table
+	 * @param newClass of the table
 	 */
 	public void setTableClass(int newClass) {
 		tableClassBounds.throwIfInvalid(newClass, this.getFrameMode(), this.getDataMode());
@@ -94,7 +94,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @param id The id for this table.
+	 * @param newId The id for this table.
 	 */
 	public void setTableId(int newId) {
 		tableIdBounds.throwIfInvalid(newId, this.getFrameMode(), this.getDataMode());
@@ -150,7 +150,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -163,7 +163,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void readParameters(DataInput source) throws IOException {
@@ -194,7 +194,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void writeParameters(DataOutputStream output) throws IOException {
@@ -212,7 +212,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<Exception> validate() {
@@ -232,7 +232,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -268,7 +268,7 @@ public class DhtHuffmanTable extends Component {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void checkModeChange() {

@@ -52,7 +52,6 @@ public class Validator {
 
 	/**
 	 * @param elements A list of DataItems
-	 * @param mode  A DataMode
 	 * @return a list of Exceptions. This will be empty if there are no problems,
 	 *			and it will have one Exception for each validity problem found in
 	 *			the items
@@ -64,6 +63,9 @@ public class Validator {
 	/**
 	 * Adds an exception to the list of problems indicating the caller expected
 	 * to find expectedName, but instead found something else.
+    * @param problems A List to store any problems found
+    * @param expectedName The name that is expected
+    * @param found The item found
 	 */
 	protected void addUnexpectedProblem(List<Exception> problems, String expectedName, DataItem found) {
 		InvalidJpegFormat problem;

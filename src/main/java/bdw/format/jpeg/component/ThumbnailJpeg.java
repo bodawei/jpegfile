@@ -35,7 +35,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getSizeOnDisk() {
@@ -58,7 +58,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(RandomAccessFile file) throws IOException {
@@ -66,7 +66,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(InputStream stream) throws IOException {
@@ -75,7 +75,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void write(OutputStream stream) throws IOException {
@@ -83,7 +83,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -95,7 +95,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
@@ -105,7 +105,7 @@ public class ThumbnailJpeg extends Thumbnail  {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void	changeChildrenModes() {

@@ -31,7 +31,7 @@ import java.io.RandomAccessFile;
 public class Component extends DataItem {
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(RandomAccessFile file) throws IOException {
@@ -39,7 +39,7 @@ public class Component extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void read(InputStream stream) throws IOException {
@@ -59,7 +59,7 @@ public class Component extends DataItem {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 *
 	 * @param stream The stream to write to
 	 * @throws IOException If an io problem happens.
@@ -77,6 +77,7 @@ public class Component extends DataItem {
 	 * they want to use a DataOutputStream.
 	 *
 	 * @param output The stream to write to.
+    * @throws IOException if an IO Exception happens
 	 */
 	public void writeParameters(DataOutputStream output) throws IOException {
 	}
