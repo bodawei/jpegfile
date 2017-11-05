@@ -22,5 +22,5 @@ then
 	exit 1;
 fi;
 
-java -classpath ${JARFILE} bdw.cli.ShowSize "$@"
+java -classpath ${JARFILE} com.davidjohnburrowes.cli.ShowSize "$@"
 

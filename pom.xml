@@ -7,12 +7,12 @@
 
   <groupId>com.davidjohnburrowes</groupId>
   <artifactId>jpegfile</artifactId>
-  <version>0.9.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <packaging>jar</packaging>
 
-  <name>JPEG File</name>
-  <description>A java library to take apart and assemble jpeg files</description>
+  <name>jpegfile</name>
+  <description>A java library to take apart and assemble JPEG files</description>
   <url>https://github.com/bodawei/JPEGFile</url>
 
   <licenses>
@@ -32,10 +32,21 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/simpligility/ossrh-demo.git</connection>
+    <connection>scm:git:ssh://github.com:bodawei/JPEGFile.git</connection>
     <developerConnection>scm:git:ssh://github.com:bodawei/JPEGFile.git</developerConnection>
     <url>http://github.com/bodawei/JPEGFile/tree/master</url>
   </scm>
+
+   <distributionManagement>
+   <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+   </snapshotRepository>
+   <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+   </repository>
+   </distributionManagement>
 
   <build>
     <plugins>

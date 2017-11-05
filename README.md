@@ -1,20 +1,37 @@
-JPEGFile
+jpegfile
 ========
 
-JPEGFile is a library for reading and writing JPEG files at a fairly low level.
+jpegfile is a library for reading and writing JPEG files at a low level.
 
 Some examples of when you would use it would make it clear when and why you would use it:
 
 * You have an existing JPEG file that you want to open, and add a textual comment into it: This library is great for that!
-* You want to dig through a JPEG file and understand what is in it: This library is also great for yo!
+* You want to dig through a JPEG file and understand what is in it: This library is also great for you!
 * You have an raw bitmapped image that you want to turn into a JPEG file: This library won't help you.
+
+Accessing
+------------
+If you use maven, or something maven compatible, you can access this via:
+
+```
+<project>
+  <dependencies>
+    <dependency>
+        <groupId>com.davidjohnburrowes</groupId>
+        <artifactId>jpegfile</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+</project>
+
+```
 
 Building
 ------------
 
 * Install a Java JRE or JDK if you don't already have it
 * Install Apache Maven <https://maven.apache.org/>
-* cd JPEGFile
+* cd jpegfile
 * mvn package
 
 Example Uses
@@ -131,11 +148,11 @@ Entropy data
 EOI
 ~~~
 
-### About the JPEGFile architecture ###
+### About the jpegfile architecture ###
 
 All the interesting classes in this library descend from DataItem. This defines a common interface and common behavior for all chunks of data that make up a JPEG file (I use the word "file" loosely here. This can deal with an in-memory stream as well as a file on disk).  There's an extensive comment at the start of DataItem which not only discusses it, but the various modes of behavior it supports (you may begin to want to read the JPEG standard to understand all of that, I'm afraid)
 
-At the lower level, the JPEGFile library has a set of classes that represent the individual markers and marker segments. Thus, there is a class that represent the SOI (Start of Image) marker, a class that represents an SOF (Start of Frame) marker segment, a class that represents a JFIF Segment. These are ignorant of any greater context.  You can instantiate one and hand-set all the properties of the instance, or you can read a series of bytes (arranged according to the JPEG standard) from a file or a stream to populate it.
+At the lower level, the jpegfile library has a set of classes that represent the individual markers and marker segments. Thus, there is a class that represent the SOI (Start of Image) marker, a class that represents an SOF (Start of Frame) marker segment, a class that represents a JFIF Segment. These are ignorant of any greater context.  You can instantiate one and hand-set all the properties of the instance, or you can read a series of bytes (arranged according to the JPEG standard) from a file or a stream to populate it.
 
 There are also a set of classes that descend from "Component" (not awt.Component). These are just pieces of the MarkerSegments.  For instance, a DAC (Define Arithmetic Coding) segment is made up of a set of tables, and each table is represented as an instance of a DacConditioningTable instance.
 

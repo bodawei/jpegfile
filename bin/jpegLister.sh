@@ -22,5 +22,5 @@ then
 	exit 1;
 fi;
 
-java -classpath ${JARFILE} bdw.cli.Lister "$@"
+java -classpath ${JARFILE} com.davidjohnburrowes.cli.Lister "$@"
 
